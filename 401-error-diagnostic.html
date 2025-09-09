@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚨 URGENT: Supabase 401 Error Diagnostics</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { 
+            color: #ff4444; 
+            text-align: center; 
+            text-shadow: 0 0 10px #ff4444;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0.5; } }
+        .status { 
+            margin: 10px 0; 
+            padding: 15px; 
+            border-left: 4px solid #00ff00; 
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+        .error { border-left-color: #ff0000; color: #ff6666; background: #2a1a1a; }
+        .warning { border-left-color: #ffaa00; color: #ffcc66; background: #2a2a1a; }
+        .success { border-left-color: #00ff00; color: #66ff66; background: #1a2a1a; }
+        button { 
+            background: #333; 
+            color: #00ff00; 
+            border: 2px solid #00ff00; 
+            padding: 15px 30px; 
+            margin: 10px; 
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        button:hover { background: #00ff00; color: #000; }
+        pre { 
+            background: #2a2a2a; 
+            padding: 20px; 
+            overflow-x: auto; 
+            border-radius: 5px;
+            border: 1px solid #444;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .critical { 
+            background: #ff1a1a; 
+            color: #fff; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .solution { 
+            background: #1a4d1a; 
+            color: #66ff66; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+        .test-section {
+            background: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 CRITICAL: SUPABASE 401 ERROR DIAGNOSTIC 🚨</h1>
+        
+        <div class="critical">
+            ⚠️ ALL DATABASE REQUESTS ARE FAILING WITH 401 UNAUTHORIZED ⚠️<br>
+            This means either tables don't exist OR permissions are misconfigured
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 IMMEDIATE DIAGNOSTIC TESTS</h2>
+            <div id="status-container">
+                <div class="status warning">⏳ Ready to run diagnostics...</div>
+            </div>
+            
+            <button onclick="testBasicConnection()">🔌 Test Basic Connection</button>
+            <button onclick="testTableAccess()">🗄️ Test Table Access</button>
+            <button onclick="testPermissions()">🔐 Test Permissions</button>
+            <button onclick="runFullDiagnostic()">🩺 Full Diagnostic</button>
+            <button onclick="clearResults()">🧹 Clear Results</button>
+        </div>
+
+        <div class="solution">
+            <h3>💡 CRITICAL SOLUTION REQUIRED:</h3>
+            <p><strong>1. Run the SQL Setup:</strong> Execute the <code>URGENT_DATABASE_SETUP.sql</code> file in your Supabase SQL Editor</p>
+            <p><strong>2. This will:</strong> Create all missing tables + Disable RLS + Grant anon permissions</p>
+            <p><strong>3. Expected Result:</strong> All 401 errors will disappear and admin dashboard will load data</p>
+        </div>
+
+        <div id="results">
+            <h3>📊 Diagnostic Results:</h3>
+            <pre id="log-output">Waiting for test results...</pre>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://wctkikgmncnunntsiqdu.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjdGtpa2dtbmNudW5udHNpcWR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzMDYyMjAsImV4cCI6MjA1MDg4MjIyMH0.C3_pEe3yOI0-eMTgejBDr_R4HJH6lAXdcMmBJUgYCmw';
+        
+        let logOutput = '';
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().substr(11, 12);
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '📝';
+            const entry = `[${timestamp}] ${prefix} ${message}`;
+            logOutput += entry + '\\n';
+            document.getElementById('log-output').textContent = logOutput;
+            console.log(entry);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('status-container');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning';
+            statusContainer.innerHTML = `<div class="status ${className}">${message}</div>`;
+        }
+
+        // Test basic Supabase connection
+        async function testBasicConnection() {
+            log('🔌 Testing basic Supabase connection...', 'info');
+            updateStatus('🔌 Testing basic connection...', 'warning');
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                log(`Connection response: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    updateStatus('✅ Basic connection successful', 'success');
+                    return true;
+                } else {
+                    updateStatus(`❌ Connection failed: ${response.status}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`Connection error: ${error.message}`, 'error');
+                updateStatus(`❌ Connection error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test access to specific tables
+        async function testTableAccess() {
+            log('🗄️ Testing table access...', 'info');
+            updateStatus('🗄️ Testing table access...', 'warning');
+            
+            const tables = ['users', 'claims', 'consultations', 'quotes', 'payments'];
+            const results = { accessible: [], missing: [], errors: [] };
+            
+            for (const table of tables) {
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=id&limit=0`, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.status === 200) {
+                        results.accessible.push(table);
+                        log(`Table '${table}': ✅ ACCESSIBLE`, 'success');
+                    } else if (response.status === 401) {
+                        results.errors.push(`${table}: 401 UNAUTHORIZED`);
+                        log(`Table '${table}': ❌ 401 UNAUTHORIZED`, 'error');
+                    } else if (response.status === 404) {
+                        results.missing.push(table);
+                        log(`Table '${table}': ❌ 404 NOT FOUND`, 'error');
+                    } else {
+                        const errorText = await response.text();
+                        results.errors.push(`${table}: ${response.status} ${errorText}`);
+                        log(`Table '${table}': ❌ ${response.status} ${errorText}`, 'error');
+                    }
+                } catch (error) {
+                    results.errors.push(`${table}: ${error.message}`);
+                    log(`Table '${table}': ❌ ${error.message}`, 'error');
+                }
+            }
+            
+            // Summary
+            if (results.accessible.length > 0) {
+                updateStatus(`✅ ${results.accessible.length} tables accessible, ${results.errors.length} have 401 errors`, 'warning');
+            } else if (results.errors.length > 0) {
+                updateStatus(`❌ ALL TABLES RETURNING 401 - PERMISSIONS/RLS ISSUE`, 'error');
+            } else {
+                updateStatus(`❌ NO TABLES FOUND - DATABASE NOT SETUP`, 'error');
+            }
+            
+            return results;
+        }
+
+        // Test specific permission scenarios
+        async function testPermissions() {
+            log('🔐 Testing permission scenarios...', 'info');
+            updateStatus('🔐 Testing permissions...', 'warning');
+            
+            const tests = [
+                { name: 'Read users table', url: `${SUPABASE_URL}/rest/v1/users?select=id&limit=1` },
+                { name: 'Count claims table', url: `${SUPABASE_URL}/rest/v1/claims?select=id&limit=0` },
+                { name: 'Insert test (should fail safely)', url: `${SUPABASE_URL}/rest/v1/users`, method: 'POST', body: {email: 'test@test.com'} }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    const options = {
+                        method: test.method || 'GET',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                    
+                    if (test.body) {
+                        options.body = JSON.stringify(test.body);
+                    }
+                    
+                    const response = await fetch(test.url, options);
+                    log(`${test.name}: ${response.status} ${response.statusText}`, response.status < 400 ? 'success' : 'error');
+                    
+                } catch (error) {
+                    log(`${test.name}: ERROR ${error.message}`, 'error');
+                }
+            }
+            
+            updateStatus('🔐 Permission tests completed - check results', 'warning');
+        }
+
+        // Run comprehensive diagnostic
+        async function runFullDiagnostic() {
+            log('🩺 STARTING FULL DIAGNOSTIC...', 'info');
+            log('=' .repeat(60), 'info');
+            updateStatus('🩺 Running full diagnostic...', 'warning');
+            
+            // Test 1: Basic connection
+            log('TEST 1: Basic Connection', 'info');
+            const connectionOk = await testBasicConnection();
+            
+            // Test 2: Table access
+            log('\\nTEST 2: Table Access', 'info');
+            const tableResults = await testTableAccess();
+            
+            // Test 3: Permissions
+            log('\\nTEST 3: Permissions', 'info');
+            await testPermissions();
+            
+            // Final analysis
+            log('\\n' + '=' .repeat(60), 'info');
+            log('🎯 DIAGNOSTIC SUMMARY:', 'info');
+            
+            if (!connectionOk) {
+                log('💥 CRITICAL: Basic connection failed - check API keys', 'error');
+                updateStatus('💥 CRITICAL: Connection failure - check configuration', 'error');
+            } else if (tableResults.errors.length > 0 && tableResults.errors.every(e => e.includes('401'))) {
+                log('💥 CRITICAL: All tables return 401 - RLS or permissions issue', 'error');
+                log('🔧 SOLUTION: Run URGENT_DATABASE_SETUP.sql to disable RLS and grant anon access', 'warning');
+                updateStatus('💥 CRITICAL: 401 errors - RLS/permissions blocking access', 'error');
+            } else if (tableResults.missing.length === tableResults.accessible.length + tableResults.missing.length) {
+                log('💥 CRITICAL: No tables exist - database not initialized', 'error');
+                log('🔧 SOLUTION: Run URGENT_DATABASE_SETUP.sql to create tables', 'warning');
+                updateStatus('💥 CRITICAL: Database tables missing', 'error');
+            } else {
+                log('✅ Some tables accessible - partial setup', 'success');
+                updateStatus('⚠️ Partial setup - some tables missing or blocked', 'warning');
+            }
+        }
+
+        function clearResults() {
+            logOutput = '';
+            document.getElementById('log-output').textContent = 'Results cleared. Ready for new tests.';
+            updateStatus('⏳ Ready to run diagnostics...', 'warning');
+        }
+
+        // Auto-run diagnostic on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('🎬 Auto-running diagnostic...', 'info');
+                runFullDiagnostic();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
