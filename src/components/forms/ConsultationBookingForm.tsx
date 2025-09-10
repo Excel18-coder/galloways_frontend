@@ -5,11 +5,24 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Clock, CheckCircle } from "lucide-react";
-import { consultationsService } from "@/lib/api";
+import { bookingConsultantsService, ConsultType } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 // API import disabled for build
 
@@ -21,7 +34,9 @@ const formSchema = z.object({
   serviceType: z.string().min(1, "Please select a service type"),
   consultationDate: z.string().min(1, "Please select a preferred date"),
   consultationTime: z.string().min(1, "Please select a preferred time"),
-  message: z.string().min(10, "Please provide details about your consultation needs"),
+  message: z
+    .string()
+    .min(10, "Please provide details about your consultation needs"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -30,7 +45,9 @@ interface ConsultationBookingFormProps {
   onClose?: () => void;
 }
 
-export default function ConsultationBookingForm({ onClose }: ConsultationBookingFormProps) {
+export default function ConsultationBookingForm({
+  onClose,
+}: ConsultationBookingFormProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
@@ -50,35 +67,41 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
 
   const onSubmit = async (data: FormData) => {
     try {
-      console.log('📋 Submitting consultation to API...');
-      const result = await consultationsService.createConsultation({
-        name: data.name,
+      console.log("📋 Submitting consultation to API...");
+      const result = await bookingConsultantsService.createConsultation({
+        full_name: data.name,
         email: data.email,
         phone: data.phone,
-        company: data.company || '',
-        serviceType: data.serviceType,
-        consultationDate: data.consultationDate,
-        consultationTime: data.consultationTime,
-        message: data.message,
-        status: 'PENDING'
+        organization: data.company || "",
+        consult_type: data.serviceType as ConsultType,
+        preferred_date: data.consultationDate,
+        preferred_time: data.consultationTime,
+        // message: data.message,
+        // consultationTime: data.consultationTime,
+        // consultationDate: data.consultationDate,
+        // description: data.message,
+        // status: "PENDING",
       });
-      
+
       console.log("Consultation booking result:", result);
-      
+
       if (result.success) {
         setIsSubmitted(true);
         toast({
           title: "Consultation Booked Successfully!",
-          description: result.message || "We'll contact you within 24 hours to confirm your appointment.",
+          description:
+            result.message ||
+            "We'll contact you within 24 hours to confirm your appointment.",
         });
       } else {
-        throw new Error(result.message || 'Failed to book consultation');
+        throw new Error(result.message || "Failed to book consultation");
       }
     } catch (error: any) {
-      console.error('Consultation booking error:', error);
+      console.error("Consultation booking error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to book consultation. Please try again.",
+        description:
+          error.message || "Failed to book consultation. Please try again.",
         variant: "destructive",
       });
     }
@@ -91,7 +114,8 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Consultation Booked!</h3>
           <p className="text-muted-foreground mb-4">
-            Thank you for booking a consultation with us. We'll contact you within 24 hours to confirm your appointment.
+            Thank you for booking a consultation with us. We'll contact you
+            within 24 hours to confirm your appointment.
           </p>
           {onClose && (
             <Button onClick={onClose} className="w-full">
@@ -136,7 +160,11 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
                   <FormItem>
                     <FormLabel>Email Address *</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="your.email@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="your.email@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -164,7 +192,10 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
                   <FormItem>
                     <FormLabel>Company/Organization</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your company name (optional)" {...field} />
+                      <Input
+                        placeholder="Your company name (optional)"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -178,26 +209,38 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Consultation Type *</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select the type of consultation you need" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="risk-assessment">Risk Assessment</SelectItem>
-                      <SelectItem value="corporate-structuring">Corporate Structuring</SelectItem>
-                      <SelectItem value="claims-audit">Claims Audit</SelectItem>
-                      <SelectItem value="policy-review">Policy Review</SelectItem>
-                      <SelectItem value="insurance-training">Insurance Training</SelectItem>
-                      <SelectItem value="general-consultation">General Consultation</SelectItem>
+                      <SelectItem value="Risk Assessment">
+                        Risk Assessment
+                      </SelectItem>
+                      <SelectItem value="Corporate Structuring">
+                        Corporate Structuring
+                      </SelectItem>
+                      <SelectItem value="Claims Audit">Claims Audit</SelectItem>
+                      <SelectItem value="Policy Review">
+                        Policy Review
+                      </SelectItem>
+                      <SelectItem value="Insurance Training">
+                        Insurance Training
+                      </SelectItem>
+                      <SelectItem value="General Consultation">
+                        General Consultation
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -219,7 +262,10 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Preferred Time *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select preferred time" />
@@ -247,10 +293,10 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
                 <FormItem>
                   <FormLabel>Consultation Details *</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Please describe your consultation needs, current challenges, and what you hope to achieve..."
                       className="min-h-[100px]"
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -259,13 +305,15 @@ export default function ConsultationBookingForm({ onClose }: ConsultationBooking
             />
 
             <div className="flex gap-4">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="flex-1"
                 disabled={form.formState.isSubmitting}
               >
                 <Clock className="w-4 h-4 mr-2" />
-                {form.formState.isSubmitting ? "Booking..." : "Book Consultation"}
+                {form.formState.isSubmitting
+                  ? "Booking..."
+                  : "Book Consultation"}
               </Button>
               {onClose && (
                 <Button type="button" variant="outline" onClick={onClose}>

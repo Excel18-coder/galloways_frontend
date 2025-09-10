@@ -6,22 +6,29 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { outsourcingRequests } from "@/lib/api";
 // API import disabled for build
 
 const Outsourcing = () => {
   const [formData, setFormData] = useState({
-    organizationName: "",
-    coreFunctions: "",
+    organization_name: "",
+    core_functions: "",
     location: "",
     address: "",
     email: "",
     services: [] as string[],
-    naturOfOutsourcing: "",
-    budgetRange: ""
+    nature_of_outsourcing: "",
+    budget_range: "",
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -31,9 +38,9 @@ const Outsourcing = () => {
     "Underwriting Support",
     "Claims Audit",
     "Claims Data Management",
-    "Quotations Support",
-    "Renewal Negotiation & Management",
-    "Policy Administration"
+    "Quotation Support",
+    "Renewal Negotiation",
+    "Policy Administration",
   ];
 
   const budgetRanges = [
@@ -41,51 +48,67 @@ const Outsourcing = () => {
     "KES 100,000 - 250,000",
     "KES 250,000 - 500,000",
     "KES 500,000 - 1,000,000",
-    "KES 1,000,000+"
+    "KES 1,000,000+",
   ];
 
   const handleServiceChange = (service: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      services: checked 
+      services: checked
         ? [...prev.services, service]
-        : prev.services.filter(s => s !== service)
+        : prev.services.filter((s) => s !== service),
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
-    if (!formData.organizationName || !formData.email || formData.services.length === 0 || !formData.budgetRange) {
+    if (
+      !formData.organization_name ||
+      !formData.email ||
+      formData.services.length === 0 ||
+      !formData.budget_range
+    ) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       // Submit to backend API
-      await console.log({
-        ...formData,
-        natureOfOutsourcing: formData.naturOfOutsourcing || 'full'
+      const result = await outsourcingRequests.createOutsourcingRequest({
+        organization_name: formData.organization_name,
+        core_functions: formData.core_functions,
+        location: formData.location,
+        address: formData.address,
+        email: formData.email,
+        services: formData.services,
+        nature_of_outsourcing: formData.nature_of_outsourcing,
+        budget_range: formData.budget_range,
       });
-      
-      setIsSubmitted(true);
-      toast({
-        title: "Success",
-        description: "Thank you for submitting your outsourcing request. Our consultants will contact you shortly."
-      });
+      console.log("📋 Outsourcing request submitted:", result);
+
+      if (result.success) {
+        setIsSubmitted(true);
+        toast({
+          title: "Success",
+          description:
+            "Thank you for submitting your outsourcing request. Our consultants will contact you shortly.",
+        });
+      }
     } catch (error: any) {
-      console.error('Outsourcing submission error:', error);
+      console.error("Outsourcing submission error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to submit request. Please try again.",
-        variant: "destructive"
+        description:
+          error.message || "Failed to submit request. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -94,18 +117,22 @@ const Outsourcing = () => {
 
   if (isSubmitted) {
     return (
-  <div className="h-screen">
+      <div className="h-screen">
         <Header />
         <main className="py-16">
           <div className="max-w-2xl mx-auto px-4 text-center">
             <Card className="border-accent">
               <CardContent className="p-8">
                 <div className="text-6xl mb-4">✅</div>
-                <h1 className="text-3xl font-bold text-primary mb-4">Request Submitted Successfully!</h1>
+                <h1 className="text-3xl font-bold text-primary mb-4">
+                  Request Submitted Successfully!
+                </h1>
                 <p className="text-muted-foreground mb-6">
-                  Thank you for submitting your outsourcing request. Our consultants will contact you shortly to discuss your requirements in detail.
+                  Thank you for submitting your outsourcing request. Our
+                  consultants will contact you shortly to discuss your
+                  requirements in detail.
                 </p>
-                <Button 
+                <Button
                   onClick={() => setIsSubmitted(false)}
                   className="bg-accent hover:bg-accent/90 text-accent-foreground"
                 >
@@ -121,7 +148,7 @@ const Outsourcing = () => {
   }
 
   return (
-  <div className="h-screen">
+    <div className="h-screen">
       <Header />
       <main className="py-16 bg-secondary/30">
         <div className="max-w-4xl mx-auto px-4">
@@ -130,14 +157,17 @@ const Outsourcing = () => {
               Insurance Services Outsourcing Questionnaire
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Partner with Galloways for comprehensive insurance outsourcing solutions. 
-              Fill out this questionnaire to help us understand your specific needs.
+              Partner with Galloways for comprehensive insurance outsourcing
+              solutions. Fill out this questionnaire to help us understand your
+              specific needs.
             </p>
           </div>
 
           <Card className="shadow-lg">
             <CardHeader className="bg-primary text-primary-foreground">
-              <CardTitle className="text-2xl">Organization & Service Requirements</CardTitle>
+              <CardTitle className="text-2xl">
+                Organization & Service Requirements
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -146,25 +176,37 @@ const Outsourcing = () => {
                   <h3 className="text-xl font-semibold text-primary border-b border-accent pb-2">
                     Organization Information
                   </h3>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="organizationName">Organization Name *</Label>
+                      <Label htmlFor="organizationName">
+                        Organization Name *
+                      </Label>
                       <Input
                         id="organizationName"
-                        value={formData.organizationName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, organizationName: e.target.value }))}
+                        value={formData.organization_name}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            organization_name: e.target.value,
+                          }))
+                        }
                         placeholder="Enter your organization name"
                         required
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="location">Location *</Label>
                       <Input
                         id="location"
                         value={formData.location}
-                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            location: e.target.value,
+                          }))
+                        }
                         placeholder="City, Country"
                         required
                       />
@@ -172,11 +214,16 @@ const Outsourcing = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="coreFunctions">Core Functions</Label>
+                    <Label htmlFor=" core_functions">Core Functions</Label>
                     <Textarea
-                      id="coreFunctions"
-                      value={formData.coreFunctions}
-                      onChange={(e) => setFormData(prev => ({ ...prev, coreFunctions: e.target.value }))}
+                      id=" core_functions"
+                      value={formData.core_functions}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          core_functions: e.target.value,
+                        }))
+                      }
                       placeholder="Describe your organization's core functions and business activities"
                       rows={3}
                     />
@@ -188,19 +235,29 @@ const Outsourcing = () => {
                       <Textarea
                         id="address"
                         value={formData.address}
-                        onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: e.target.value,
+                          }))
+                        }
                         placeholder="Enter your full address"
                         rows={2}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address *</Label>
                       <Input
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            email: e.target.value,
+                          }))
+                        }
                         placeholder="contact@yourorganization.com"
                         required
                       />
@@ -213,18 +270,25 @@ const Outsourcing = () => {
                   <h3 className="text-xl font-semibold text-primary border-b border-accent pb-2">
                     Insurance Services Outsourcing
                   </h3>
-                  
+
                   <div className="space-y-4">
                     <Label>Types of Services to Outsource *</Label>
                     <div className="grid md:grid-cols-2 gap-4">
                       {serviceOptions.map((service) => (
-                        <div key={service} className="flex items-center space-x-2">
+                        <div
+                          key={service}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={service}
                             checked={formData.services.includes(service)}
-                            onCheckedChange={(checked) => handleServiceChange(service, checked as boolean)}
+                            onCheckedChange={(checked) =>
+                              handleServiceChange(service, checked as boolean)
+                            }
                           />
-                          <Label htmlFor={service} className="text-sm">{service}</Label>
+                          <Label htmlFor={service} className="text-sm">
+                            {service}
+                          </Label>
                         </div>
                       ))}
                     </div>
@@ -233,19 +297,30 @@ const Outsourcing = () => {
                   <div className="space-y-4">
                     <Label>Nature of Outsourcing *</Label>
                     <RadioGroup
-                      value={formData.naturOfOutsourcing}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, naturOfOutsourcing: value }))}
+                      value={formData.nature_of_outsourcing}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          nature_of_outsourcing: value,
+                        }))
+                      }
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="full" id="full" />
+                        <RadioGroupItem value="Full outsourcing" id="full" />
                         <Label htmlFor="full">Full outsourcing</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="partial" id="partial" />
+                        <RadioGroupItem
+                          value="Partial outsourcing"
+                          id="partial"
+                        />
                         <Label htmlFor="partial">Partial outsourcing</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="on-demand" id="on-demand" />
+                        <RadioGroupItem
+                          value="On-demand support"
+                          id="on-demand"
+                        />
                         <Label htmlFor="on-demand">On-demand support</Label>
                       </div>
                     </RadioGroup>
@@ -257,16 +332,26 @@ const Outsourcing = () => {
                   <h3 className="text-xl font-semibold text-primary border-b border-accent pb-2">
                     Budget Information
                   </h3>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="budgetRange">Budget Range (KES) *</Label>
-                    <Select value={formData.budgetRange} onValueChange={(value) => setFormData(prev => ({ ...prev, budgetRange: value }))}>
+                    <Select
+                      value={formData.budget_range}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          budget_range: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select your budget range" />
                       </SelectTrigger>
                       <SelectContent>
                         {budgetRanges.map((range) => (
-                          <SelectItem key={range} value={range}>{range}</SelectItem>
+                          <SelectItem key={range} value={range}>
+                            {range}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -283,7 +368,8 @@ const Outsourcing = () => {
                     {isLoading ? "Submitting..." : "Submit Request"}
                   </Button>
                   <p className="text-sm text-muted-foreground text-center mt-4">
-                    * Required fields. All information will be kept confidential.
+                    * Required fields. All information will be kept
+                    confidential.
                   </p>
                 </div>
               </form>

@@ -14,7 +14,7 @@ import Footer from "@/components/layout/Footer";
 
 const Payment = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams(); 
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [paymentData, setPaymentData] = useState({
