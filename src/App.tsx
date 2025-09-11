@@ -77,7 +77,7 @@ function App() {
               <Route path="/claims" element={<Claims />} />
               <Route path="/diaspora" element={<Diaspora />} />
               <Route path="/consultancy" element={<Consultancy />} />
-              <Route path="/quotes" element={<Quotes />} />
+              <Route path="/quotes" element={<Quotes  />} />
               <Route path="/outsourcing" element={<Outsourcing />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/payment/success" element={<PaymentSuccess />} />

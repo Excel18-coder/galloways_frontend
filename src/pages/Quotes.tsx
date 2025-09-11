@@ -28,7 +28,11 @@ import {
   MessageSquare,
   FileDown,
 } from "lucide-react";
-// import { productFields } from "./QuotesInputData";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const insuranceIcons = {
   "Burglary / Theft Insurance": (
@@ -265,69 +269,6 @@ const collectFormData = (formElement) => {
 const showToast = (title, description, variant = "default") => {
   console.log(`Toast: ${title} - ${description} (${variant})`);
 };
-
-// ============= COMPONENTS =============
-const Input = ({ className = "", ...props }) => (
-  <input
-    className={`flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className}`}
-    {...props}
-  />
-);
-
-const Textarea = ({ className = "", ...props }) => (
-  <textarea
-    className={`flex min-h-20 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${className}`}
-    {...props}
-  />
-);
-
-const Label = ({ className = "", ...props }) => (
-  <label
-    className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}
-    {...props}
-  />
-);
-
-const Button = ({
-  className = "",
-  variant = "default",
-  size = "default",
-  disabled = false,
-  children,
-  ...props
-}) => {
-  const baseClasses =
-    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-
-  const variantClasses = {
-    default: "bg-blue-600 text-white hover:bg-blue-700",
-    outline: "border border-gray-300 bg-white hover:bg-gray-50",
-  };
-
-  const sizeClasses = {
-    default: "h-10 py-2 px-4",
-    lg: "h-11 px-8",
-  };
-
-  return (
-    <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      disabled={disabled}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-const Card = ({ className = "", children, ...props }) => (
-  <div
-    className={`rounded-lg border border-gray-200 bg-white text-card-foreground shadow-sm ${className}`}
-    {...props}
-  >
-    {children}
-  </div>
-);
 
 const FormField = ({ field }) => {
   const baseInputClass =
@@ -703,933 +644,919 @@ export default function Quotes() {
     } finally {
       setIsLoading(false);
     }
+  };
 
-    return (
-      <div className="h-screen bg-background">
-        <Header />
-        <main className="pt-20">
-          <div className="max-w-5xl mx-auto mt-8">
-            <div className="flex border-b mb-8">
-              <button
-                className={`px-6 py-3 font-semibold focus:outline-none ${
-                  tab === "quote"
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground"
-                }`}
-                onClick={() => setTab("quote")}
-              >
-                Request Quote
-              </button>
-              <button
-                className={`px-6 py-3 font-semibold focus:outline-none ${
-                  tab === "downloads"
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground"
-                }`}
-                onClick={() => setTab("downloads")}
-              >
-                Downloads
-              </button>
-            </div>
-            {tab === "downloads" && (
-              <div className="py-12">
-                <h2 className="text-2xl font-bold mb-6 text-center text-primary">
-                  Download Forms & Instructions
-                </h2>
-                <p className="mb-8 text-center text-muted-foreground">
-                  Please download the required form, fill it in, and upload it
-                  for processing. Ensure you have all necessary attachments as
-                  listed in the requirements guide. If you need help, contact
-                  our support team.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {/* Livestock Category */}
-                  <div className="p-6 bg-card rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                      {insuranceIcons["Livestock Insurance Proposal Form"]}
-                      Livestock Insurance Category
-                    </h3>
-                    <a
-                      href="/dist/Downloads/Livestock_Insurance_Proposal_Form.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Livestock
-                      Insurance Proposal Form
-                    </a>
-                    <a
-                      href="/dist/Downloads/Livestock Vetenary.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
-                      Form
-                    </a>
-                    <div className="font-semibold mb-2">Instructions:</div>
-                    <ul className="list-disc ml-6 text-muted-foreground">
-                      <li>
-                        Download and fill in the Livestock Insurance Proposal
-                        Form.
-                      </li>
-                      <li>
-                        Attach a veterinary health valuation certificate (from a
-                        certified vet).
-                      </li>
-                      <li>
-                        Upload the completed form and attachments for
-                        processing.
-                      </li>
-                    </ul>
-                  </div>
-                  {/* Medical Category */}
-                  <div className="p-6 bg-card rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                      {
-                        insuranceIcons[
-                          "Equimed Application Form (Medical Insurance)"
-                        ]
-                      }
-                      Medical Insurance Category
-                    </h3>
-                    <a
-                      href="/dist/Downloads/Medical Insurance - individual.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Medical
-                      Insurance - Individual
-                    </a>
-                    <a
-                      href="/dist/Downloads/group_medical_insurance.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Medical
-                      Insurance - Group
-                    </a>
-                    <div className="font-semibold mb-2">Instructions:</div>
-                    <ul className="list-disc ml-6 text-muted-foreground">
-                      <li>Download and fill in the Medical Insurance Form.</li>
-                      <li>
-                        Attach all required documents as listed in the form.
-                      </li>
-                      <li>
-                        Upload the completed form and attachments for
-                        processing.
-                      </li>
-                    </ul>
-                  </div>
-                  {/* Crop Insurance */}
-                  <div className="p-6 bg-card rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                      {insuranceIcons["All Risks Insurance"]}
-                      Crop Insurance
-                    </h3>
-                    <a
-                      href="/dist/Downloads/crop insurance proposal form.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Crop
-                      Insurance Proposal Form
-                    </a>
-                    <div className="font-semibold mb-2">Instructions:</div>
-                    <ul className="list-disc ml-6 text-muted-foreground">
-                      <li>
-                        Download and fill in the Crop Insurance Proposal Form.
-                      </li>
-                      <li>
-                        Attach all required documents as listed in the form.
-                      </li>
-                      <li>
-                        Upload the completed form and attachments for
-                        processing.
-                      </li>
-                    </ul>
-                  </div>
-                  {/* Greenhouse Insurance */}
-                  <div className="p-6 bg-card rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                      {insuranceIcons["Domestic Package (Write-Up Wording)"]}
-                      Greenhouse Insurance
-                    </h3>
-                    <a
-                      href="/dist/Downloads/greenhouse insurance proposal form.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Greenhouse
-                      Insurance Proposal Form
-                    </a>
-                    <div className="font-semibold mb-2">Instructions:</div>
-                    <ul className="list-disc ml-6 text-muted-foreground">
-                      <li>
-                        Download and fill in the Greenhouse Insurance Proposal
-                        Form.
-                      </li>
-                      <li>
-                        Attach all required documents as listed in the form.
-                      </li>
-                      <li>
-                        Upload the completed form and attachments for
-                        processing.
-                      </li>
-                    </ul>
-                  </div>
-                  {/* Poultry Category */}
-                  <div className="p-6 bg-card rounded-lg shadow">
-                    <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                      {insuranceIcons["Poultry Proposal Form"]}
-                      Poultry Insurance Category
-                    </h3>
-                    <a
-                      href="/dist/Downloads/poultry proposal form.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Poultry
-                      Insurance Proposal Form
-                    </a>
-                    <a
-                      href="/dist/Downloads/vet health and valuation poultry.pdf"
-                      download
-                      className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                    >
-                      <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
-                      Form
-                    </a>
-                    <div className="font-semibold mb-2">Instructions:</div>
-                    <ul className="list-disc ml-6 text-muted-foreground">
-                      <li>
-                        Download and fill in the Poultry Insurance Proposal
-                        Form.
-                      </li>
-                      <li>
-                        Attach a veterinary health valuation certificate (from a
-                        certified vet).
-                      </li>
-                      <li>
-                        Upload the completed form and attachments for
-                        processing.
-                      </li>
-                    </ul>
-                  </div>
+  return (
+    <div className="h-screen bg-background">
+      <Header />
+      <main className="pt-20">
+        <div className="max-w-5xl mx-auto mt-8">
+          <div className="flex border-b mb-8">
+            <button
+              className={`px-6 py-3 font-semibold focus:outline-none ${
+                tab === "quote"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground"
+              }`}
+              onClick={() => setTab("quote")}
+            >
+              Request Quote
+            </button>
+            <button
+              className={`px-6 py-3 font-semibold focus:outline-none ${
+                tab === "downloads"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground"
+              }`}
+              onClick={() => setTab("downloads")}
+            >
+              Downloads
+            </button>
+          </div>
+          {tab === "downloads" && (
+            <div className="py-12">
+              <h2 className="text-2xl font-bold mb-6 text-center text-primary">
+                Download Forms & Instructions
+              </h2>
+              <p className="mb-8 text-center text-muted-foreground">
+                Please download the required form, fill it in, and upload it for
+                processing. Ensure you have all necessary attachments as listed
+                in the requirements guide. If you need help, contact our support
+                team.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Livestock Category */}
+                <div className="p-6 bg-card rounded-lg shadow">
+                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+                    {insuranceIcons["Livestock Insurance Proposal Form"]}
+                    Livestock Insurance Category
+                  </h3>
+                  <a
+                    href="/dist/Downloads/Livestock_Insurance_Proposal_Form.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Livestock
+                    Insurance Proposal Form
+                  </a>
+                  <a
+                    href="/dist/Downloads/Livestock Vetenary.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
+                    Form
+                  </a>
+                  <div className="font-semibold mb-2">Instructions:</div>
+                  <ul className="list-disc ml-6 text-muted-foreground">
+                    <li>
+                      Download and fill in the Livestock Insurance Proposal
+                      Form.
+                    </li>
+                    <li>
+                      Attach a veterinary health valuation certificate (from a
+                      certified vet).
+                    </li>
+                    <li>
+                      Upload the completed form and attachments for processing.
+                    </li>
+                  </ul>
+                </div>
+                {/* Medical Category */}
+                <div className="p-6 bg-card rounded-lg shadow">
+                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+                    {
+                      insuranceIcons[
+                        "Equimed Application Form (Medical Insurance)"
+                      ]
+                    }
+                    Medical Insurance Category
+                  </h3>
+                  <a
+                    href="/dist/Downloads/Medical Insurance - individual.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Medical
+                    Insurance - Individual
+                  </a>
+                  <a
+                    href="/dist/Downloads/group_medical_insurance.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Medical
+                    Insurance - Group
+                  </a>
+                  <div className="font-semibold mb-2">Instructions:</div>
+                  <ul className="list-disc ml-6 text-muted-foreground">
+                    <li>Download and fill in the Medical Insurance Form.</li>
+                    <li>
+                      Attach all required documents as listed in the form.
+                    </li>
+                    <li>
+                      Upload the completed form and attachments for processing.
+                    </li>
+                  </ul>
+                </div>
+                {/* Crop Insurance */}
+                <div className="p-6 bg-card rounded-lg shadow">
+                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+                    {insuranceIcons["All Risks Insurance"]}
+                    Crop Insurance
+                  </h3>
+                  <a
+                    href="/dist/Downloads/crop insurance proposal form.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Crop
+                    Insurance Proposal Form
+                  </a>
+                  <div className="font-semibold mb-2">Instructions:</div>
+                  <ul className="list-disc ml-6 text-muted-foreground">
+                    <li>
+                      Download and fill in the Crop Insurance Proposal Form.
+                    </li>
+                    <li>
+                      Attach all required documents as listed in the form.
+                    </li>
+                    <li>
+                      Upload the completed form and attachments for processing.
+                    </li>
+                  </ul>
+                </div>
+                {/* Greenhouse Insurance */}
+                <div className="p-6 bg-card rounded-lg shadow">
+                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+                    {insuranceIcons["Domestic Package (Write-Up Wording)"]}
+                    Greenhouse Insurance
+                  </h3>
+                  <a
+                    href="/dist/Downloads/greenhouse insurance proposal form.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Greenhouse
+                    Insurance Proposal Form
+                  </a>
+                  <div className="font-semibold mb-2">Instructions:</div>
+                  <ul className="list-disc ml-6 text-muted-foreground">
+                    <li>
+                      Download and fill in the Greenhouse Insurance Proposal
+                      Form.
+                    </li>
+                    <li>
+                      Attach all required documents as listed in the form.
+                    </li>
+                    <li>
+                      Upload the completed form and attachments for processing.
+                    </li>
+                  </ul>
+                </div>
+                {/* Poultry Category */}
+                <div className="p-6 bg-card rounded-lg shadow">
+                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+                    {insuranceIcons["Poultry Proposal Form"]}
+                    Poultry Insurance Category
+                  </h3>
+                  <a
+                    href="/dist/Downloads/poultry proposal form.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Poultry
+                    Insurance Proposal Form
+                  </a>
+                  <a
+                    href="/dist/Downloads/vet health and valuation poultry.pdf"
+                    download
+                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                  >
+                    <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
+                    Form
+                  </a>
+                  <div className="font-semibold mb-2">Instructions:</div>
+                  <ul className="list-disc ml-6 text-muted-foreground">
+                    <li>
+                      Download and fill in the Poultry Insurance Proposal Form.
+                    </li>
+                    <li>
+                      Attach a veterinary health valuation certificate (from a
+                      certified vet).
+                    </li>
+                    <li>
+                      Upload the completed form and attachments for processing.
+                    </li>
+                  </ul>
                 </div>
               </div>
-            )}
-            {tab === "quote" && (
-              <>
-                {success ? (
-                  <SuccessMessage refNum={refNum} onReset={handleReset} />
-                ) : (
-                  <div
-                    id="quote-form"
-                    className="space-y-6 bg-white p-8 rounded-lg shadow-sm border"
-                  >
-                    <PersonalInfoSection />
-                    <InsuranceDetailsSection
-                      selectedProduct={selectedProduct}
-                      onProductChange={handleProductChange}
-                    />
-                    <ContactPreferencesSection />
-                    <FileUploadSection />
+            </div>
+          )}
+          {tab === "quote" && (
+            <>
+              {success ? (
+                <SuccessMessage refNum={refNum} onReset={handleReset} />
+              ) : (
+                <div
+                  id="quote-form"
+                  className="space-y-6 bg-white p-8 rounded-lg shadow-sm border"
+                >
+                  <PersonalInfoSection />
+                  <InsuranceDetailsSection
+                    selectedProduct={selectedProduct}
+                    onProductChange={handleProductChange}
+                  />
+                  <ContactPreferencesSection />
+                  <FileUploadSection />
 
-                    <div className="space-y-6">
-                      <div className="flex items-start space-x-2">
-                        <input
-                          type="checkbox"
-                          id="terms"
-                          name="terms"
-                          className="mt-1"
-                          required
-                        />
-                        <label
-                          htmlFor="terms"
-                          className="text-sm text-gray-600"
-                        >
-                          I agree to the{" "}
-                          <a href="#" className="text-blue-600 underline">
-                            Terms of Service
-                          </a>{" "}
-                          and{" "}
-                          <a href="#" className="text-blue-600 underline">
-                            Privacy Policy
-                          </a>
-                          . I consent to being contacted regarding my insurance
-                          quote request.
-                        </label>
-                      </div>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        name="terms"
+                        className="mt-1"
+                        required
+                      />
+                      <label htmlFor="terms" className="text-sm text-gray-600">
+                        I agree to the{" "}
+                        <a href="#" className="text-blue-600 underline">
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a href="#" className="text-blue-600 underline">
+                          Privacy Policy
+                        </a>
+                        . I consent to being contacted regarding my insurance
+                        quote request.
+                      </label>
+                    </div>
 
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <Button
-                          size="lg"
-                          className="flex-1 px-8 py-3"
-                          disabled={isLoading}
-                          onClick={() => handleSubmit(false)}
-                        >
-                          {isLoading ? "Submitting..." : "Submit & Get Quote"}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          disabled={isLoading}
-                          onClick={() => handleSubmit(true)}
-                        >
-                          Save as Draft
-                        </Button>
-                      </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button
+                        size="lg"
+                        className="flex-1 px-8 py-3"
+                        disabled={isLoading}
+                        onClick={() => handleSubmit(false)}
+                      >
+                        {isLoading ? "Submitting..." : "Submit & Get Quote"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        disabled={isLoading}
+                        onClick={() => handleSubmit(true)}
+                      >
+                        Save as Draft
+                      </Button>
                     </div>
                   </div>
-                )}
-                {/* Why Choose Our Quotes */}
-                <section className="py-20 px-4 bg-muted/50">
-                  <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-12">
-                      <h2 className="text-3xl font-bold text-foreground mb-4">
-                        Why Choose Galloways for Your Quote?
-                      </h2>
-                      <p className="text-muted-foreground">
-                        Experience the difference with our professional quote
-                        service
+                </div>
+              )}
+              {/* Why Choose Our Quotes */}
+              <section className="py-20 px-4 bg-muted/50">
+                <div className="max-w-7xl mx-auto">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-foreground mb-4">
+                      Why Choose Galloways for Your Quote?
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Experience the difference with our professional quote
+                      service
+                    </p>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {[
+                      {
+                        title: "Fast Response",
+                        description:
+                          "Get your personalized quote within 24 hours of submission",
+                        icon: "⚡",
+                      },
+                      {
+                        title: "Multiple Options",
+                        description:
+                          "Compare quotes from our network of trusted insurance partners",
+                        icon: "📊",
+                      },
+                      {
+                        title: "Expert Guidance",
+                        description:
+                          "Our certified professionals help you understand your options",
+                        icon: "🎯",
+                      },
+                      {
+                        title: "No Obligation",
+                        description: "Free quotes with no pressure to purchase",
+                        icon: "🤝",
+                      },
+                      {
+                        title: "Competitive Rates",
+                        description:
+                          "Access to competitive pricing through our partner network",
+                        icon: "💰",
+                      },
+                      {
+                        title: "Ongoing Support",
+                        description:
+                          "Continued support throughout your insurance journey",
+                        icon: "🛡️",
+                      },
+                    ].map((benefit, index) => (
+                      <Card key={index} className="p-6 text-center">
+                        <div className="text-4xl mb-4">{benefit.icon}</div>
+                        <h3 className="font-semibold mb-3">{benefit.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {benefit.description}
+                        </p>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </section>
+              {/* Contact Information */}
+              <section className="py-20 px-4">
+                <div className="max-w-6xl mx-auto">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-foreground mb-4">
+                      Need Help with Your Quote?
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Our team is ready to assist you with any questions
+                    </p>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    <Card className="p-6 text-center">
+                      <Phone className="w-8 h-8 text-primary mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">Call Us</h3>
+                      <p className="text-muted-foreground mb-3">
+                        Speak directly with our experts
                       </p>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-8">
-                      {[
-                        {
-                          title: "Fast Response",
-                          description:
-                            "Get your personalized quote within 24 hours of submission",
-                          icon: "⚡",
-                        },
-                        {
-                          title: "Multiple Options",
-                          description:
-                            "Compare quotes from our network of trusted insurance partners",
-                          icon: "📊",
-                        },
-                        {
-                          title: "Expert Guidance",
-                          description:
-                            "Our certified professionals help you understand your options",
-                          icon: "🎯",
-                        },
-                        {
-                          title: "No Obligation",
-                          description:
-                            "Free quotes with no pressure to purchase",
-                          icon: "🤝",
-                        },
-                        {
-                          title: "Competitive Rates",
-                          description:
-                            "Access to competitive pricing through our partner network",
-                          icon: "💰",
-                        },
-                        {
-                          title: "Ongoing Support",
-                          description:
-                            "Continued support throughout your insurance journey",
-                          icon: "🛡️",
-                        },
-                      ].map((benefit, index) => (
-                        <Card key={index} className="p-6 text-center">
-                          <div className="text-4xl mb-4">{benefit.icon}</div>
-                          <h3 className="font-semibold mb-3">
-                            {benefit.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {benefit.description}
-                          </p>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-                {/* Contact Information */}
-                <section className="py-20 px-4">
-                  <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                      <h2 className="text-3xl font-bold text-foreground mb-4">
-                        Need Help with Your Quote?
-                      </h2>
-                      <p className="text-muted-foreground">
-                        Our team is ready to assist you with any questions
+                      <p className="font-semibold">+254720769993</p>
+                      <p className="text-sm text-muted-foreground">
+                        Mon-Fri: 8AM-6PM, Sat: 9AM-2PM
                       </p>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-8">
-                      <Card className="p-6 text-center">
-                        <Phone className="w-8 h-8 text-primary mx-auto mb-4" />
-                        <h3 className="font-semibold mb-2">Call Us</h3>
-                        <p className="text-muted-foreground mb-3">
-                          Speak directly with our experts
-                        </p>
-                        <p className="font-semibold">+254720769993</p>
-                        <p className="text-sm text-muted-foreground">
-                          Mon-Fri: 8AM-6PM, Sat: 9AM-2PM
-                        </p>
-                      </Card>
-                      <Card className="p-6 text-center">
-                        <Mail className="w-8 h-8 text-primary mx-auto mb-4" />
-                        <h3 className="font-semibold mb-2">Email Us</h3>
-                        <p className="text-muted-foreground mb-3">
-                          Send us your questions
-                        </p>
-                        <p className="font-semibold">
-                          gallowaysquotations@gmail.com
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Response within 2 hours
-                        </p>
-                      </Card>
-                      <Card className="p-6 text-center">
-                        <MessageSquare className="w-8 h-8 text-primary mx-auto mb-4" />
-                        <h3 className="font-semibold mb-2">WhatsApp</h3>
-                        <p className="text-muted-foreground mb-3">
-                          Chat with us instantly
-                        </p>
-                        <p className="font-semibold">
-                          +254720769993/+254758301346
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Available 24/7
-                        </p>
-                      </Card>
-                    </div>
+                    </Card>
+                    <Card className="p-6 text-center">
+                      <Mail className="w-8 h-8 text-primary mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">Email Us</h3>
+                      <p className="text-muted-foreground mb-3">
+                        Send us your questions
+                      </p>
+                      <p className="font-semibold">
+                        gallowaysquotations@gmail.com
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Response within 2 hours
+                      </p>
+                    </Card>
+                    <Card className="p-6 text-center">
+                      <MessageSquare className="w-8 h-8 text-primary mx-auto mb-4" />
+                      <h3 className="font-semibold mb-2">WhatsApp</h3>
+                      <p className="text-muted-foreground mb-3">
+                        Chat with us instantly
+                      </p>
+                      <p className="font-semibold">
+                        +254720769993/+254758301346
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Available 24/7
+                      </p>
+                    </Card>
                   </div>
-                </section>
-              </>
-            )}
+                </div>
+              </section>
+            </>
+          )}
+        </div>
+      </main>
+      <section className="py-20 px-4 bg-muted/50">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-primary mb-8 text-center">
+            Insurance Product Downloads & Requirements
+          </h2>
+          {/* Marine Insurance Category */}
+          <div className="p-6 bg-card rounded-lg shadow">
+            <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
+              {insuranceIcons["Marine Insurance"]}
+              Marine Insurance
+            </h3>
+            <div className="font-semibold mb-2">Cover Includes:</div>
+            <ul className="list-disc ml-6 text-muted-foreground mb-2">
+              <li>Perils of the sea</li>
+              <li>Fire, collusion, theft, etc.</li>
+            </ul>
+            <div className="font-semibold mb-2">Requirements:</div>
+            <ul className="list-disc ml-6 text-muted-foreground">
+              <li>Profoma invoice</li>
+              <li>Import declaration form</li>
+              <li>Bill of lading (sea)</li>
+              <li>Airwaybill (air)</li>
+              <li>CR 12</li>
+              <li>Certificate of incorporation</li>
+              <li>KRA pin certificate</li>
+            </ul>
           </div>
-        </main>
-        <section className="py-20 px-4 bg-muted/50">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-primary mb-8 text-center">
-              Insurance Product Downloads & Requirements
-            </h2>
-            {/* Marine Insurance Category */}
-            <div className="p-6 bg-card rounded-lg shadow">
-              <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                {insuranceIcons["Marine Insurance"]}
-                Marine Insurance
-              </h3>
-              <div className="font-semibold mb-2">Cover Includes:</div>
-              <ul className="list-disc ml-6 text-muted-foreground mb-2">
-                <li>Perils of the sea</li>
-                <li>Fire, collusion, theft, etc.</li>
-              </ul>
-              <div className="font-semibold mb-2">Requirements:</div>
+          {/* Property & Theft Insurance */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">
+              Property & Theft Insurance
+            </h3>
+            {/* Burglary / Theft Insurance */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Burglary / Theft Insurance"]}Burglary / Theft
+                Insurance
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
               <ul className="list-disc ml-6 text-muted-foreground">
-                <li>Profoma invoice</li>
-                <li>Import declaration form</li>
-                <li>Bill of lading (sea)</li>
-                <li>Airwaybill (air)</li>
-                <li>CR 12</li>
+                <li>Asset register</li>
+                <li>Valuation reports</li>
+                <li>ID copy</li>
+                <li>Business registration certificate</li>
                 <li>Certificate of incorporation</li>
-                <li>KRA pin certificate</li>
+                <li>KRA pin for the company</li>
+                <li>CR12</li>
+                <li>Photos (inside & outside of business premise)</li>
               </ul>
             </div>
-            {/* Property & Theft Insurance */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">
-                Property & Theft Insurance
-              </h3>
-              {/* Burglary / Theft Insurance */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Burglary / Theft Insurance"]}Burglary / Theft
-                  Insurance
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Asset register</li>
-                  <li>Valuation reports</li>
-                  <li>ID copy</li>
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin for the company</li>
-                  <li>CR12</li>
-                  <li>Photos (inside & outside of business premise)</li>
-                </ul>
-              </div>
-              {/* All Risks Insurance */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["All Risks Insurance"]}All Risks Insurance
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Asset register</li>
-                  <li>ID copy</li>
-                  <li>Business registration certificate</li>
-                  <li>KRA pin</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>Photos (inside & outside of business premise)</li>
-                </ul>
-              </div>
-              {/* Fire & Perils Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Fire & Perils Proposal Form"]}Fire & Perils
-                  Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Title deed & valuation report (if owned)</li>
-                  <li>Photos (if rented)</li>
-                  <li>Asset register (for industrial business)</li>
-                  <li>ID copy & KRA pin certificate</li>
-                </ul>
-              </div>
-              {/* Political Violence & Terrorism (PVT) */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Political Violence & Terrorism (PVT)"]}
-                  Political Violence & Terrorism (PVT)
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Client ID & KRA pin</li>
-                  <li>CR12 (for corporates)</li>
-                  <li>Valuation reports (for rental businesses)</li>
-                  <li>Photos (inside & outside premises)</li>
-                </ul>
-              </div>
-              {/* Domestic Package (Write-Up Wording) */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Domestic Package (Write-Up Wording)"]}
-                  Domestic Package (Write-Up Wording)
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Excel sheet of all contents with estimated values</li>
-                  <li>Title deed & valuation report (if owned)</li>
-                  <li>ID copy & KRA pin certificate</li>
-                </ul>
-              </div>
+            {/* All Risks Insurance */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["All Risks Insurance"]}All Risks Insurance
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Asset register</li>
+                <li>ID copy</li>
+                <li>Business registration certificate</li>
+                <li>KRA pin</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>Photos (inside & outside of business premise)</li>
+              </ul>
             </div>
-            {/* Motor Insurance */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">Motor Insurance</h3>
-              {/* Motor Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Motor Proposal Form"]}Motor Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Logbook</li>
-                  <li>Invoice & buyer/seller agreement (if new)</li>
-                  <li>Import documents (if applicable)</li>
-                  <li>Client ID & KRA pin certificate</li>
-                  <li>
-                    If company-owned: KRA pin, certificate of incorporation,
-                    CR12
-                  </li>
-                </ul>
-              </div>
-              {/* Motor Trade Proposal */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Motor Trade Proposal"]}Motor Trade Proposal
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Asset register</li>
-                  <li>Photos of business premises</li>
-                  <li>CR12</li>
-                  <li>KRA pin for company</li>
-                  <li>Number of KG plates</li>
-                </ul>
-              </div>
-              {/* Carriers’ Legal Liability Insurance */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Carriers’ Legal Liability Insurance"]}
-                  Carriers’ Legal Liability Insurance
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>ID copy</li>
-                  <li>KRA pin certificate</li>
-                  <li>CR12</li>
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                </ul>
-              </div>
-              {/* Goods in Transit Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Goods in Transit Proposal Form"]}Goods in
-                  Transit Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>ID copy</li>
-                  <li>KRA pin certificate</li>
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                </ul>
-              </div>
+            {/* Fire & Perils Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Fire & Perils Proposal Form"]}Fire & Perils
+                Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Title deed & valuation report (if owned)</li>
+                <li>Photos (if rented)</li>
+                <li>Asset register (for industrial business)</li>
+                <li>ID copy & KRA pin certificate</li>
+              </ul>
             </div>
-            {/* Liability & Employee Insurance */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">
-                Liability & Employee Insurance
-              </h3>
-              {/* Work Injury Benefits (WIBA) */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Work Injury Benefits (WIBA)"]}Work Injury
-                  Benefits (WIBA)
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>
-                    Excel sheet of workers (job descriptions, wages, salaries)
-                  </li>
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>KRA pin for company</li>
-                </ul>
-              </div>
-              {/* Employer’s Liability */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Employer’s Liability"]}Employer’s Liability
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>
-                    Excel sheet of employees (job descriptions & gross salaries)
-                  </li>
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>KRA pin for company</li>
-                </ul>
-              </div>
-              {/* Public Liability */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Public Liability"]}Public Liability
-                </h4>
-                s{" "}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin for company</li>
-                  <li>CR12</li>
-                </ul>
-              </div>
-              {/* Contractual Liability Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Contractual Liability Proposal Form"]}
-                  Contractual Liability Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Service Level Agreement (SLA)</li>
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>KRA pin for company</li>
-                </ul>
-              </div>
+            {/* Political Violence & Terrorism (PVT) */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Political Violence & Terrorism (PVT)"]}
+                Political Violence & Terrorism (PVT)
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Client ID & KRA pin</li>
+                <li>CR12 (for corporates)</li>
+                <li>Valuation reports (for rental businesses)</li>
+                <li>Photos (inside & outside premises)</li>
+              </ul>
             </div>
-            {/* Professional Indemnity & Medical */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">
-                Professional Indemnity & Medical
-              </h3>
-              {/* PI Proposal Form – Advocates */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["PI Proposal Form – Advocates"]}PI Proposal
-                  Form – Advocates
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin</li>
-                  <li>Business registration certificate</li>
-                  <li>Practicing licence</li>
-                  <li>Regulator licence</li>
-                </ul>
-              </div>
-              {/* PI Proposal Form – Architects */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["PI Proposal Form – Architects"]}PI Proposal
-                  Form – Architects
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin</li>
-                  <li>Business registration certificate</li>
-                  <li>Practicing licence</li>
-                  <li>Regulator licence</li>
-                </ul>
-              </div>
-              {/* PI Proposal Form – Doctors / Medical Practitioners */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {
-                    insuranceIcons[
-                      "PI Proposal Form – Doctors / Medical Practitioners"
-                    ]
-                  }
-                  PI Proposal Form – Doctors / Medical Practitioners
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin</li>
-                  <li>Business registration certificate</li>
-                  <li>Practicing licence</li>
-                  <li>Regulator licence</li>
-                </ul>
-              </div>
-              {/* PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {
-                    insuranceIcons[
-                      "PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors"
-                    ]
-                  }
-                  PI Proposal Form – Insurance Agents / Solicitors / Engineers,
-                  QS & Land Surveyors
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin</li>
-                  <li>Business registration certificate</li>
-                  <li>Practicing licence</li>
-                  <li>Regulator licence</li>
-                </ul>
-              </div>
-              {/* Travel Insurance Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Travel Insurance Proposal Form"]}Travel
-                  Insurance Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>ID copy</li>
-                  <li>KRA pin certificate</li>
-                  <li>Passport</li>
-                </ul>
-              </div>
-            </div>
-            {/* Fidelity, Money & Specialized Covers */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">
-                Fidelity, Money & Specialized Covers
-              </h3>
-              {/* Fidelity Guarantee Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Fidelity Guarantee Proposal Form"]}Fidelity
-                  Guarantee Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Certificate of incorporation</li>
-                  <li>Business registration certificate</li>
-                  <li>CR12</li>
-                  <li>KRA pin for company</li>
-                </ul>
-              </div>
-              {/* Money Insurance Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Money Insurance Proposal Form"]}Money
-                  Insurance Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>
-                    Standard company KYC docs (ID, KRA, CR12, Incorporation,
-                    Registration cert.)
-                  </li>
-                </ul>
-              </div>
-              {/* Poultry Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Poultry Proposal Form"]}Poultry Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>
-                    Veterinary health valuation certificate (uploaded by
-                    certified vet)
-                  </li>
-                </ul>
-              </div>
-              {/* Livestock Insurance Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Livestock Insurance Proposal Form"]}Livestock
-                  Insurance Proposal Form
-                </h4>
-                {/* Download button removed, guide content retained */}
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Vet health report</li>
-                  <li>KYC docs (ID, KRA, CR12, etc.)</li>
-                </ul>
-              </div>
-              {/* Personal Accident Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Personal Accident Proposal Form"]}Personal
-                  Accident Proposal Form
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>KRA pin certificate</li>
-                  <li>ID copy (individual)</li>
-                </ul>
-              </div>
-            </div>
-            {/* Engineering & Contractors Insurance */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-semibold mb-4">
-                Engineering & Contractors Insurance
-              </h3>
-              {/* Contractors’ All Risk Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Contractors’ All Risk Proposal Form"]}
-                  Contractors’ All Risk Proposal Form
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>KRA certificate</li>
-                  <li>CR12</li>
-                  <li>Certificate of incorporation</li>
-                  <li>NCA licence</li>
-                  <li>County approvals</li>
-                  <li>NEMA approvals</li>
-                  <li>Bill of quantities</li>
-                  <li>KYC for structural engineer</li>
-                  <li>Project manager’s report</li>
-                </ul>
-              </div>
-              {/* Erection All Risks Proposal Form */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Erection All Risks Proposal Form"]}Erection
-                  All Risks Proposal Form
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>Certificate of incorporation</li>
-                  <li>KRA pin for company</li>
-                  <li>CR12</li>
-                  <li>Contract award letter</li>
-                </ul>
-              </div>
-              {/* Contractors’ Plant & Machinery (CPM Write-Up) */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {
-                    insuranceIcons[
-                      "Contractors’ Plant & Machinery (CPM Write-Up)"
-                    ]
-                  }
-                  Contractors’ Plant & Machinery (CPM Write-Up)
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Logbook</li>
-                  <li>Valuation reports</li>
-                  <li>ID copy</li>
-                  <li>KRA pin</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                  <li>Proforma invoice (if new)</li>
-                  <li>Buyer/seller agreement</li>
-                </ul>
-              </div>
-              {/* Machinery Breakdown (Extra Damage) */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Machinery Breakdown (Extra Damage)"]}
-                  Machinery Breakdown (Extra Damage)
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>
-                    Standard engineering insurance KYC docs (ID, KRA, CR12,
-                    Incorporation)
-                  </li>
-                </ul>
-              </div>
-              {/* Electronic Equipment Insurance */}
-              <div className="mb-8 p-6 bg-card rounded-lg shadow">
-                <h4 className="text-xl font-bold mb-2">
-                  {insuranceIcons["Electronic Equipment Insurance"]}Electronic
-                  Equipment Insurance
-                </h4>
-
-                <div className="font-semibold mb-2">Required Attachments:</div>
-                <ul className="list-disc ml-6 text-muted-foreground">
-                  <li>Business registration certificate</li>
-                  <li>KRA pin for company</li>
-                  <li>Certificate of incorporation</li>
-                  <li>CR12</li>
-                </ul>
-              </div>
+            {/* Domestic Package (Write-Up Wording) */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Domestic Package (Write-Up Wording)"]}
+                Domestic Package (Write-Up Wording)
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Excel sheet of all contents with estimated values</li>
+                <li>Title deed & valuation report (if owned)</li>
+                <li>ID copy & KRA pin certificate</li>
+              </ul>
             </div>
           </div>
-        </section>
-        <Footer />
-      </div>
-    );
-  };
+          {/* Motor Insurance */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">Motor Insurance</h3>
+            {/* Motor Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Motor Proposal Form"]}Motor Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Logbook</li>
+                <li>Invoice & buyer/seller agreement (if new)</li>
+                <li>Import documents (if applicable)</li>
+                <li>Client ID & KRA pin certificate</li>
+                <li>
+                  If company-owned: KRA pin, certificate of incorporation, CR12
+                </li>
+              </ul>
+            </div>
+            {/* Motor Trade Proposal */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Motor Trade Proposal"]}Motor Trade Proposal
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Asset register</li>
+                <li>Photos of business premises</li>
+                <li>CR12</li>
+                <li>KRA pin for company</li>
+                <li>Number of KG plates</li>
+              </ul>
+            </div>
+            {/* Carriers’ Legal Liability Insurance */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Carriers’ Legal Liability Insurance"]}
+                Carriers’ Legal Liability Insurance
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>ID copy</li>
+                <li>KRA pin certificate</li>
+                <li>CR12</li>
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+              </ul>
+            </div>
+            {/* Goods in Transit Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Goods in Transit Proposal Form"]}Goods in
+                Transit Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>ID copy</li>
+                <li>KRA pin certificate</li>
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+              </ul>
+            </div>
+          </div>
+          {/* Liability & Employee Insurance */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">
+              Liability & Employee Insurance
+            </h3>
+            {/* Work Injury Benefits (WIBA) */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Work Injury Benefits (WIBA)"]}Work Injury
+                Benefits (WIBA)
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>
+                  Excel sheet of workers (job descriptions, wages, salaries)
+                </li>
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>KRA pin for company</li>
+              </ul>
+            </div>
+            {/* Employer’s Liability */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Employer’s Liability"]}Employer’s Liability
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>
+                  Excel sheet of employees (job descriptions & gross salaries)
+                </li>
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>KRA pin for company</li>
+              </ul>
+            </div>
+            {/* Public Liability */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Public Liability"]}Public Liability
+              </h4>
+              s <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin for company</li>
+                <li>CR12</li>
+              </ul>
+            </div>
+            {/* Contractual Liability Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Contractual Liability Proposal Form"]}
+                Contractual Liability Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Service Level Agreement (SLA)</li>
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>KRA pin for company</li>
+              </ul>
+            </div>
+          </div>
+          {/* Professional Indemnity & Medical */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">
+              Professional Indemnity & Medical
+            </h3>
+            {/* PI Proposal Form – Advocates */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["PI Proposal Form – Advocates"]}PI Proposal Form
+                – Advocates
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin</li>
+                <li>Business registration certificate</li>
+                <li>Practicing licence</li>
+                <li>Regulator licence</li>
+              </ul>
+            </div>
+            {/* PI Proposal Form – Architects */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["PI Proposal Form – Architects"]}PI Proposal
+                Form – Architects
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin</li>
+                <li>Business registration certificate</li>
+                <li>Practicing licence</li>
+                <li>Regulator licence</li>
+              </ul>
+            </div>
+            {/* PI Proposal Form – Doctors / Medical Practitioners */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {
+                  insuranceIcons[
+                    "PI Proposal Form – Doctors / Medical Practitioners"
+                  ]
+                }
+                PI Proposal Form – Doctors / Medical Practitioners
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin</li>
+                <li>Business registration certificate</li>
+                <li>Practicing licence</li>
+                <li>Regulator licence</li>
+              </ul>
+            </div>
+            {/* PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {
+                  insuranceIcons[
+                    "PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors"
+                  ]
+                }
+                PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS
+                & Land Surveyors
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin</li>
+                <li>Business registration certificate</li>
+                <li>Practicing licence</li>
+                <li>Regulator licence</li>
+              </ul>
+            </div>
+            {/* Travel Insurance Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Travel Insurance Proposal Form"]}Travel
+                Insurance Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>ID copy</li>
+                <li>KRA pin certificate</li>
+                <li>Passport</li>
+              </ul>
+            </div>
+          </div>
+          {/* Fidelity, Money & Specialized Covers */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">
+              Fidelity, Money & Specialized Covers
+            </h3>
+            {/* Fidelity Guarantee Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Fidelity Guarantee Proposal Form"]}Fidelity
+                Guarantee Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Certificate of incorporation</li>
+                <li>Business registration certificate</li>
+                <li>CR12</li>
+                <li>KRA pin for company</li>
+              </ul>
+            </div>
+            {/* Money Insurance Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Money Insurance Proposal Form"]}Money Insurance
+                Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>
+                  Standard company KYC docs (ID, KRA, CR12, Incorporation,
+                  Registration cert.)
+                </li>
+              </ul>
+            </div>
+            {/* Poultry Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Poultry Proposal Form"]}Poultry Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>
+                  Veterinary health valuation certificate (uploaded by certified
+                  vet)
+                </li>
+              </ul>
+            </div>
+            {/* Livestock Insurance Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Livestock Insurance Proposal Form"]}Livestock
+                Insurance Proposal Form
+              </h4>
+              {/* Download button removed, guide content retained */}
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Vet health report</li>
+                <li>KYC docs (ID, KRA, CR12, etc.)</li>
+              </ul>
+            </div>
+            {/* Personal Accident Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Personal Accident Proposal Form"]}Personal
+                Accident Proposal Form
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>KRA pin certificate</li>
+                <li>ID copy (individual)</li>
+              </ul>
+            </div>
+          </div>
+          {/* Engineering & Contractors Insurance */}
+          <div className="mb-12">
+            <h3 className="text-2xl font-semibold mb-4">
+              Engineering & Contractors Insurance
+            </h3>
+            {/* Contractors’ All Risk Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Contractors’ All Risk Proposal Form"]}
+                Contractors’ All Risk Proposal Form
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>KRA certificate</li>
+                <li>CR12</li>
+                <li>Certificate of incorporation</li>
+                <li>NCA licence</li>
+                <li>County approvals</li>
+                <li>NEMA approvals</li>
+                <li>Bill of quantities</li>
+                <li>KYC for structural engineer</li>
+                <li>Project manager’s report</li>
+              </ul>
+            </div>
+            {/* Erection All Risks Proposal Form */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Erection All Risks Proposal Form"]}Erection All
+                Risks Proposal Form
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>Certificate of incorporation</li>
+                <li>KRA pin for company</li>
+                <li>CR12</li>
+                <li>Contract award letter</li>
+              </ul>
+            </div>
+            {/* Contractors’ Plant & Machinery (CPM Write-Up) */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {
+                  insuranceIcons[
+                    "Contractors’ Plant & Machinery (CPM Write-Up)"
+                  ]
+                }
+                Contractors’ Plant & Machinery (CPM Write-Up)
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Logbook</li>
+                <li>Valuation reports</li>
+                <li>ID copy</li>
+                <li>KRA pin</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+                <li>Proforma invoice (if new)</li>
+                <li>Buyer/seller agreement</li>
+              </ul>
+            </div>
+            {/* Machinery Breakdown (Extra Damage) */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Machinery Breakdown (Extra Damage)"]}
+                Machinery Breakdown (Extra Damage)
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>
+                  Standard engineering insurance KYC docs (ID, KRA, CR12,
+                  Incorporation)
+                </li>
+              </ul>
+            </div>
+            {/* Electronic Equipment Insurance */}
+            <div className="mb-8 p-6 bg-card rounded-lg shadow">
+              <h4 className="text-xl font-bold mb-2">
+                {insuranceIcons["Electronic Equipment Insurance"]}Electronic
+                Equipment Insurance
+              </h4>
+
+              <div className="font-semibold mb-2">Required Attachments:</div>
+              <ul className="list-disc ml-6 text-muted-foreground">
+                <li>Business registration certificate</li>
+                <li>KRA pin for company</li>
+                <li>Certificate of incorporation</li>
+                <li>CR12</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
 }
