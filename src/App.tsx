@@ -11,7 +11,7 @@ const Products = lazy(() => import("./pages/Products"));
 const Claims = lazy(() => import("./pages/Claims"));
 const Diaspora = lazy(() => import("./pages/Diaspora"));
 const Consultancy = lazy(() => import("./pages/Consultancy"));
-const Quotes = lazy(() => import("./pages/Quotes"));
+import Quotes from "./pages/Quotes";
 const Outsourcing = lazy(() => import("./pages/Outsourcing"));
 const Payment = lazy(() => import("./pages/Payment"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
@@ -37,7 +37,7 @@ function App() {
     const initBackend = async () => {
       try {
         console.log('🔧 Testing Laravel backend connection...');
-        
+
         // Test Laravel API connection
         const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
         if (response.ok) {
@@ -51,7 +51,7 @@ function App() {
         console.log('🔄 Using offline mode with demo data');
       }
     };
-    
+
     initBackend();
   }, []);
 
@@ -60,10 +60,10 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <HashRouter 
-          future={{ 
-            v7_startTransition: true, 
-            v7_relativeSplatPath: true 
+        <HashRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
           }}
         >
           <Suspense fallback={
