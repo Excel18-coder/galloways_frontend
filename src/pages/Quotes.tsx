@@ -1,27 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Shield,
-  Home,
-  Building2,
-  Car,
-  Briefcase,
-  Users,
-  UserCheck,
+
   FileText,
-  HeartPulse,
-  Layers,
-  Plane,
-  PiggyBank,
-  Coins,
-  Hammer,
-  Wrench,
-  MonitorSmartphone,
+
   CheckCircle,
   Upload,
   Phone,
   Mail,
   MessageSquare,
 } from "lucide-react";
+import { quotesService } from "@/lib/api";
 
 // ============= CONSTANTS =============
 const INSURANCE_PRODUCTS = [
@@ -694,9 +682,12 @@ export default function InsuranceQuotesForm() {
         timestamp: new Date().toISOString(),
       };
 
-      // Log form data for debugging
-      console.log("Form submission data:", submissionData);
-      console.log("Is draft:", isDraft);
+      const response = await quotesService.createQuote(submissionData);
+      console.log("Response:", response);
+      if (response.success) {
+        setSuccess(true);
+
+      }
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));

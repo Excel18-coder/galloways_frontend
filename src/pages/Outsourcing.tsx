@@ -92,7 +92,7 @@ const Outsourcing = () => {
         nature_of_outsourcing: formData.nature_of_outsourcing,
         budget_range: formData.budget_range,
       });
-      console.log("📋 Outsourcing request submitted:", result);
+     
 
       if (result.success) {
         setIsSubmitted(true);
@@ -102,13 +102,13 @@ const Outsourcing = () => {
             "Thank you for submitting your outsourcing request. Our consultants will contact you shortly.",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Outsourcing submission error:", error);
       toast({
         title: "Error",
         description:
-          error.message || "Failed to submit request. Please try again.",
-        variant: "destructive",
+          error instanceof Error ? error.message : "Failed to submit request. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
