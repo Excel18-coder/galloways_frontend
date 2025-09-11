@@ -91,10 +91,14 @@ export function AdminDashboard() {
       
       // Fetch real data from Laravel backend API
       const [metricsRes, activitiesRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/dashboard/comprehensive`)
-          .then(res => res.json())
-          .catch(error => {
-            console.warn('📊 Metrics API failed, using fallback data:', error);
+        fetch(
+          `${
+            import.meta.env.VITE_API_URL || " http://localhost:8000/api/v1"
+          }/admin/dashboard/comprehensive`
+        )
+          .then((res) => res.json())
+          .catch((error) => {
+            console.warn("📊 Metrics API failed, using fallback data:", error);
             return {
               success: true,
               data: {
@@ -112,27 +116,34 @@ export function AdminDashboard() {
                 claimsGrowthRate: 8.7,
                 quoteGrowthRate: 15.2,
                 revenueGrowthRate: 22.1,
-                lastUpdated: new Date().toISOString()
-              }
+                lastUpdated: new Date().toISOString(),
+              },
             };
           }),
-        fetch(`${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/activities`)
-          .then(res => res.json())
-          .catch(error => {
-            console.warn('📊 Activities API failed, using fallback data:', error);
+        fetch(
+          `${
+            import.meta.env.VITE_API_URL || " http://localhost:8000/api/v1"
+          }/admin/claims`
+        )
+          .then((res) => res.json())
+          .catch((error) => {
+            console.warn(
+              "📊 Activities API failed, using fallback data:",
+              error
+            );
             return {
               success: true,
               data: [
                 {
-                  id: '1',
-                  type: 'claim',
-                  description: 'New motor claim submitted',
-                  entity_type: 'claim',
-                  created_at: new Date().toISOString()
-                }
-              ]
+                  id: "1",
+                  type: "claim",
+                  description: "New motor claim submitted",
+                  entity_type: "claim",
+                  created_at: new Date().toISOString(),
+                },
+              ],
             };
-          })
+          }),
       ]);
 
       if (metricsRes && metricsRes.success) {

@@ -118,10 +118,10 @@ export function AdminConsultations() {
       params.append('limit', '20');
       if (statusFilter !== "all") params.append('status', statusFilter);
       if (searchTerm) params.append('search', searchTerm);
-      
-      const url = `${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/consultations?${params.toString()}`;
-      
-      const response = await fetch(url, {
+ 
+
+
+      const response = await fetch(`http://localhost:8000/api/v1/${consultations}?${params.toString()}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -206,7 +206,7 @@ export function AdminConsultations() {
 
   const viewConsultationDetails = async (consultationId: number) => {
     try {
-      const url = `${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/consultations/${consultationId}`;
+      const url = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/admin/consultations/${consultationId}`;
       
       const response = await fetch(url, {
         method: 'GET',
@@ -352,7 +352,7 @@ export function AdminConsultations() {
     // Update consultation status to indicate contact was made
     updateConsultationStatus(consultation.id, 'contacted');
   };
-
+  
   // Schedule meeting functionality
   const openScheduleModal = (consultation: Consultation) => {
     setSelectedConsultation(consultation);
