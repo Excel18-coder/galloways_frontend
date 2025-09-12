@@ -5,30 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  TrendingUp, 
-  FileText, 
-  Shield, 
-  DollarSign, 
+import {
+  Users,
+
+  FileText,
+  Shield,
+  DollarSign,
   MessageSquare,
   Calendar,
   BarChart3,
-  User,
+
   LogOut,
   ChevronRight,
-  Clock,
-  CheckCircle,
-  XCircle,
+
   AlertCircle,
-  Building2,
-  Phone,
-  Mail,
-  MapPin,
+
   Building,
   CreditCard,
   Globe,
-  Activity
+  
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -109,7 +104,7 @@ const Resources = () => {
 
       // Get user profile
       const profileData = await console.log();
-      
+
       if (!profileData.success || !profileData.data || !["ADMIN", "SUPER_ADMIN"].includes(profileData.data.role)) {
         toast({
           title: "Access Denied",
@@ -127,7 +122,7 @@ const Resources = () => {
         email: profileData.data.email
       });
       setUser(profileData);
-      
+
       await loadDashboardData();
     } catch (error) {
       console.error("Error checking user role:", error);
@@ -148,12 +143,12 @@ const Resources = () => {
         console.log(),
         console.log()
       ]);
-      
+
       // Handle the response structure from comprehensive stats endpoint
       if (dashboardStats.success && dashboardStats.data) {
         setStats(dashboardStats.data);
         console.log("Real-time dashboard stats loaded:", dashboardStats.data);
-        
+
         if (dashboardStats.data.isRealTime) {
           toast({
             title: "Dashboard Updated",
@@ -170,7 +165,7 @@ const Resources = () => {
         // Fallback if response structure is different
         setStats(dashboardStats.data || {});
       }
-      
+
       if (activitiesData.success && activitiesData.data) {
         setActivities(activitiesData.data);
       } else {
@@ -183,7 +178,7 @@ const Resources = () => {
         description: "Failed to load dashboard data. Using offline mode.",
         variant: "destructive",
       });
-      
+
       // Set fallback empty data structure to prevent crashes
       setStats({
         totalClaims: 0,
@@ -245,21 +240,21 @@ Generated on: ${new Date().toLocaleString()}
 
       // Create a blob with text content (in reality, this would be PDF binary data)
       const blob = new Blob([pdfContent], { type: 'text/plain' });
-      
+
       // Create a temporary URL for the blob
       const url = window.URL.createObjectURL(blob);
-      
+
       // Create a temporary anchor element and trigger the download
       const a = document.createElement('a');
       a.href = url;
       a.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.txt`;
       document.body.appendChild(a);
       a.click();
-      
+
       // Clean up
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast({
         title: "Success",
         description: "Report downloaded successfully!",

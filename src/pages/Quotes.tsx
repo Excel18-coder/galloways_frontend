@@ -3,7 +3,6 @@ import Header from "../components/layout/Header";
 import { quotesService } from "../lib/api";
 import Footer from "../components/layout/Footer";
 
-import { toast } from "../hooks/use-toast";
 import {
   Shield,
   Home,
@@ -33,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import DownloadsSection from "./QuotesDownload";
 
 const insuranceIcons = {
   "Burglary / Theft Insurance": (
@@ -159,86 +159,7 @@ const CONTACT_METHODS = [
   },
 ];
 
-// Sample product fields for demonstration
-const PRODUCT_FIELDS = {
-  "Motor Insurance Application Form": [
-    {
-      id: "vehicleType",
-      label: "Vehicle Type",
-      type: "select",
-      options: ["Car", "Motorcycle", "Truck", "Van"],
-      required: true,
-    },
-    {
-      id: "vehicleValue",
-      label: "Vehicle Value (KES)",
-      type: "number",
-      required: true,
-    },
-    {
-      id: "registrationNumber",
-      label: "Registration Number",
-      type: "text",
-      required: false,
-    },
-    {
-      id: "engineCapacity",
-      label: "Engine Capacity (CC)",
-      type: "number",
-      required: true,
-    },
-  ],
-  "Travel Insurance Proposal Form": [
-    {
-      id: "destination",
-      label: "Travel Destination",
-      type: "text",
-      required: true,
-    },
-    { id: "travelDates", label: "Travel Period", type: "text", required: true },
-    {
-      id: "tripPurpose",
-      label: "Purpose of Trip",
-      type: "select",
-      options: ["Business", "Leisure", "Medical", "Education"],
-      required: true,
-    },
-    {
-      id: "travelersCount",
-      label: "Number of Travelers",
-      type: "number",
-      required: true,
-    },
-  ],
-  "Fire Insurance Proposal Form": [
-    {
-      id: "propertyType",
-      label: "Property Type",
-      type: "select",
-      options: ["Residential", "Commercial", "Industrial"],
-      required: true,
-    },
-    {
-      id: "propertyValue",
-      label: "Property Value (KES)",
-      type: "number",
-      required: true,
-    },
-    {
-      id: "constructionType",
-      label: "Construction Type",
-      type: "select",
-      options: ["Stone", "Timber", "Iron Sheets", "Mixed"],
-      required: true,
-    },
-    {
-      id: "occupancy",
-      label: "Occupancy Details",
-      type: "textarea",
-      required: true,
-    },
-  ],
-};
+
 
 // ============= UTILITY FUNCTIONS =============
 const generateReferenceNumber = () => `GIQ-${Date.now().toString().slice(-8)}`;
@@ -421,16 +342,6 @@ const InsuranceDetailsSection = ({ selectedProduct, onProductChange }) => (
       </select>
     </div>
 
-    {selectedProduct && PRODUCT_FIELDS[selectedProduct] && (
-      <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">{selectedProduct} Details</h3>
-        <div className="space-y-4">
-          {PRODUCT_FIELDS[selectedProduct].map((field) => (
-            <FormField key={field.id} field={field} />
-          ))}
-        </div>
-      </div>
-    )}
 
     <div className="grid md:grid-cols-2 gap-4">
       <div>
@@ -673,186 +584,7 @@ export default function Quotes() {
               Downloads
             </button>
           </div>
-          {tab === "downloads" && (
-            <div className="py-12">
-              <h2 className="text-2xl font-bold mb-6 text-center text-primary">
-                Download Forms & Instructions
-              </h2>
-              <p className="mb-8 text-center text-muted-foreground">
-                Please download the required form, fill it in, and upload it for
-                processing. Ensure you have all necessary attachments as listed
-                in the requirements guide. If you need help, contact our support
-                team.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* Livestock Category */}
-                <div className="p-6 bg-card rounded-lg shadow">
-                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                    {insuranceIcons["Livestock Insurance Proposal Form"]}
-                    Livestock Insurance Category
-                  </h3>
-                  <a
-                    href="/dist/Downloads/Livestock_Insurance_Proposal_Form.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Livestock
-                    Insurance Proposal Form
-                  </a>
-                  <a
-                    href="/dist/Downloads/Livestock Vetenary.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
-                    Form
-                  </a>
-                  <div className="font-semibold mb-2">Instructions:</div>
-                  <ul className="list-disc ml-6 text-muted-foreground">
-                    <li>
-                      Download and fill in the Livestock Insurance Proposal
-                      Form.
-                    </li>
-                    <li>
-                      Attach a veterinary health valuation certificate (from a
-                      certified vet).
-                    </li>
-                    <li>
-                      Upload the completed form and attachments for processing.
-                    </li>
-                  </ul>
-                </div>
-                {/* Medical Category */}
-                <div className="p-6 bg-card rounded-lg shadow">
-                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                    {
-                      insuranceIcons[
-                        "Equimed Application Form (Medical Insurance)"
-                      ]
-                    }
-                    Medical Insurance Category
-                  </h3>
-                  <a
-                    href="/dist/Downloads/Medical Insurance - individual.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Medical
-                    Insurance - Individual
-                  </a>
-                  <a
-                    href="/dist/Downloads/group_medical_insurance.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Medical
-                    Insurance - Group
-                  </a>
-                  <div className="font-semibold mb-2">Instructions:</div>
-                  <ul className="list-disc ml-6 text-muted-foreground">
-                    <li>Download and fill in the Medical Insurance Form.</li>
-                    <li>
-                      Attach all required documents as listed in the form.
-                    </li>
-                    <li>
-                      Upload the completed form and attachments for processing.
-                    </li>
-                  </ul>
-                </div>
-                {/* Crop Insurance */}
-                <div className="p-6 bg-card rounded-lg shadow">
-                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                    {insuranceIcons["All Risks Insurance"]}
-                    Crop Insurance
-                  </h3>
-                  <a
-                    href="/dist/Downloads/crop insurance proposal form.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Crop
-                    Insurance Proposal Form
-                  </a>
-                  <div className="font-semibold mb-2">Instructions:</div>
-                  <ul className="list-disc ml-6 text-muted-foreground">
-                    <li>
-                      Download and fill in the Crop Insurance Proposal Form.
-                    </li>
-                    <li>
-                      Attach all required documents as listed in the form.
-                    </li>
-                    <li>
-                      Upload the completed form and attachments for processing.
-                    </li>
-                  </ul>
-                </div>
-                {/* Greenhouse Insurance */}
-                <div className="p-6 bg-card rounded-lg shadow">
-                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                    {insuranceIcons["Domestic Package (Write-Up Wording)"]}
-                    Greenhouse Insurance
-                  </h3>
-                  <a
-                    href="/dist/Downloads/greenhouse insurance proposal form.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Greenhouse
-                    Insurance Proposal Form
-                  </a>
-                  <div className="font-semibold mb-2">Instructions:</div>
-                  <ul className="list-disc ml-6 text-muted-foreground">
-                    <li>
-                      Download and fill in the Greenhouse Insurance Proposal
-                      Form.
-                    </li>
-                    <li>
-                      Attach all required documents as listed in the form.
-                    </li>
-                    <li>
-                      Upload the completed form and attachments for processing.
-                    </li>
-                  </ul>
-                </div>
-                {/* Poultry Category */}
-                <div className="p-6 bg-card rounded-lg shadow">
-                  <h3 className="text-xl font-bold mb-2 text-primary flex items-center">
-                    {insuranceIcons["Poultry Proposal Form"]}
-                    Poultry Insurance Category
-                  </h3>
-                  <a
-                    href="/dist/Downloads/poultry proposal form.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Poultry
-                    Insurance Proposal Form
-                  </a>
-                  <a
-                    href="/dist/Downloads/vet health and valuation poultry.pdf"
-                    download
-                    className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
-                  >
-                    <FileDown className="mr-2 h-5 w-5" /> Download Veterinary
-                    Form
-                  </a>
-                  <div className="font-semibold mb-2">Instructions:</div>
-                  <ul className="list-disc ml-6 text-muted-foreground">
-                    <li>
-                      Download and fill in the Poultry Insurance Proposal Form.
-                    </li>
-                    <li>
-                      Attach a veterinary health valuation certificate (from a
-                      certified vet).
-                    </li>
-                    <li>
-                      Upload the completed form and attachments for processing.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
+          {tab === "downloads" && <DownloadsSection />}
           {tab === "quote" && (
             <>
               {success ? (
