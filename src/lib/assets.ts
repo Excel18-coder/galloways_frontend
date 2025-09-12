@@ -62,5 +62,5 @@ export const getDownloadUrl = (filename: string): string => {
  * Get main logo URL
  */
 export const getMainLogoUrl = (): string => {
-  return getAssetUrl('/galloways-logo.jpg');
+  return getAssetUrl('/favicon_io/android-chrome-512x512.png');
 };
