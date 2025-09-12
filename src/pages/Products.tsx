@@ -15,7 +15,10 @@ import {
   CheckCircle,
   ArrowRight
 } from "lucide-react";
-
+import kiparo from '../../public/pictures/kiparo.jpg'
+import tractor1 from '../../public/pictures/tractor1.jpg'
+import tracto2 from '../../public/pictures/tractor2.jpg'
+import oil from '../../public/pictures/oil.jpg'
 const Products = () => {
   // Map product titles to image filenames
   const productImages = {
@@ -222,10 +225,10 @@ const Products = () => {
       ],
       color: "text-orange-600",
       gallery: [
-        getPictureUrl("plant1.jpg"),
-        getPictureUrl("plant2.jpg"),
-        getPictureUrl("plant3.jpg"),
-        getPictureUrl("plant4.jpg")
+        getPictureUrl("/pictures/tractor1.jpg"),
+        getPictureUrl("/pictures/tractor2.jpg"),
+        getPictureUrl("/pictures/kiparo.jpg"),
+        getPictureUrl("/pictures/oil.jpg")
       ],
       download: {
         label: "Contractors All Risk Proposal",
@@ -386,7 +389,7 @@ const Products = () => {
                         <div className="mb-4">
                           <div className="grid grid-cols-2 gap-4 mb-2">
                             {product.gallery?.map((img, i) => (
-                              <img key={i} src={"/pictures/" + img.replace("/pictures/", "")} alt={`Plant machinery ${i+1}`} className="rounded-xl border h-40 w-full object-cover" loading="lazy" />
+                              <img key={i} src={img.replace("/pictures/", "")} alt={`Plant machinery ${i+1}`} className="rounded-xl border h-40 w-full object-cover" loading="lazy" />
                             ))}
                           </div>
                           {product.download && (
