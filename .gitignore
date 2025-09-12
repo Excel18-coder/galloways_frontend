@@ -1,2 +1,13 @@
 node_modules/
-.env 
+.env
+.env.development
+.env.test
+.env.production
+dist/
+build/
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.tsbuildinfo
+coverage/
