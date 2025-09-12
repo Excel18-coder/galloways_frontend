@@ -2,7 +2,7 @@ import React from 'react';
 import { FileDown } from 'lucide-react';
 
 const DownloadsSection = () => {
-  
+  // Available files from the directory listing
   const availableFiles = [
     'ALL RISKS.pdf',
     'Britam erectors all risk.pdf',
@@ -11,8 +11,10 @@ const DownloadsSection = () => {
     'claim_documentation_guide.pdf',
     'Claim_Form_Motor_-_Ammended.pdf',
     'Claim_Forms_-_Damage_or_Loss-amended.pdf',
+    'CONTRACTORS ALL RISK PROPOSAL FORM.pdf',
     'Contractors plant and machinery 421V1.pdf',
     'Contractual liability proposal form.pdf',
+    'crop insurance proposal form.pdf',
     'domestic package insurance proposal form.pdf',
     'ELECTRONIC INSURANCE PROPOSAL FORM.pdf',
     'Fidelity Guarantee Claim Forms.pdf',
@@ -21,6 +23,7 @@ const DownloadsSection = () => {
     'GALLOWAYS MOTOR INSURANCE APPLICATION FORM.pdf',
     'Galloways Professional Indemnity Cover Proposal Form.pdf',
     'GOODS IN TRANSIT INSURANCE.pdf',
+    'greenhouse insurance proposal form.pdf',
     'group_medical_insurance.pdf',
     'Livestock_Insurance_Proposal_Form.pdf',
     'Livestock Vetenary.pdf',
@@ -29,14 +32,18 @@ const DownloadsSection = () => {
     'Money Insurance Proposal form(254) 294 mad.pdf',
     'Motor_Entertainment_System_Claim_Form.pdf',
     'Motor Theft Claim Form.pdf',
+    'pension_application_form.pdf',
+    'pension_brochure.pdf',
     'Personal_Accident_Claim_Form.pdf',
     'PI Proposal - Architects.pdf',
     'PI Proposal form - Advocates.pdf',
     'Political Violence _ Terrorism Proposal Form(1) converted[1].pdf',
+    'poultry proposal form.pdf',
     'Professional Indemnity Insurance Proposal Form.pdf',
     'PUBLIC LIABILITY.pdf',
     'Public_Liability_(THIRDPARTY)_Claim_Form.pdf',
     'travel insurance.pdf',
+    'vet health and valuation poultry.pdf',
     'wiba new.pdf',
     'Windscreen & window damage claim form.pdf',
     "Workmen's_Compenstion_Accident_Claim_Form_-_ammended.pdf"
@@ -69,7 +76,8 @@ const DownloadsSection = () => {
       "Burglary Insurance Proposa23.pdf"
     ],
     "Contractors Insurance": [
-      "Contractors plant and machinery 421V1.pdf"
+      "Contractors plant and machinery 421V1.pdf",
+      "CONTRACTORS ALL RISK PROPOSAL FORM.pdf"
     ],
     "Contractual Liability": [
       "Contractual liability proposal form.pdf"
@@ -125,6 +133,20 @@ const DownloadsSection = () => {
     "Claim Documentation": [
       "claim_documentation_guide.pdf",
       "Claim_Forms_-_Damage_or_Loss-amended.pdf"
+    ],
+    "Crop Insurance": [
+      "crop insurance proposal form.pdf"
+    ],
+    "Greenhouse Insurance": [
+      "greenhouse insurance proposal form.pdf"
+    ],
+    "Pension": [
+      "pension_application_form.pdf",
+      "pension_brochure.pdf"
+    ],
+    "Poultry Insurance": [
+      "poultry proposal form.pdf",
+      "vet health and valuation poultry.pdf"
     ]
   };
 

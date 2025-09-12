@@ -20,20 +20,20 @@ const getBaseUrl = (): string => {
  */
 export const getAssetUrl = (path: string): string => {
   if (!path) return '';
-  
+
   // If path is already a complete URL, return as-is
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
-  
+
   // Ensure path starts with /
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  
+
   const baseUrl = getBaseUrl();
-  
+
   // Remove trailing slash from baseUrl and combine with path
   const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-  
+
   return `${cleanBaseUrl}${normalizedPath}`;
 };
 
