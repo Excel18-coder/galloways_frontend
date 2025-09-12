@@ -76,7 +76,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
+
         ...options.headers,
       },
       mode: 'cors',
@@ -147,7 +147,7 @@ const claimsService = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+
         },
         body: JSON.stringify(data),
       });
@@ -248,7 +248,7 @@ const outsourcingRequests = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+
         },
         body: JSON.stringify(data),
       });
@@ -335,7 +335,7 @@ const bookingConsultantsService = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+
         },
         body: JSON.stringify(data),
       });
@@ -416,7 +416,7 @@ const consultationsService = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
+
         },
         body: JSON.stringify(data),
       });
