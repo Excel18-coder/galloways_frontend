@@ -1,9 +1,5 @@
-import { outsourcing } from '../components/admin/AdminOutsourcing';
-import Outsourcing from '../pages/Outsourcing';
-
-
 // Environment Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com';
 const DEBUG = import.meta.env.VITE_DEBUG === 'true' || true;
 
 // Types
