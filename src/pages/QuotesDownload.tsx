@@ -2,23 +2,18 @@ import React from "react";
 import { FileDown } from "lucide-react";
 
 const DownloadsSection = () => {
-  // Available files from the directory listing
+  // Available files from the directory listing (only quote/proposal forms)
   const availableFiles = [
     "ALL RISKS.pdf",
     "Britam erectors all risk.pdf",
     "Burglary Insurance Proposa23.pdf",
     "CARRIERS LEGAL LIABILITY INSURANCE  BRITAM form.pdf",
-    "claim_documentation_guide.pdf",
-    "Claim_Form_Motor_-_Ammended.pdf",
-    "Claim_Forms_-_Damage_or_Loss-amended.pdf",
     "CONTRACTORS ALL RISK PROPOSAL FORM.pdf",
     "Contractors plant and machinery 421V1.pdf",
     "Contractual liability proposal form.pdf",
     "crop insurance proposal form.pdf",
     "domestic package insurance proposal form.pdf",
     "ELECTRONIC INSURANCE PROPOSAL FORM.pdf",
-    "Fidelity Guarantee Claim Forms.pdf",
-    "Fidelity_Guarantee_Claim_Forms.pdf",
     "FIRE INSURANCE PROPOSAL FORM.pdf",
     "GALLOWAYS MOTOR INSURANCE APPLICATION FORM.pdf",
     "Galloways Professional Indemnity Cover Proposal Form.pdf",
@@ -27,30 +22,23 @@ const DownloadsSection = () => {
     "group_medical_insurance.pdf",
     "Livestock_Insurance_Proposal_Form.pdf",
     "Livestock Vetenary.pdf",
-    "Machinery_Breakdown_Extr_Damage-Claim_Form.pdf",
     "Medical Insurance - individual.pdf",
     "Money Insurance Proposal form(254) 294 mad.pdf",
-    "Motor_Entertainment_System_Claim_Form.pdf",
-    "Motor Theft Claim Form.pdf",
     "pension_application_form.pdf",
     "pension_brochure.pdf",
-    "Personal_Accident_Claim_Form.pdf",
     "PI Proposal - Architects.pdf",
     "PI Proposal form - Advocates.pdf",
     "Political Violence _ Terrorism Proposal Form(1) converted[1].pdf",
     "poultry proposal form.pdf",
     "Professional Indemnity Insurance Proposal Form.pdf",
     "PUBLIC LIABILITY.pdf",
-    "Public_Liability_(THIRDPARTY)_Claim_Form.pdf",
     "travel insurance.pdf",
     "vet health and valuation poultry.pdf",
     "wiba new.pdf",
-    "Windscreen & window damage claim form.pdf",
-    "Workmen's_Compenstion_Accident_Claim_Form_-_ammended.pdf",
     "CIC Marine Cargo Insurance Proposal Form.pdf"
   ];
 
-  // Group files by category
+  // Group files by category (only quote/proposal forms)
   const fileCategories = {
     "Livestock Insurance": [
       "Livestock_Insurance_Proposal_Form.pdf",
@@ -62,10 +50,6 @@ const DownloadsSection = () => {
     ],
     "Motor Insurance": [
       "GALLOWAYS MOTOR INSURANCE APPLICATION FORM.pdf",
-      "Motor Theft Claim Form.pdf",
-      "Windscreen & window damage claim form.pdf",
-      "Motor_Entertainment_System_Claim_Form.pdf",
-      "Claim_Form_Motor_-_Ammended.pdf",
     ],
     "Fire Insurance": ["FIRE INSURANCE PROPOSAL FORM.pdf"],
     "Travel Insurance": ["travel insurance.pdf"],
@@ -77,10 +61,6 @@ const DownloadsSection = () => {
     "Contractual Liability": ["Contractual liability proposal form.pdf"],
     "Domestic Package": ["domestic package insurance proposal form.pdf"],
     "Electronic Insurance": ["ELECTRONIC INSURANCE PROPOSAL FORM.pdf"],
-    "Fidelity Guarantee": [
-      "Fidelity Guarantee Claim Forms.pdf",
-      "Fidelity_Guarantee_Claim_Forms.pdf",
-    ],
     "Goods in Transit": ["GOODS IN TRANSIT INSURANCE.pdf"],
     "Money Insurance": ["Money Insurance Proposal form(254) 294 mad.pdf"],
     "Professional Indemnity": [
@@ -89,27 +69,15 @@ const DownloadsSection = () => {
       "PI Proposal form - Advocates.pdf",
       "Professional Indemnity Insurance Proposal Form.pdf",
     ],
-    "Public Liability": [
-      "PUBLIC LIABILITY.pdf",
-      "Public_Liability_(THIRDPARTY)_Claim_Form.pdf",
-    ],
-    "Workmen's Compensation": [
-      "Workmen's_Compenstion_Accident_Claim_Form_-_ammended.pdf",
-    ],
+    "Public Liability": ["PUBLIC LIABILITY.pdf"],
     "All Risks": ["ALL RISKS.pdf", "Britam erectors all risk.pdf"],
     "Carriers Liability": [
       "CARRIERS LEGAL LIABILITY INSURANCE  BRITAM form.pdf",
     ],
-    "Machinery Breakdown": ["Machinery_Breakdown_Extr_Damage-Claim_Form.pdf"],
-    "Personal Accident": ["Personal_Accident_Claim_Form.pdf"],
     "Political Violence & Terrorism": [
       "Political Violence _ Terrorism Proposal Form(1) converted[1].pdf",
     ],
     WIBA: ["wiba new.pdf"],
-    "Claim Documentation": [
-      "claim_documentation_guide.pdf",
-      "Claim_Forms_-_Damage_or_Loss-amended.pdf",
-    ],
     "Crop Insurance": ["crop insurance proposal form.pdf"],
     "Greenhouse Insurance": ["greenhouse insurance proposal form.pdf"],
     Pension: ["pension_application_form.pdf", "pension_brochure.pdf"],
@@ -135,12 +103,11 @@ const DownloadsSection = () => {
   return (
     <div className="py-12">
       <h2 className="text-2xl font-bold mb-6 text-center text-primary">
-        Download Forms & Instructions
+        Download Proposal Forms
       </h2>
       <p className="mb-8 text-center text-muted-foreground">
-        Please download the required form, fill it in, and upload it for
-        processing. Ensure you have all necessary attachments as listed in the
-        requirements guide. If you need help, contact our support team.
+        Please download the required proposal form, fill it in, and submit it for a quote.
+        If you need help, contact our support team.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {Object.entries(fileCategories).map(([category, files]) => (
