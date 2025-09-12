@@ -1,5 +1,5 @@
 // Environment Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1';
 const DEBUG = import.meta.env.VITE_DEBUG === 'true' || true;
 
 // Types
@@ -42,8 +42,8 @@ interface ConsultationData {
   preferred_time: string;
   // description: string;
   status?: string;
-  consultationTime:string;
-  message:string;
+  consultationTime: string;
+  message: string;
   consultationDate: string;
   createdAt?: string;
   updatedAt?: string;
@@ -59,6 +59,7 @@ interface OutsourcingData {
   nature_of_outsourcing: string;
   budget_range: string;
 }
+
 // Enhanced helper for HTTP requests with better error handling
 async function request<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -102,12 +103,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
       if (DEBUG) {
         console.error('API Error:', errorMessage);
       }
-      return {
-        success: false,
-        data: null,
-        message: errorMessage,
-        error: errorMessage
-      };
+      throw new Error(errorMessage);
     }
 
     if (DEBUG) {
@@ -123,12 +119,7 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
     if (DEBUG) {
       console.error('API Request failed:', error);
     }
-    return {
-      success: false,
-      error: error.message || 'Network error - could not connect to server',
-      data: null,
-      message: error.message || 'Network error - could not connect to server'
-    };
+    throw new Error(error.message || 'Network error - could not connect to server');
   }
 }
 
@@ -175,6 +166,11 @@ const claimsService = {
         responseData = null;
       }
 
+      if (!response.ok) {
+        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
       const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
       let message = responseData?.message || responseData?.error || '';
 
@@ -198,12 +194,7 @@ const claimsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to create claim',
-        error: error.message,
-      };
+      throw new Error(error.message || 'Failed to create claim');
     }
   },
 
@@ -276,6 +267,11 @@ const outsourcingRequests = {
         responseData = null;
       }
 
+      if (!response.ok) {
+        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
       const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
       let message = responseData?.message || responseData?.error || '';
 
@@ -299,12 +295,7 @@ const outsourcingRequests = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to create outsourcing',
-        error: error.message,
-      };
+      throw new Error(error.message || 'Failed to create outsourcing');
     }
   },
   getClaims: async (): Promise<ApiResponse> =>
@@ -367,6 +358,11 @@ const bookingConsultantsService = {
         console.log('CreateConsultation response raw:', { status: response.status, data: responseData });
       }
 
+      if (!response.ok) {
+        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
       const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
       let message = responseData?.message || responseData?.error || '';
 
@@ -394,12 +390,7 @@ const bookingConsultantsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to create consultation',
-        error: error.message,
-      };
+      throw new Error(error.message || 'Failed to create consultation');
     }
   },
 
@@ -448,6 +439,11 @@ const consultationsService = {
         console.log('CreateConsultation response raw:', { status: response.status, data: responseData });
       }
 
+      if (!response.ok) {
+        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
       const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
       let message = responseData?.message || responseData?.error || '';
 
@@ -475,12 +471,7 @@ const consultationsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to create consultation',
-        error: error.message,
-      };
+      throw new Error(error.message || 'Failed to create consultation');
     }
   },
 
@@ -496,10 +487,6 @@ const consultationsService = {
   testConnection: async (): Promise<ApiResponse> =>
     request('/consultations/test', { method: 'GET' })
 };
-
-
-
-
 
 // Resources Service
 const resourcesService = {
@@ -526,11 +513,7 @@ const dashboardService = {
         message: response.error || 'Dashboard stats loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: {},
-        message: error.message || 'Failed to load dashboard stats'
-      };
+      throw new Error(error.message || 'Failed to load dashboard stats');
     }
   },
 
@@ -543,11 +526,7 @@ const dashboardService = {
         message: response.error || 'Activities loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: [],
-        message: error.message || 'Failed to load activities'
-      };
+      throw new Error(error.message || 'Failed to load activities');
     }
   },
 
@@ -560,11 +539,7 @@ const dashboardService = {
         message: response.error || 'Top stats loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: {},
-        message: error.message || 'Failed to load top stats'
-      };
+      throw new Error(error.message || 'Failed to load top stats');
     }
   },
 };
@@ -581,11 +556,7 @@ const adminService = {
         message: response.error || 'System health check completed'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to check system health'
-      };
+      throw new Error(error.message || 'Failed to check system health');
     }
   },
 
@@ -621,27 +592,7 @@ const adminService = {
         message: 'Metrics loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: {
-          totalUsers: 0,
-          totalClaims: 0,
-          totalConsultations: 0,
-          totalPayments: 0,
-          totalQuotes: 0,
-          totalOutsourcingRequests: 0,
-          totalDiasporaRequests: 0,
-          totalRevenue: 0,
-          monthlyRevenue: 0,
-          conversionRate: 0,
-          userGrowthRate: 0,
-          claimsGrowthRate: 0,
-          quoteGrowthRate: 0,
-          revenueGrowthRate: 0,
-          lastUpdated: new Date().toISOString()
-        },
-        message: error.message || 'Failed to load metrics'
-      };
+      throw new Error(error.message || 'Failed to load metrics');
     }
   },
 
@@ -654,11 +605,7 @@ const adminService = {
         message: response.error || 'Activities loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: [],
-        message: error.message || 'Failed to load activities'
-      };
+      throw new Error(error.message || 'Failed to load activities');
     }
   },
 
@@ -686,11 +633,7 @@ const adminService = {
         message: response.error || 'Claims loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: { data: [], pagination: { totalPages: 1, currentPage: 1, total: 0, perPage: limit } },
-        message: error.message || 'Failed to load claims'
-      };
+      throw new Error(error.message || 'Failed to load claims');
     }
   },
 
@@ -703,11 +646,7 @@ const adminService = {
         message: response.error || 'Claim loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to load claim'
-      };
+      throw new Error(error.message || 'Failed to load claim');
     }
   },
 
@@ -720,11 +659,7 @@ const adminService = {
         message: response.error || 'Claims stats loaded successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: { total: 0, pending: 0, approved: 0, rejected: 0 },
-        message: error.message || 'Failed to load claims stats'
-      };
+      throw new Error(error.message || 'Failed to load claims stats');
     }
   },
 
@@ -740,11 +675,7 @@ const adminService = {
         message: response.error || 'Claim status updated successfully'
       };
     } catch (error: any) {
-      return {
-        success: false,
-        data: null,
-        message: error.message || 'Failed to update claim status'
-      };
+      throw new Error(error.message || 'Failed to update claim status');
     }
   },
 
@@ -826,7 +757,7 @@ const adminService = {
 
       return { success: true, data: null, message: 'Document downloaded successfully' };
     } catch (error: any) {
-      return { success: false, data: null, message: error.message || 'Failed to download document' };
+      throw new Error(error.message || 'Failed to download document');
     }
   },
 
@@ -855,12 +786,7 @@ const testSupabaseConnection = async (): Promise<ApiResponse> => {
       message: response.error || 'Connected to Laravel backend successfully'
     };
   } catch (error: any) {
-    return {
-      success: false,
-      error: error.message,
-      data: null,
-      message: 'Failed to connect to Laravel backend'
-    };
+    throw new Error(error.message || 'Failed to connect to Laravel backend');
   }
 };
 
@@ -883,17 +809,7 @@ const testLaravelConnection = async (): Promise<ApiResponse> => {
       message: response.error || `Connected to Laravel backend (${endTime - startTime}ms)`
     };
   } catch (error: any) {
-    return {
-      success: false,
-      data: {
-        status: 'disconnected',
-        timestamp: new Date().toISOString(),
-        backend: 'Laravel/PostgreSQL',
-        endpoint: API_BASE_URL,
-        error: error.message
-      },
-      message: `Failed to connect to Laravel backend: ${error.message}`
-    };
+    throw new Error(error.message || 'Failed to connect to Laravel backend');
   }
 };
 
