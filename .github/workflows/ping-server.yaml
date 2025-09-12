@@ -14,7 +14,7 @@ jobs:
         run: |
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
             -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            https://csk-backend-v2.onrender.com/ping)
+            https://gallo-api.onrender.com/api/v1)
 
           echo "Response: $RESPONSE"
 
@@ -23,18 +23,3 @@ jobs:
           else
             echo "service_down=false" >> $GITHUB_ENV
           fi
-
-      - name: Send Email if Service is Down
-        if: env.service_down == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASS }}
-          subject: "⚠️ Backend Service Down"
-          to: ${{ secrets.ALERT_EMAIL }}
-          from: GitHub Actions <${{ secrets.EMAIL_USER }}>
-          body: |
-            The backend service (https://csk-backend-v2.onrender.com/ping) is down.
-            Time: ${{ github.event.schedule }}
