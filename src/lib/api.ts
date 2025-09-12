@@ -1,4 +1,3 @@
-// Environment Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1';
 const DEBUG = import.meta.env.VITE_DEBUG === 'true' || true;
 
