@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 
-// Lazy load components for better performance
+
 const Index = lazy(() => import("./pages/Index"));
 const Products = lazy(() => import("./pages/Products"));
 const Claims = lazy(() => import("./pages/Claims"));
@@ -85,7 +85,7 @@ function App() {
               <Route path="/payment/callback" element={<PaymentCallback />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/resources" element={<Resources />} />
-              {/* <Route path="/downloads" element={<Downloads />} /> */}
+             
               <Route path="/admin/*" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
