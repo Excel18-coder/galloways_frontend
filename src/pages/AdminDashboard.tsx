@@ -11,7 +11,7 @@ import { AdminDiaspora } from "@/components/admin/AdminDiaspora";
 import { AdminOutsourcing } from "@/components/admin/AdminOutsourcing";
 import { AdminUsers } from "@/components/admin/AdminUsers";
 import { AdminPayments } from "@/components/admin/AdminPayments";
-// API import disabled for build
+
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
