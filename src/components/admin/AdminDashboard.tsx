@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { 
-  Users, 
-  CreditCard, 
-  TrendingUp, 
+import {
+  Users,
+  CreditCard,
+  TrendingUp,
   Activity,
   Download,
   RefreshCw,
@@ -69,7 +69,7 @@ export function AdminDashboard() {
     revenueGrowthRate: 0,
     lastUpdated: new Date().toISOString()
   });
-  
+
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -77,7 +77,7 @@ export function AdminDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30);
   const [realtimeEnabled, setRealtimeEnabled] = useState(true);
-  
+
   const realtimeChannels = useRef<any[]>([]);
   const refreshTimer = useRef<NodeJS.Timeout>();
   const { toast: toastHook } = useToast();
@@ -85,16 +85,16 @@ export function AdminDashboard() {
   const fetchDashboardData = useCallback(async (showToast = true) => {
     setLoading(true);
     setConnectionStatus('connecting');
-    
+
     try {
       console.log('📊 Fetching real dashboard data from API...');
-      
+
       // Fetch real data from Laravel backend API
       const [metricsRes, activitiesRes] = await Promise.all([
         fetch(
           `${
-            import.meta.env.VITE_API_URL || " http://localhost:8000/api/v1"
-          }/admin/dashboard/comprehensive`
+            import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+          }/dashboard/comprehensive`
         )
           .then((res) => res.json())
           .catch((error) => {
@@ -122,8 +122,8 @@ export function AdminDashboard() {
           }),
         fetch(
           `${
-            import.meta.env.VITE_API_URL || " http://localhost:8000/api/v1"
-          }/admin/claims`
+            import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+          }/claims`
         )
           .then((res) => res.json())
           .catch((error) => {
@@ -178,7 +178,7 @@ export function AdminDashboard() {
       }
 
       setLastUpdated(new Date());
-      
+
       if (showToast && metricsRes && metricsRes.success) {
         toastHook({
           title: "Dashboard Updated",
@@ -188,7 +188,7 @@ export function AdminDashboard() {
     } catch (error: any) {
       console.error('Dashboard fetch error:', error);
       setConnectionStatus('disconnected');
-      
+
       // Set empty stats on error but don't crash
       setStats({
         totalUsers: 0,
@@ -208,7 +208,7 @@ export function AdminDashboard() {
         lastUpdated: new Date().toISOString()
       });
       setRecentActivity([]);
-      
+
       if (showToast) {
         toastHook({
           title: "Connection Error",
@@ -223,10 +223,10 @@ export function AdminDashboard() {
 
   const handleRealTimeUpdate = useCallback((payload: any) => {
     console.log('Real-time update received:', payload);
-    
+
     const updateType = payload.eventType || 'UPDATE';
     const table = payload.table || 'Unknown';
-    
+
     toastHook({
       title: "Real-time Update",
       description: `${updateType} in ${table}`,
@@ -248,12 +248,12 @@ export function AdminDashboard() {
         }
         return [];
       });
-      
+
       Promise.resolve(channels).then((channelArray) => {
         if (channelArray && channelArray.length >= 0) {
           realtimeChannels.current = channelArray;
           console.log('Real-time subscriptions established');
-        
+
           toastHook({
             title: "Real-time Connected",
             description: "Dashboard will update automatically",
@@ -266,13 +266,13 @@ export function AdminDashboard() {
       });
     } catch (error) {
       console.error('Real-time setup error:', error);
-      
+
       // Fallback to polling mode
       setRealtimeEnabled(false);
       setAutoRefresh(true);
-      
+
       toastHook({
-        title: "Real-time Unavailable", 
+        title: "Real-time Unavailable",
         description: "Using auto-refresh mode instead",
         variant: "destructive"
       });
@@ -289,11 +289,11 @@ export function AdminDashboard() {
 
   useEffect(() => {
     fetchDashboardData(true);
-    
+
     if (realtimeEnabled) {
       setupRealTimeSubscriptions();
     }
-    
+
     if (autoRefresh) {
       setupAutoRefresh();
     }
@@ -316,7 +316,7 @@ export function AdminDashboard() {
     if (refreshTimer.current) {
       clearInterval(refreshTimer.current);
     }
-    
+
     if (autoRefresh) {
       setupAutoRefresh();
     }
@@ -420,7 +420,7 @@ export function AdminDashboard() {
             Real-time overview of your platform • Last updated: {lastUpdated.toLocaleTimeString()}
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           {/* Connection Status */}
           <div className="flex items-center space-x-2">
@@ -453,8 +453,8 @@ export function AdminDashboard() {
           </div>
 
           {/* Refresh Interval */}
-          <Select 
-            value={refreshInterval.toString()} 
+          <Select
+            value={refreshInterval.toString()}
             onValueChange={(value) => setRefreshInterval(Number(value))}
           >
             <SelectTrigger className="w-20">
@@ -473,7 +473,7 @@ export function AdminDashboard() {
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          
+
           <Button onClick={exportDashboardData} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Export

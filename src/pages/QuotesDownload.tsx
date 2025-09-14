@@ -35,7 +35,8 @@ const DownloadsSection = () => {
     "travel insurance.pdf",
     "vet health and valuation poultry.pdf",
     "wiba new.pdf",
-    "CIC Marine Cargo Insurance Proposal Form.pdf"
+    "CIC Marine Cargo Insurance Proposal Form.pdf",
+    "Fidelity Guarantee proposal.pdf"
   ];
 
   // Group files by category (only quote/proposal forms)
@@ -48,9 +49,7 @@ const DownloadsSection = () => {
       "Medical Insurance - individual.pdf",
       "group_medical_insurance.pdf",
     ],
-    "Motor Insurance": [
-      "GALLOWAYS MOTOR INSURANCE APPLICATION FORM.pdf",
-    ],
+    "Motor Insurance": ["GALLOWAYS MOTOR INSURANCE APPLICATION FORM.pdf"],
     "Fire Insurance": ["FIRE INSURANCE PROPOSAL FORM.pdf"],
     "Travel Insurance": ["travel insurance.pdf"],
     "Burglary Insurance": ["Burglary Insurance Proposa23.pdf"],
@@ -58,6 +57,7 @@ const DownloadsSection = () => {
       "Contractors plant and machinery 421V1.pdf",
       "CONTRACTORS ALL RISK PROPOSAL FORM.pdf",
     ],
+    "Fidelity Guarantee": ["Fidelity Guarantee proposal.pdf"],
     "Contractual Liability": ["Contractual liability proposal form.pdf"],
     "Domestic Package": ["domestic package insurance proposal form.pdf"],
     "Electronic Insurance": ["ELECTRONIC INSURANCE PROPOSAL FORM.pdf"],
@@ -106,8 +106,8 @@ const DownloadsSection = () => {
         Download Proposal Forms
       </h2>
       <p className="mb-8 text-center text-muted-foreground">
-        Please download the required proposal form, fill it in, and submit it for a quote.
-        If you need help, contact our support team.
+        Please download the required proposal form, fill it in, and submit it
+        for a quote. If you need help, contact our support team.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {Object.entries(fileCategories).map(([category, files]) => (

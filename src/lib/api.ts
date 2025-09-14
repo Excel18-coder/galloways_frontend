@@ -1,5 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1';
-const DEBUG = import.meta.env.VITE_DEBUG === 'true' || true;
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
+const DEBUG = import.meta.env.VITE_DEBUG === "true" || true;
 
 // Types
 interface ApiResponse<T = any> {
@@ -29,14 +30,20 @@ interface ClaimData {
   createdAt?: string;
   updatedAt?: string;
 }
-export type ConsultType = 'Risk Assessment' | 'Corporate Structuring' | 'Claims Audit' | 'Policy Review' | 'Insurance Training' | 'General Consultation';
+export type ConsultType =
+  | "Risk Assessment"
+  | "Corporate Structuring"
+  | "Claims Audit"
+  | "Policy Review"
+  | "Insurance Training"
+  | "General Consultation";
 interface ConsultationData {
   id?: number;
   full_name: string;
   email: string;
   phone: string;
   organization: string;
-  consult_type: ConsultType
+  consult_type: ConsultType;
   preferred_date: string;
   preferred_time: string;
   // description: string;
@@ -60,26 +67,29 @@ interface OutsourcingData {
 }
 
 // Enhanced helper for HTTP requests with better error handling
-async function request<T = any>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+async function request<T = any>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
 
   if (DEBUG) {
-    console.log(`API Request: ${options.method || 'GET'} ${url}`);
+    console.log(`API Request: ${options.method || "GET"} ${url}`);
     if (options.body) {
-      console.log('Request body:', options.body);
+      console.log("Request body:", options.body);
     }
   }
 
   try {
     const res = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
 
         ...options.headers,
       },
-      mode: 'cors',
-      credentials: 'omit',
+      mode: "cors",
+      credentials: "omit",
       ...options,
     });
 
@@ -88,53 +98,63 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
     }
 
     // Handle different response types
-    const contentType = res.headers.get('content-type');
+    const contentType = res.headers.get("content-type");
     let data: any;
 
-    if (contentType && contentType.includes('application/json')) {
+    if (contentType && contentType.includes("application/json")) {
       data = await res.json();
     } else {
       data = await res.text();
     }
 
     if (!res.ok) {
-      const errorMessage = data?.message || data?.error || `HTTP ${res.status}: ${res.statusText}`;
+      const errorMessage =
+        data?.message || data?.error || `HTTP ${res.status}: ${res.statusText}`;
       if (DEBUG) {
-        console.error('API Error:', errorMessage);
+        console.error("API Error:", errorMessage);
       }
       throw new Error(errorMessage);
     }
 
     if (DEBUG) {
-      console.log('API Success:', data);
+      console.log("API Success:", data);
     }
 
     return {
       success: true,
       data: data?.data || data,
-      message: data?.message || 'Request successful'
+      message: data?.message || "Request successful",
     };
   } catch (error: any) {
     if (DEBUG) {
-      console.error('API Request failed:', error);
+      console.error("API Request failed:", error);
     }
-    throw new Error(error.message || 'Network error - could not connect to server');
+    throw new Error(
+      error.message || "Network error - could not connect to server"
+    );
   }
 }
 
 // Auth Service
 const authService = {
-  login: async (data: { email: string; password: string }): Promise<ApiResponse> =>
-    request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  login: async (data: {
+    email: string;
+    password: string;
+  }): Promise<ApiResponse> =>
+    request("/auth/login", { method: "POST", body: JSON.stringify(data) }),
 
-  register: async (data: { fullName: string; email: string; password: string }): Promise<ApiResponse> =>
-    request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  register: async (data: {
+    fullName: string;
+    email: string;
+    password: string;
+  }): Promise<ApiResponse> =>
+    request("/auth/register", { method: "POST", body: JSON.stringify(data) }),
 
   logout: async (): Promise<ApiResponse> =>
-    request('/auth/logout', { method: 'POST' }),
+    request("/auth/logout", { method: "POST" }),
 
   getProfile: async (): Promise<ApiResponse> =>
-    request('/auth/profile', { method: 'GET' }),
+    request("/auth/profile", { method: "GET" }),
 };
 
 // Claims Service
@@ -142,20 +162,19 @@ const claimsService = {
   createClaim: async (data: ClaimData): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/claims`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
       });
 
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       let responseData: any = null;
 
       try {
-        if (contentType && contentType.includes('application/json')) {
+        if (contentType && contentType.includes("application/json")) {
           responseData = await response.json();
         } else {
           const text = await response.text();
@@ -166,24 +185,38 @@ const claimsService = {
       }
 
       if (!response.ok) {
-        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage =
+          responseData?.message ||
+          responseData?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
-      const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
-      let message = responseData?.message || responseData?.error || '';
+      const success =
+        response.ok &&
+        !(
+          responseData &&
+          (responseData.error || responseData.success === false)
+        );
+      let message = responseData?.message || responseData?.error || "";
 
-      if (!message && responseData?.errors && typeof responseData.errors === 'object') {
+      if (
+        !message &&
+        responseData?.errors &&
+        typeof responseData.errors === "object"
+      ) {
         const parts: string[] = [];
         for (const [field, errs] of Object.entries<any>(responseData.errors)) {
-          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(', ')}`);
-          else if (typeof errs === 'string') parts.push(`${field}: ${errs}`);
+          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(", ")}`);
+          else if (typeof errs === "string") parts.push(`${field}: ${errs}`);
         }
-        if (parts.length) message = parts.join('\n');
+        if (parts.length) message = parts.join("\n");
       }
 
       if (!message) {
-        message = response.ok ? 'Claim created successfully' : 'Failed to create claim';
+        message = response.ok
+          ? "Claim created successfully"
+          : "Failed to create claim";
       }
 
       return {
@@ -193,70 +226,80 @@ const claimsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to create claim');
+      throw new Error(error.message || "Failed to create claim");
     }
   },
 
   getClaims: async (): Promise<ApiResponse> =>
-    request('/claims', { method: 'GET' }),
+    request("/claims", { method: "GET" }),
 
   getClaim: async (id: string): Promise<ApiResponse> =>
-    request(`/claims/${id}`, { method: 'GET' }),
+    request(`/claims/${id}`, { method: "GET" }),
 
   updateClaimStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/claims/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    request(`/claims/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 };
 
 // Quotes Service
 const quotesService = {
   createQuote: async (data: any): Promise<ApiResponse> =>
-    request('/quotes', { method: 'POST', body: JSON.stringify(data) }),
+    request("/quotes", { method: "POST", body: JSON.stringify(data) }),
 
   getQuotes: async (): Promise<ApiResponse> =>
-    request('/quotes', { method: 'GET' }),
+    request("/quotes", { method: "GET" }),
 
   getQuote: async (id: string): Promise<ApiResponse> =>
-    request(`/quotes/${id}`, { method: 'GET' }),
+    request(`/quotes/${id}`, { method: "GET" }),
 
   updateQuoteStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/quotes/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    request(`/quotes/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 };
 
 // Payments Service
 const paymentsService = {
   createPayment: async (data: any): Promise<ApiResponse> =>
-    request('/payments', { method: 'POST', body: JSON.stringify(data) }),
+    request("/payments", { method: "POST", body: JSON.stringify(data) }),
 
   getPayments: async (): Promise<ApiResponse> =>
-    request('/payments', { method: 'GET' }),
+    request("/payments", { method: "GET" }),
 
   getPayment: async (id: string): Promise<ApiResponse> =>
-    request(`/payments/${id}`, { method: 'GET' }),
+    request(`/payments/${id}`, { method: "GET" }),
 
   processPayment: async (id: string, data: any): Promise<ApiResponse> =>
-    request(`/payments/${id}/process`, { method: 'POST', body: JSON.stringify(data) }),
+    request(`/payments/${id}/process`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 // Outsourcing Service
 
 const outsourcingRequests = {
-  createOutsourcingRequest: async (data: OutsourcingData): Promise<ApiResponse> => {
+  createOutsourcingRequest: async (
+    data: OutsourcingData
+  ): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/outsourcing-requests`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
       });
 
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       let responseData: any = null;
 
       try {
-        if (contentType && contentType.includes('application/json')) {
+        if (contentType && contentType.includes("application/json")) {
           responseData = await response.json();
         } else {
           const text = await response.text();
@@ -267,24 +310,38 @@ const outsourcingRequests = {
       }
 
       if (!response.ok) {
-        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage =
+          responseData?.message ||
+          responseData?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
-      const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
-      let message = responseData?.message || responseData?.error || '';
+      const success =
+        response.ok &&
+        !(
+          responseData &&
+          (responseData.error || responseData.success === false)
+        );
+      let message = responseData?.message || responseData?.error || "";
 
-      if (!message && responseData?.errors && typeof responseData.errors === 'object') {
+      if (
+        !message &&
+        responseData?.errors &&
+        typeof responseData.errors === "object"
+      ) {
         const parts: string[] = [];
         for (const [field, errs] of Object.entries<any>(responseData.errors)) {
-          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(', ')}`);
-          else if (typeof errs === 'string') parts.push(`${field}: ${errs}`);
+          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(", ")}`);
+          else if (typeof errs === "string") parts.push(`${field}: ${errs}`);
         }
-        if (parts.length) message = parts.join('\n');
+        if (parts.length) message = parts.join("\n");
       }
 
       if (!message) {
-        message = response.ok ? 'Outsourcing created successfully' : 'Failed to create outsourcing';
+        message = response.ok
+          ? "Outsourcing created successfully"
+          : "Failed to create outsourcing";
       }
 
       return {
@@ -294,35 +351,47 @@ const outsourcingRequests = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to create outsourcing');
+      throw new Error(error.message || "Failed to create outsourcing");
     }
   },
   getClaims: async (): Promise<ApiResponse> =>
-    request('/outsourcing-requests', { method: 'GET' }),
+    request("/outsourcing-requests", { method: "GET" }),
 
   getRequests: async (): Promise<ApiResponse> =>
-    request('/outsourcing-requests', { method: 'GET' }),
+    request("/outsourcing-requests", { method: "GET" }),
 
   getRequest: async (id: string): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}`, { method: 'GET' }),
+    request(`/outsourcing-requests/${id}`, { method: "GET" }),
 
-  updateRequestStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateRequestStatus: async (
+    id: string,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/outsourcing-requests/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 };
 
 // Diaspora Service
 const diasporaService = {
   createRequest: async (data: any): Promise<ApiResponse> =>
-    request('/diaspora', { method: 'POST', body: JSON.stringify(data) }),
+    request("/diaspora", { method: "POST", body: JSON.stringify(data) }),
 
   getRequests: async (): Promise<ApiResponse> =>
-    request('/diaspora', { method: 'GET' }),
+    request("/diaspora", { method: "GET" }),
 
   getRequest: async (id: string): Promise<ApiResponse> =>
-    request(`/diaspora/${id}`, { method: 'GET' }),
+    request(`/diaspora/${id}`, { method: "GET" }),
 
-  updateRequestStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/diaspora/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateRequestStatus: async (
+    id: string,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/diaspora/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 };
 
 // Consultations Service
@@ -330,20 +399,19 @@ const bookingConsultantsService = {
   createConsultation: async (data: ConsultationData): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/booking-consultants`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
       });
 
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       let responseData: any = null;
 
       try {
-        if (contentType && contentType.includes('application/json')) {
+        if (contentType && contentType.includes("application/json")) {
           responseData = await response.json();
         } else {
           const text = await response.text();
@@ -354,32 +422,49 @@ const bookingConsultantsService = {
       }
 
       if (DEBUG) {
-        console.log('CreateConsultation response raw:', { status: response.status, data: responseData });
+        console.log("CreateConsultation response raw:", {
+          status: response.status,
+          data: responseData,
+        });
       }
 
       if (!response.ok) {
-        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage =
+          responseData?.message ||
+          responseData?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
-      const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
-      let message = responseData?.message || responseData?.error || '';
+      const success =
+        response.ok &&
+        !(
+          responseData &&
+          (responseData.error || responseData.success === false)
+        );
+      let message = responseData?.message || responseData?.error || "";
 
       if (!message && responseData && Array.isArray(responseData.message)) {
-        message = responseData.message.join('\n');
+        message = responseData.message.join("\n");
       }
 
-      if (!message && responseData?.errors && typeof responseData.errors === 'object') {
+      if (
+        !message &&
+        responseData?.errors &&
+        typeof responseData.errors === "object"
+      ) {
         const parts: string[] = [];
         for (const [field, errs] of Object.entries<any>(responseData.errors)) {
-          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(', ')}`);
-          else if (typeof errs === 'string') parts.push(`${field}: ${errs}`);
+          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(", ")}`);
+          else if (typeof errs === "string") parts.push(`${field}: ${errs}`);
         }
-        if (parts.length) message = parts.join('\n');
+        if (parts.length) message = parts.join("\n");
       }
 
       if (!message) {
-        message = response.ok ? 'Consultation created successfully' : 'Failed to create consultation';
+        message = response.ok
+          ? "Consultation created successfully"
+          : "Failed to create consultation";
       }
 
       return {
@@ -389,42 +474,46 @@ const bookingConsultantsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to create consultation');
+      throw new Error(error.message || "Failed to create consultation");
     }
   },
 
   getConsultations: async (): Promise<ApiResponse> =>
-    request('/booking-consultants', { method: 'GET' }),
+    request("/booking-consultants", { method: "GET" }),
 
   getConsultation: async (id: string): Promise<ApiResponse> =>
-    request(`/booking-consultants/${id}`, { method: 'GET' }),
+    request(`/booking-consultants/${id}`, { method: "GET" }),
 
-  updateConsultationStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/booking-consultants/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateConsultationStatus: async (
+    id: string,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/booking-consultants/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   testConnection: async (): Promise<ApiResponse> =>
-    request('/booking-consultants/test', { method: 'GET' })
+    request("/booking-consultants/test", { method: "GET" }),
 };
-
 
 const consultationsService = {
   createConsultation: async (data: ConsultationData): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/consultations`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
       });
 
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       let responseData: any = null;
 
       try {
-        if (contentType && contentType.includes('application/json')) {
+        if (contentType && contentType.includes("application/json")) {
           responseData = await response.json();
         } else {
           const text = await response.text();
@@ -435,32 +524,49 @@ const consultationsService = {
       }
 
       if (DEBUG) {
-        console.log('CreateConsultation response raw:', { status: response.status, data: responseData });
+        console.log("CreateConsultation response raw:", {
+          status: response.status,
+          data: responseData,
+        });
       }
 
       if (!response.ok) {
-        const errorMessage = responseData?.message || responseData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage =
+          responseData?.message ||
+          responseData?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
-      const success = response.ok && !(responseData && (responseData.error || responseData.success === false));
-      let message = responseData?.message || responseData?.error || '';
+      const success =
+        response.ok &&
+        !(
+          responseData &&
+          (responseData.error || responseData.success === false)
+        );
+      let message = responseData?.message || responseData?.error || "";
 
       if (!message && responseData && Array.isArray(responseData.message)) {
-        message = responseData.message.join('\n');
+        message = responseData.message.join("\n");
       }
 
-      if (!message && responseData?.errors && typeof responseData.errors === 'object') {
+      if (
+        !message &&
+        responseData?.errors &&
+        typeof responseData.errors === "object"
+      ) {
         const parts: string[] = [];
         for (const [field, errs] of Object.entries<any>(responseData.errors)) {
-          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(', ')}`);
-          else if (typeof errs === 'string') parts.push(`${field}: ${errs}`);
+          if (Array.isArray(errs)) parts.push(`${field}: ${errs.join(", ")}`);
+          else if (typeof errs === "string") parts.push(`${field}: ${errs}`);
         }
-        if (parts.length) message = parts.join('\n');
+        if (parts.length) message = parts.join("\n");
       }
 
       if (!message) {
-        message = response.ok ? 'Consultation created successfully' : 'Failed to create consultation';
+        message = response.ok
+          ? "Consultation created successfully"
+          : "Failed to create consultation";
       }
 
       return {
@@ -470,34 +576,44 @@ const consultationsService = {
         error: responseData?.error || null,
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to create consultation');
+      throw new Error(error.message || "Failed to create consultation");
     }
   },
 
   getConsultations: async (): Promise<ApiResponse> =>
-    request('/consultations', { method: 'GET' }),
+    request("/consultations", { method: "GET" }),
 
   getConsultation: async (id: string): Promise<ApiResponse> =>
-    request(`/consultations/${id}`, { method: 'GET' }),
+    request(`/consultations/${id}`, { method: "GET" }),
 
-  updateConsultationStatus: async (id: string, status: string): Promise<ApiResponse> =>
-    request(`/consultations/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateConsultationStatus: async (
+    id: string,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/consultations/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   testConnection: async (): Promise<ApiResponse> =>
-    request('/consultations/test', { method: 'GET' })
+    request("/consultations/test", { method: "GET" }),
 };
 
 // Resources Service
 const resourcesService = {
   getResources: async (): Promise<ApiResponse> =>
-    request('/resources', { method: 'GET' }),
+    request("/resources", { method: "GET" }),
 
   downloadResource: async (id: string): Promise<ApiResponse> =>
-    request(`/resources/${id}/download`, { method: 'GET' }),
+    request(`/resources/${id}/download`, { method: "GET" }),
 
   uploadResource: async (formData: FormData): Promise<ApiResponse> => {
-    const body = JSON.stringify(Object.fromEntries(formData.entries ? formData.entries() : Object.entries(formData)));
-    return request('/resources', { method: 'POST', body });
+    const body = JSON.stringify(
+      Object.fromEntries(
+        formData.entries ? formData.entries() : Object.entries(formData)
+      )
+    );
+    return request("/resources", { method: "POST", body });
   },
 };
 
@@ -505,40 +621,40 @@ const resourcesService = {
 const dashboardService = {
   getStats: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/dashboard/stats');
+      const response = await request("/dashboard/stats");
       return {
         success: !response.error,
         data: response.error ? {} : response.data,
-        message: response.error || 'Dashboard stats loaded successfully'
+        message: response.error || "Dashboard stats loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load dashboard stats');
+      throw new Error(error.message || "Failed to load dashboard stats");
     }
   },
 
   getActivities: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/dashboard/activities');
+      const response = await request("/dashboard/activities");
       return {
         success: !response.error,
-        data: response.error ? [] : (response.data || []),
-        message: response.error || 'Activities loaded successfully'
+        data: response.error ? [] : response.data || [],
+        message: response.error || "Activities loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load activities');
+      throw new Error(error.message || "Failed to load activities");
     }
   },
 
   getTopStats: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/dashboard/top-stats');
+      const response = await request("/dashboard/top-stats");
       return {
         success: !response.error,
         data: response.error ? {} : response.data,
-        message: response.error || 'Top stats loaded successfully'
+        message: response.error || "Top stats loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load top stats');
+      throw new Error(error.message || "Failed to load top stats");
     }
   },
 };
@@ -548,20 +664,20 @@ const adminService = {
   // System Health Check
   getSystemHealth: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/admin/health');
+      const response = await request("/health");
       return {
         success: !response.error,
         data: response.error ? null : response.data,
-        message: response.error || 'System health check completed'
+        message: response.error || "System health check completed",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to check system health');
+      throw new Error(error.message || "Failed to check system health");
     }
   },
 
   getSystemMetrics: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/admin/metrics');
+      const response = await request("/metrics");
       if (response.error) {
         return {
           success: false,
@@ -580,173 +696,240 @@ const adminService = {
             claimsGrowthRate: 0,
             quoteGrowthRate: 0,
             revenueGrowthRate: 0,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
           },
-          message: response.error
+          message: response.error,
         };
       }
       return {
         success: true,
         data: response.data,
-        message: 'Metrics loaded successfully'
+        message: "Metrics loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load metrics');
+      throw new Error(error.message || "Failed to load metrics");
     }
   },
 
   getRecentActivities: async (limit = 50): Promise<ApiResponse> => {
     try {
-      const response = await request(`/admin/activities?limit=${limit}`);
+      const response = await request(`/activities?limit=${limit}`);
       return {
         success: !response.error,
-        data: response.error ? [] : (response.data || []),
-        message: response.error || 'Activities loaded successfully'
+        data: response.error ? [] : response.data || [],
+        message: response.error || "Activities loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load activities');
+      throw new Error(error.message || "Failed to load activities");
     }
   },
 
   // Users
-  getAllUsers: async (page = 1, limit = 50): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/admin/users?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getAllUsers: async (
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<PaginatedResponse<any>>> =>
+    request(`/users?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getUserStats: async (): Promise<ApiResponse> =>
-    request('/admin/users/stats', { method: 'GET' }),
+    request("/users/stats", { method: "GET" }),
 
   updateUserStatus: async (id: number, status: string): Promise<ApiResponse> =>
-    request(`/admin/users/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    request(`/users/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   // Claims Management
-  getAllClaims: async (page = 1, limit = 50, status?: string, search?: string): Promise<ApiResponse<PaginatedResponse<any>>> => {
+  getAllClaims: async (
+    page = 1,
+    limit = 50,
+    status?: string,
+    search?: string
+  ): Promise<ApiResponse<PaginatedResponse<any>>> => {
     try {
-      const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
-      if (status && status !== 'all') params.append('status', status);
-      if (search) params.append('search', search);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+      if (status && status !== "all") params.append("status", status);
+      if (search) params.append("search", search);
 
-      const response = await request(`/admin/claims?${params.toString()}`);
+      const response = await request(`/claims?${params.toString()}`);
       return {
         success: !response.error,
-        data: response.error ? { data: [], pagination: { totalPages: 1, currentPage: 1, total: 0, perPage: limit } } : response.data,
-        message: response.error || 'Claims loaded successfully'
+        data: response.error
+          ? {
+              data: [],
+              pagination: {
+                totalPages: 1,
+                currentPage: 1,
+                total: 0,
+                perPage: limit,
+              },
+            }
+          : response.data,
+        message: response.error || "Claims loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load claims');
+      throw new Error(error.message || "Failed to load claims");
     }
   },
 
   getClaimById: async (id: number): Promise<ApiResponse> => {
     try {
-      const response = await request(`/admin/claims/${id}`);
+      const response = await request(`/claims/${id}`);
       return {
         success: !response.error,
         data: response.error ? null : response.data,
-        message: response.error || 'Claim loaded successfully'
+        message: response.error || "Claim loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load claim');
+      throw new Error(error.message || "Failed to load claim");
     }
   },
 
   getClaimsStats: async (): Promise<ApiResponse> => {
     try {
-      const response = await request('/admin/claims/stats');
+      const response = await request("/claims/stats");
       return {
         success: !response.error,
-        data: response.error ? { total: 0, pending: 0, approved: 0, rejected: 0 } : response.data,
-        message: response.error || 'Claims stats loaded successfully'
+        data: response.error
+          ? { total: 0, pending: 0, approved: 0, rejected: 0 }
+          : response.data,
+        message: response.error || "Claims stats loaded successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to load claims stats');
+      throw new Error(error.message || "Failed to load claims stats");
     }
   },
 
-  updateClaimStatus: async (id: number, status: string): Promise<ApiResponse> => {
+  updateClaimStatus: async (
+    id: number,
+    status: string
+  ): Promise<ApiResponse> => {
     try {
-      const response = await request(`/admin/claims/${id}/status`, {
-        method: 'PUT',
-        body: JSON.stringify({ status })
+      const response = await request(`/claims/${id}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ status }),
       });
       return {
         success: !response.error,
         data: response.error ? null : response.data,
-        message: response.error || 'Claim status updated successfully'
+        message: response.error || "Claim status updated successfully",
       };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to update claim status');
+      throw new Error(error.message || "Failed to update claim status");
     }
   },
 
   // Consultations
-  getAllConsultations: async (page = 1, limit = 50, status?: string, search?: string): Promise<ApiResponse<PaginatedResponse<any>>> => {
-    const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
-    if (status) params.append('status', status);
-    if (search) params.append('search', search);
-    return request(`/admin/consultations?${params.toString()}`, { method: 'GET' });
+  getAllConsultations: async (): Promise<
+    ApiResponse<PaginatedResponse<any>>
+  > => {
+    return request(`/consultations`, { method: "GET" });
   },
 
   getConsultationById: async (id: number): Promise<ApiResponse> =>
-    request(`/admin/consultations/${id}`, { method: 'GET' }),
+    request(`/consultations/${id}`, { method: "GET" }),
 
-  updateConsultationStatus: async (id: number, status: string): Promise<ApiResponse> =>
-    request(`/admin/consultations/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateConsultationStatus: async (
+    id: number,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/consultations/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   // Quotes
-  getAllQuotes: async (page = 1, limit = 50): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/admin/quotes?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getAllQuotes: async (
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<PaginatedResponse<any>>> =>
+    request(`/quotes?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getQuoteById: async (id: number): Promise<ApiResponse> =>
-    request(`/admin/quotes/${id}`, { method: 'GET' }),
+    request(`/quotes/${id}`, { method: "GET" }),
 
   updateQuoteStatus: async (id: number, status: string): Promise<ApiResponse> =>
-    request(`/admin/quotes/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+    request(`/quotes/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   // Diaspora
-  getAllDiasporaRequests: async (page = 1, limit = 50): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/admin/diaspora?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getAllDiasporaRequests: async (
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<PaginatedResponse<any>>> =>
+    request(`/diaspora?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getDiasporaById: async (id: number): Promise<ApiResponse> =>
-    request(`/admin/diaspora/${id}`, { method: 'GET' }),
+    request(`/diaspora/${id}`, { method: "GET" }),
 
-  updateDiasporaStatus: async (id: number, status: string): Promise<ApiResponse> =>
-    request(`/admin/diaspora/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateDiasporaStatus: async (
+    id: number,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/diaspora/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   // Outsourcing
-  getAllOutsourcingRequests: async (page = 1, limit = 50): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/admin/outsourcing?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getAllOutsourcingRequests: async (
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<PaginatedResponse<any>>> =>
+    request(`/outsourcing?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getOutsourcingById: async (id: number): Promise<ApiResponse> =>
-    request(`/admin/outsourcing/${id}`, { method: 'GET' }),
+    request(`/outsourcing/${id}`, { method: "GET" }),
 
-  updateOutsourcingStatus: async (id: number, status: string): Promise<ApiResponse> =>
-    request(`/admin/outsourcing/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  updateOutsourcingStatus: async (
+    id: number,
+    status: string
+  ): Promise<ApiResponse> =>
+    request(`/outsourcing/${id}/status`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
 
   // Payments
-  getAllPayments: async (page = 1, limit = 50): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/admin/payments?page=${page}&limit=${limit}`, { method: 'GET' }),
+  getAllPayments: async (
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<PaginatedResponse<any>>> =>
+    request(`/payments?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getPaymentStats: async (): Promise<ApiResponse> =>
-    request('/admin/payments/stats', { method: 'GET' }),
+    request("/payments/stats", { method: "GET" }),
 
   // Documents
-  downloadDocument: async (documentId: number, filename: string): Promise<ApiResponse> => {
+  downloadDocument: async (
+    documentId: number,
+    filename: string
+  ): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/documents/${documentId}/download`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/documents/${documentId}/download`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to download document');
+        throw new Error("Failed to download document");
       }
 
       // Create blob from response
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -754,61 +937,70 @@ const adminService = {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      return { success: true, data: null, message: 'Document downloaded successfully' };
+      return {
+        success: true,
+        data: null,
+        message: "Document downloaded successfully",
+      };
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to download document');
+      throw new Error(error.message || "Failed to download document");
     }
   },
 
   // Export and Real-time
   exportData: async (type: string, options: any): Promise<ApiResponse> =>
-    request('/admin/export', { method: 'POST', body: JSON.stringify({ type, ...options }) }),
+    request("/export", {
+      method: "POST",
+      body: JSON.stringify({ type, ...options }),
+    }),
 
   subscribeToRealTimeUpdates: (callback: (payload: any) => void): any[] => {
     // Placeholder for real-time subscriptions
-    console.log('Real-time subscriptions not implemented for Laravel backend');
+    console.log("Real-time subscriptions not implemented for Laravel backend");
     return [];
   },
 
   unsubscribeFromRealTimeUpdates: (channels: any[]): void => {
-    console.log('Unsubscribing from real-time updates');
+    console.log("Unsubscribing from real-time updates");
   },
 };
 
 // Test connection functions
 const testSupabaseConnection = async (): Promise<ApiResponse> => {
   try {
-    const response = await request('/health');
+    const response = await request("/health");
     return {
       success: !response.error,
       data: response.error ? null : response.data,
-      message: response.error || 'Connected to Laravel backend successfully'
+      message: response.error || "Connected to Laravel backend successfully",
     };
   } catch (error: any) {
-    throw new Error(error.message || 'Failed to connect to Laravel backend');
+    throw new Error(error.message || "Failed to connect to Laravel backend");
   }
 };
 
 const testLaravelConnection = async (): Promise<ApiResponse> => {
   try {
     const startTime = Date.now();
-    const response = await request('/health');
+    const response = await request("/health");
     const endTime = Date.now();
 
     return {
       success: !response.error,
       data: {
-        status: response.error ? 'disconnected' : 'connected',
+        status: response.error ? "disconnected" : "connected",
         latency: endTime - startTime,
         timestamp: new Date().toISOString(),
-        backend: 'Laravel/PostgreSQL',
+        backend: "Laravel/PostgreSQL",
         endpoint: API_BASE_URL,
-        ...response.data
+        ...response.data,
       },
-      message: response.error || `Connected to Laravel backend (${endTime - startTime}ms)`
+      message:
+        response.error ||
+        `Connected to Laravel backend (${endTime - startTime}ms)`,
     };
   } catch (error: any) {
-    throw new Error(error.message || 'Failed to connect to Laravel backend');
+    throw new Error(error.message || "Failed to connect to Laravel backend");
   }
 };
 
@@ -844,7 +1036,6 @@ const api = {
   bookingConsultantsService,
   testSupabaseConnection,
   testLaravelConnection,
-
 };
 
 export default api;

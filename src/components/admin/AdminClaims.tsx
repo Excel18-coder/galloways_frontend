@@ -6,38 +6,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Eye, Download, Filter, FileText, Calendar, DollarSign, User, RefreshCw } from 'lucide-react';
-// API import disabled for build
 import { useToast } from '@/hooks/use-toast';
 
 interface Document {
   id: number;
-  originalName: string;
+  original_name: string;
   size: number;
-  createdAt: string;
+  created_at: string;
   path?: string;
-  mimeType?: string;
+  mime_type?: string;
 }
 
 interface Claim {
   id: number;
-  policyNumber: string;
-  claimType: string;
-  incidentDate: string;
-  estimatedLoss: number;
+  policy_number: string;
+  claim_type: string;
+  incident_date: string;
+  estimated_loss: number;
   description: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   status: string;
-  documents: Document[];
-  createdAt: string;
-  updatedAt: string;
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-  };
+  supporting_documents: Document[];
+  created_at: string;
+  updated_at: string;
 }
 
 export function AdminClaims() {
@@ -51,35 +45,14 @@ export function AdminClaims() {
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
 
-  const handleClaimsData = useCallback((data: { claims: Claim[] }) => {
-    console.log('Received claims data:', data);
-    setClaims(data.claims || []);
-    setLoading(false);
-  }, []);
-
-  const handleClaimUpdate = useCallback((data: any) => {
-    console.log('Received claim update:', data);
-    setClaims(prev => prev.map(claim => 
-      claim.id === data.id ? { ...claim, ...data } : claim
-    ));
-    toast({
-      title: "Claim Updated",
-      description: `Claim ${data.id} has been updated.`,
-    });
-  }, [toast]);
-
-  useEffect(() => {
-    fetchClaims();
-  }, [currentPage, statusFilter, searchTerm]);
-
   const fetchClaims = async () => {
     try {
       setLoading(true);
       console.log('📋 Fetching real claims data from API...');
-      
+
       // Fetch real data from Laravel backend API
-      const url = `${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
-      
+      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -99,7 +72,7 @@ export function AdminClaims() {
         const claimsData = result.data?.claims || result.data || [];
         setClaims(claimsData);
         setTotalPages(result.data?.pagination?.totalPages || 1);
-        
+
         toast({
           title: "Claims Loaded",
           description: `Found ${claimsData.length} claims from database`,
@@ -115,33 +88,10 @@ export function AdminClaims() {
       }
     } catch (error) {
       console.error('Failed to fetch claims:', error);
-      
-      // Fallback to demo data if API fails
-      const fallbackData = [
-        {
-          id: 1,
-          policyNumber: 'POL001',
-          claimType: 'Motor',
-          incidentDate: '2025-09-01',
-          estimatedLoss: 50000,
-          description: 'Vehicle accident claim',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
-          phone: '+254700000000',
-          status: 'pending',
-          documents: [],
-          createdAt: '2025-09-01T10:00:00Z',
-          updatedAt: '2025-09-01T10:00:00Z'
-        }
-      ];
-      
-      setClaims(fallbackData);
-      setTotalPages(1);
-      
+      setClaims([]);
       toast({
         title: "Connection Error",
-        description: "Using demo data - check API connection",
+        description: "Failed to fetch claims - check API connection",
         variant: "destructive",
       });
     } finally {
@@ -151,12 +101,13 @@ export function AdminClaims() {
 
   const viewClaimDetails = async (claimId: number) => {
     try {
-      // Simulated API response for development
-      const result = {
-        success: true,
-        data: claims.find(claim => claim.id === claimId) || null,
-        message: 'Claim details loaded successfully'
-      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims/${claimId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
 
       if (result.success) {
         setSelectedClaim(result.data);
@@ -180,12 +131,19 @@ export function AdminClaims() {
 
   const updateClaimStatus = async (claimId: number, newStatus: string) => {
     try {
-      // Simulated API response for development
-      const result = {
-        success: true,
-        data: { id: claimId, status: newStatus },
-        message: 'Claim status updated successfully'
-      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims/${claimId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
 
       if (result.success) {
         fetchClaims(); // Refresh the list
@@ -215,21 +173,27 @@ export function AdminClaims() {
 
   const downloadDocument = async (documentId: number, filename: string) => {
     try {
-      // Simulated API response for development
-      const result = {
-        success: true,
-        message: 'Document download feature not available in development mode'
-      };
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/documents/${documentId}/download`);
       
-      if (result.success) {
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
         toast({
           title: "Success",
-          description: result.message || "Document download started.",
+          description: "Document download started.",
         });
       } else {
         toast({
           title: "Error",
-          description: result.message || "Failed to download document.",
+          description: "Failed to download document.",
           variant: "destructive",
         });
       }
@@ -252,29 +216,29 @@ export function AdminClaims() {
 
       // Simulate export delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       const exportData = {
         claims: claims.map(claim => ({
           id: claim.id,
-          policyNumber: claim.policyNumber,
-          claimType: claim.claimType,
-          claimant: claim.user?.name || 'N/A',
-          email: claim.user?.email || 'N/A',
-          estimatedLoss: claim.estimatedLoss,
+          policy_number: claim.policy_number,
+          claim_type: claim.claim_type,
+          claimant: `${claim.first_name} ${claim.last_name}`,
+          email: claim.email,
+          estimated_loss: claim.estimated_loss,
           status: claim.status,
-          incidentDate: claim.incidentDate,
-          createdAt: claim.createdAt,
-          documentCount: claim.documents?.length || 0
+          incident_date: claim.incident_date,
+          created_at: claim.created_at,
+          document_count: claim.supporting_documents?.length || 0
         })),
         timestamp: new Date().toISOString(),
         format
       };
-      
+
       // Create file content based on format
       let content = '';
       let filename = `claims-export-${new Date().toISOString().split('T')[0]}`;
       let mimeType = 'text/plain';
-      
+
       if (format === 'json') {
         content = JSON.stringify(exportData, null, 2);
         filename += '.json';
@@ -282,13 +246,13 @@ export function AdminClaims() {
       } else if (format === 'csv') {
         const csvHeaders = 'ID,Policy Number,Claim Type,Claimant,Email,Amount,Status,Incident Date,Created At,Documents\n';
         const csvData = exportData.claims
-          .map(claim => `${claim.id},"${claim.policyNumber}","${claim.claimType}","${claim.claimant}","${claim.email}",${claim.estimatedLoss},"${claim.status}","${claim.incidentDate}","${claim.createdAt}",${claim.documentCount}`)
+          .map(claim => `${claim.id},"${claim.policy_number}","${claim.claim_type}","${claim.claimant}","${claim.email}",${claim.estimated_loss},"${claim.status}","${claim.incident_date}","${claim.created_at}",${claim.document_count}`)
           .join('\n');
         content = csvHeaders + csvData;
         filename += '.csv';
         mimeType = 'text/csv';
       }
-      
+
       // Download file
       const blob = new Blob([content], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
@@ -299,7 +263,7 @@ export function AdminClaims() {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      
+
       toast({
         title: "Export Complete",
         description: `Claims data exported as ${format.toUpperCase()}`,
@@ -432,19 +396,19 @@ export function AdminClaims() {
                 {claims.length > 0 ? (
                   claims.map((claim) => (
                     <tr key={claim.id} className="border-b hover:bg-gray-50">
-                      <td className="p-3 font-mono text-sm">{claim.policyNumber}</td>
+                      <td className="p-3 font-mono text-sm">{claim.policy_number}</td>
                       <td className="p-3">
                         <div>
                           <div className="font-medium">
-                            {claim.firstName} {claim.lastName}
+                            {claim.first_name} {claim.last_name}
                           </div>
                           <div className="text-sm text-gray-500">{claim.email}</div>
                           <div className="text-sm text-gray-500">{claim.phone}</div>
                         </div>
                       </td>
-                      <td className="p-3">{claim.claimType}</td>
-                      <td className="p-3 font-medium">{formatCurrency(claim.estimatedLoss)}</td>
-                      <td className="p-3">{formatDate(claim.incidentDate)}</td>
+                      <td className="p-3">{claim.claim_type}</td>
+                      <td className="p-3 font-medium">{formatCurrency(claim.estimated_loss)}</td>
+                      <td className="p-3">{formatDate(claim.incident_date)}</td>
                       <td className="p-3">
                         <Badge className={getStatusColor(claim.status)}>
                           {claim.status}
@@ -453,7 +417,7 @@ export function AdminClaims() {
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">{claim.documents?.length || 0} files</span>
+                          <span className="text-sm">{claim.supporting_documents?.length || 0} files</span>
                         </div>
                       </td>
                       <td className="p-3">
@@ -477,6 +441,7 @@ export function AdminClaims() {
                             </SelectContent>
                           </Select>
                         </div>
+                       
                       </td>
                     </tr>
                   ))
@@ -526,7 +491,7 @@ export function AdminClaims() {
           <DialogHeader>
             <DialogTitle>Claim Details</DialogTitle>
           </DialogHeader>
-          
+
           {selectedClaim && (
             <div className="space-y-6">
               {/* Basic Info */}
@@ -541,19 +506,19 @@ export function AdminClaims() {
                   <CardContent className="space-y-3">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Policy Number</label>
-                      <p className="font-mono">{selectedClaim.policyNumber}</p>
+                      <p className="font-mono">{selectedClaim.policy_number}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Claim Type</label>
-                      <p>{selectedClaim.claimType}</p>
+                      <p>{selectedClaim.claim_type}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Estimated Loss</label>
-                      <p className="font-medium">{formatCurrency(selectedClaim.estimatedLoss)}</p>
+                      <p className="font-medium">{formatCurrency(selectedClaim.estimated_loss)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Incident Date</label>
-                      <p>{formatDate(selectedClaim.incidentDate)}</p>
+                      <p>{formatDate(selectedClaim.incident_date)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Status</label>
@@ -574,11 +539,11 @@ export function AdminClaims() {
                   <CardContent className="space-y-3">
                     <div>
                       <label className="text-sm font-medium text-gray-500">First Name</label>
-                      <p>{selectedClaim.firstName}</p>
+                      <p>{selectedClaim.first_name}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Last Name</label>
-                      <p>{selectedClaim.lastName}</p>
+                      <p>{selectedClaim.last_name}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Email</label>
@@ -590,7 +555,7 @@ export function AdminClaims() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Submitted</label>
-                      <p>{formatDate(selectedClaim.createdAt)}</p>
+                      <p>{formatDate(selectedClaim.created_at)}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -611,27 +576,27 @@ export function AdminClaims() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Attached Documents ({selectedClaim.documents?.length || 0})
+                    Attached Documents ({selectedClaim.supporting_documents?.length || 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {(selectedClaim.documents?.length || 0) > 0 ? (
+                  {(selectedClaim.supporting_documents?.length || 0) > 0 ? (
                     <div className="grid gap-3">
-                      {selectedClaim.documents?.map((doc) => (
+                      {selectedClaim.supporting_documents?.map((doc) => (
                         <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5 text-gray-400" />
                             <div>
-                              <p className="font-medium">{doc.originalName}</p>
+                              <p className="font-medium">{doc.original_name}</p>
                               <p className="text-sm text-gray-500">
-                                {formatFileSize(doc.size)} • {formatDate(doc.createdAt)}
+                                {formatFileSize(doc.size)} • {formatDate(doc.created_at)}
                               </p>
                             </div>
                           </div>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => downloadDocument(doc.id, doc.originalName)}
+                            onClick={() => downloadDocument(doc.id, doc.original_name)}
                           >
                             <Download className="h-4 w-4" />
                           </Button>

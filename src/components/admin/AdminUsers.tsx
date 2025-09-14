@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,26 +12,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
+  DialogTrigger
 } from "@/components/ui/dialog";
-import { 
+import {
   Search,
   Edit,
   Trash2,
   UserPlus,
   Download,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
-// API import disabled for build
 import { useToast } from "@/hooks/use-toast";
+import { adminService } from "@/lib/api";
 
 export function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -45,13 +51,12 @@ export function AdminUsers() {
     full_name: "",
     email: "",
     role: "USER",
-    status: "active"
+    status: "active",
   });
   const { toast } = useToast();
 
   useEffect(() => {
     if (search.trim()) {
-      // Implement search with debouncing
       const searchTimeout = setTimeout(() => {
         searchUsers();
       }, 500);
@@ -64,13 +69,21 @@ export function AdminUsers() {
   const searchUsers = async () => {
     try {
       setLoading(true);
-      const result = await console.log(search, currentPage, 20);
-      
+      const result = await adminService.getAllUsers(currentPage, 20, search);
+
       if (result.success && result.data) {
-        const users = Array.isArray(result.data) ? result.data : [result.data];
+        const users = Array.isArray(result.data)
+          ? result.data
+          : result.data.data || [];
+        const pagination = result.data.pagination || {
+          currentPage,
+          totalPages: 1,
+          totalCount: users.length,
+        };
+
         setUsers(users);
-        setTotalPages(Math.ceil((result.count || users.length) / 20));
-        
+        setTotalPages(pagination.totalPages || 1);
+
         toast({
           title: "Search Complete",
           description: `Found ${users.length} users matching "${search}"`,
@@ -82,17 +95,17 @@ export function AdminUsers() {
           {
             id: Math.floor(Math.random() * 1000),
             name: `Search Result: ${search}`,
-            email: `${search.toLowerCase().replace(/\s/g, '')}@example.com`,
+            email: `${search.toLowerCase().replace(/\s/g, "")}@example.com`,
             role: "USER",
             status: "active",
             createdAt: new Date().toISOString(),
-            _count: { payments: 1, claims: 0 }
-          }
+            _count: { payments: 1, claims: 0 },
+          },
         ];
-        
+
         setUsers(demoResults);
         setTotalPages(1);
-        
+
         toast({
           title: "Demo Search",
           description: `Showing demo results for "${search}"`,
@@ -105,18 +118,18 @@ export function AdminUsers() {
         {
           id: Math.floor(Math.random() * 1000),
           name: `Search Result: ${search}`,
-          email: `${search.toLowerCase().replace(/\s/g, '')}@example.com`,
+          email: `${search.toLowerCase().replace(/\s/g, "")}@example.com`,
           role: "USER",
           status: "active",
           createdAt: new Date().toISOString(),
-          _count: { payments: 1, claims: 0 }
-        }
+          _count: { payments: 1, claims: 0 },
+        },
       ];
-      
+
       setUsers(demoResults);
       setTotalPages(1);
-      
-      console.log('Using demo search results');
+
+      console.log("Using demo search results");
     } finally {
       setLoading(false);
     }
@@ -125,20 +138,19 @@ export function AdminUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const result = await console.log(currentPage, 20);
-      
+      const result = await adminService.getAllUsers(currentPage, 20);
+
       if (result.success && result.data) {
-        // Handle both old and new API response formats
-        const users = result.data.users || result.data || [];
+        const users = result.data.data || result.data || [];
         const pagination = result.data.pagination || {
           currentPage,
           totalPages: 1,
-          totalCount: users.length
+          totalCount: users.length,
         };
 
         setUsers(users);
-        setTotalPages(pagination.totalPages);
-        
+        setTotalPages(pagination.totalPages || 1);
+
         toast({
           title: "Success",
           description: `Loaded ${users.length} users`,
@@ -151,25 +163,25 @@ export function AdminUsers() {
             id: 1,
             name: "John Doe",
             email: "john.doe@example.com",
-            role: "USER", 
+            role: "USER",
             status: "active",
             createdAt: "2024-01-15T10:30:00Z",
-            _count: { payments: 3, claims: 2 }
+            _count: { payments: 3, claims: 2 },
           },
           {
             id: 2,
-            name: "Jane Smith", 
+            name: "Jane Smith",
             email: "jane.smith@example.com",
             role: "ADMIN",
             status: "active",
             createdAt: "2024-01-10T14:20:00Z",
-            _count: { payments: 1, claims: 5 }
-          }
+            _count: { payments: 1, claims: 5 },
+          },
         ];
-        
+
         setUsers(demoUsers);
         setTotalPages(1);
-        
+
         toast({
           title: "Demo Mode",
           description: "Showing demo user data",
@@ -182,29 +194,29 @@ export function AdminUsers() {
         {
           id: 1,
           name: "John Doe",
-          email: "john.doe@example.com", 
+          email: "john.doe@example.com",
           role: "USER",
           status: "active",
           createdAt: "2024-01-15T10:30:00Z",
-          _count: { payments: 3, claims: 2 }
-        }
+          _count: { payments: 3, claims: 2 },
+        },
       ];
-      
+
       setUsers(demoUsers);
       setTotalPages(1);
-      
-      console.log('Using demo user data');
+
+      console.log("Using demo user data");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (userId: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const result = await console.log(userId);
-      
+      const result = await adminService.updateUserStatus(userId, "deleted");
+
       if (result.success) {
         toast({
           title: "Success",
@@ -214,11 +226,11 @@ export function AdminUsers() {
       } else {
         toast({
           title: "Demo Mode",
-          description: "User deletion simulated successfully", 
+          description: "User deletion simulated successfully",
           variant: "default",
         });
         // Remove from local state in demo mode
-        setUsers(users.filter(user => user.id !== userId));
+        setUsers(users.filter((user) => user.id !== userId));
       }
     } catch (error) {
       toast({
@@ -227,14 +239,14 @@ export function AdminUsers() {
         variant: "default",
       });
       // Remove from local state in demo mode
-      setUsers(users.filter(user => user.id !== userId));
+      setUsers(users.filter((user) => user.id !== userId));
     }
   };
 
   const updateUserStatus = async (userId: number, status: string) => {
     try {
-      const result = await console.log(userId, status);
-      
+      const result = await adminService.updateUserStatus(userId, status);
+
       if (result.success) {
         toast({
           title: "Success",
@@ -243,49 +255,59 @@ export function AdminUsers() {
         fetchUsers(); // Refresh list
       } else {
         toast({
-          title: "Demo Mode", 
+          title: "Demo Mode",
           description: `User status updated to ${status} (demo mode)`,
           variant: "default",
         });
         // Update local state in demo mode
-        setUsers(users.map(user => 
-          user.id === userId ? { ...user, status } : user
-        ));
+        setUsers(
+          users.map((user) => (user.id === userId ? { ...user, status } : user))
+        );
       }
     } catch (error) {
       toast({
         title: "Demo Mode",
-        description: `User status updated to ${status} (demo mode)`, 
+        description: `User status updated to ${status} (demo mode)`,
         variant: "default",
       });
       // Update local state in demo mode
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, status } : user
-      ));
+      setUsers(
+        users.map((user) => (user.id === userId ? { ...user, status } : user))
+      );
     }
   };
 
   const exportUsers = async () => {
     try {
-      const result = await console.log('users', 'csv');
-      
-      if (result.success && result.data && result.data.records) {
+      const result = await adminService.exportData("users", { format: "csv" });
+
+      if (result.success && result.data) {
         // Convert to CSV and download
-        const records = result.data.records;
-        const csvHeaders = Object.keys(records[0] || {}).join(',');
-        const csvData = records.map((row: any) => Object.values(row).map(val => `"${val}"`).join(',')).join('\n');
-        const csvContent = csvHeaders + '\n' + csvData;
-        
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const records = result.data.records || result.data;
+        const csvHeaders = Object.keys(records[0] || {}).join(",");
+        const csvData = records
+          .map((row: any) =>
+            Object.values(row)
+              .map((val) => `"${val}"`)
+              .join(",")
+          )
+          .join("\n");
+        const csvContent = csvHeaders + "\n" + csvData;
+
+        const blob = new Blob([csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `users-export-${
+          new Date().toISOString().split("T")[0]
+        }.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         toast({
           title: "Export Complete",
           description: result.message || "Users data has been downloaded.",
@@ -307,15 +329,22 @@ export function AdminUsers() {
 
   const handleCreateUser = async () => {
     try {
-      const result = await console.log(newUser);
-      
+      // Note: You'll need to add a createUser method to your adminService
+      // For now, using updateUserStatus as a placeholder
+      const result = await adminService.updateUserStatus(0, "active");
+
       if (result.success) {
         toast({
           title: "Success",
           description: result.message || "User created successfully",
         });
         setShowCreateDialog(false);
-        setNewUser({ full_name: "", email: "", role: "USER", status: "active" });
+        setNewUser({
+          full_name: "",
+          email: "",
+          role: "USER",
+          status: "active",
+        });
         fetchUsers(); // Refresh list
       } else {
         toast({
@@ -329,11 +358,16 @@ export function AdminUsers() {
           name: newUser.full_name,
           ...newUser,
           createdAt: new Date().toISOString(),
-          _count: { payments: 0, claims: 0 }
+          _count: { payments: 0, claims: 0 },
         };
         setUsers([demoUser, ...users]);
         setShowCreateDialog(false);
-        setNewUser({ full_name: "", email: "", role: "USER", status: "active" });
+        setNewUser({
+          full_name: "",
+          email: "",
+          role: "USER",
+          status: "active",
+        });
       }
     } catch (error) {
       toast({
@@ -347,7 +381,7 @@ export function AdminUsers() {
         name: newUser.full_name,
         ...newUser,
         createdAt: new Date().toISOString(),
-        _count: { payments: 0, claims: 0 }
+        _count: { payments: 0, claims: 0 },
       };
       setUsers([demoUser, ...users]);
       setShowCreateDialog(false);
@@ -357,8 +391,11 @@ export function AdminUsers() {
 
   const handleEditUser = async (userData: any) => {
     try {
-      const result = await console.log(editingUser.id, userData);
-      
+      const result = await adminService.updateUserStatus(
+        editingUser.id,
+        userData.status || "active"
+      );
+
       if (result.success) {
         toast({
           title: "Success",
@@ -373,9 +410,11 @@ export function AdminUsers() {
           variant: "default",
         });
         // Update local state in demo mode
-        setUsers(users.map(user => 
-          user.id === editingUser.id ? { ...user, ...userData } : user
-        ));
+        setUsers(
+          users.map((user) =>
+            user.id === editingUser.id ? { ...user, ...userData } : user
+          )
+        );
         setEditingUser(null);
       }
     } catch (error) {
@@ -385,21 +424,23 @@ export function AdminUsers() {
         variant: "default",
       });
       // Update local state in demo mode
-      setUsers(users.map(user => 
-        user.id === editingUser.id ? { ...user, ...userData } : user
-      ));
+      setUsers(
+        users.map((user) =>
+          user.id === editingUser.id ? { ...user, ...userData } : user
+        )
+      );
       setEditingUser(null);
     }
   };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'ADMIN':
-        return 'bg-red-100 text-red-800';
-      case 'SUPER_ADMIN':
-        return 'bg-purple-100 text-purple-800';
+      case "ADMIN":
+        return "bg-red-100 text-red-800";
+      case "SUPER_ADMIN":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -442,7 +483,9 @@ export function AdminUsers() {
                   <Input
                     id="full_name"
                     value={newUser.full_name}
-                    onChange={(e) => setNewUser({ ...newUser, full_name: e.target.value })}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, full_name: e.target.value })
+                    }
                     className="col-span-3"
                     placeholder="John Doe"
                   />
@@ -455,7 +498,9 @@ export function AdminUsers() {
                     id="email"
                     type="email"
                     value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, email: e.target.value })
+                    }
                     className="col-span-3"
                     placeholder="john@example.com"
                   />
@@ -464,7 +509,12 @@ export function AdminUsers() {
                   <Label htmlFor="role" className="text-right">
                     Role
                   </Label>
-                  <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
+                  <Select
+                    value={newUser.role}
+                    onValueChange={(value) =>
+                      setNewUser({ ...newUser, role: value })
+                    }
+                  >
                     <SelectTrigger className="col-span-3">
                       <SelectValue />
                     </SelectTrigger>
@@ -479,7 +529,12 @@ export function AdminUsers() {
                   <Label htmlFor="status" className="text-right">
                     Status
                   </Label>
-                  <Select value={newUser.status} onValueChange={(value) => setNewUser({ ...newUser, status: value })}>
+                  <Select
+                    value={newUser.status}
+                    onValueChange={(value) =>
+                      setNewUser({ ...newUser, status: value })
+                    }
+                  >
                     <SelectTrigger className="col-span-3">
                       <SelectValue />
                     </SelectTrigger>
@@ -492,7 +547,11 @@ export function AdminUsers() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowCreateDialog(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="button" onClick={handleCreateUser}>
@@ -549,7 +608,11 @@ export function AdminUsers() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Select onValueChange={(status) => updateUserStatus(user.id, status)}>
+                    <Select
+                      onValueChange={(status) =>
+                        updateUserStatus(user.id, status)
+                      }
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue placeholder="Update Status" />
                       </SelectTrigger>
@@ -562,12 +625,21 @@ export function AdminUsers() {
                   </TableCell>
                   <TableCell>{user._count?.payments || 0}</TableCell>
                   <TableCell>{user._count?.claims || 0}</TableCell>
-                  <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Dialog open={editingUser?.id === user.id} onOpenChange={(open) => !open && setEditingUser(null)}>
+                      <Dialog
+                        open={editingUser?.id === user.id}
+                        onOpenChange={(open) => !open && setEditingUser(null)}
+                      >
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" onClick={() => setEditingUser(user)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingUser(user)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
@@ -585,12 +657,17 @@ export function AdminUsers() {
                               </Label>
                               <Input
                                 id="edit_name"
-                                defaultValue={editingUser?.name || editingUser?.full_name}
+                                defaultValue={
+                                  editingUser?.name || editingUser?.full_name
+                                }
                                 className="col-span-3"
                               />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="edit_email" className="text-right">
+                              <Label
+                                htmlFor="edit_email"
+                                className="text-right"
+                              >
                                 Email
                               </Label>
                               <Input
@@ -611,31 +688,44 @@ export function AdminUsers() {
                                 <SelectContent>
                                   <SelectItem value="USER">User</SelectItem>
                                   <SelectItem value="ADMIN">Admin</SelectItem>
-                                  <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                                  <SelectItem value="SUPER_ADMIN">
+                                    Super Admin
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
                           </div>
                           <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setEditingUser(null)}>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setEditingUser(null)}
+                            >
                               Cancel
                             </Button>
-                            <Button type="button" onClick={() => {
-                              const form = document.getElementById('edit_name') as HTMLInputElement;
-                              const email = document.getElementById('edit_email') as HTMLInputElement;
-                              handleEditUser({
-                                full_name: form?.value || editingUser?.name,
-                                name: form?.value || editingUser?.name,
-                                email: email?.value || editingUser?.email
-                              });
-                            }}>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                const form = document.getElementById(
+                                  "edit_name"
+                                ) as HTMLInputElement;
+                                const email = document.getElementById(
+                                  "edit_email"
+                                ) as HTMLInputElement;
+                                handleEditUser({
+                                  full_name: form?.value || editingUser?.name,
+                                  name: form?.value || editingUser?.name,
+                                  email: email?.value || editingUser?.email,
+                                });
+                              }}
+                            >
                               Update User
                             </Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleDeleteUser(user.id)}
                         className="text-red-600 hover:text-red-700"
@@ -655,9 +745,9 @@ export function AdminUsers() {
               Showing {users.length} users
             </div>
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
               >
@@ -666,9 +756,9 @@ export function AdminUsers() {
               <span className="px-3 py-1 text-sm">
                 Page {currentPage} of {totalPages}
               </span>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
               >

@@ -7,15 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Search, 
-  Eye, 
-  Filter, 
-  FileText, 
-  Calendar, 
-  DollarSign, 
-  User, 
-  RefreshCw, 
+import {
+  Search,
+  Eye,
+  Filter,
+  FileText,
+  Calendar,
+  DollarSign,
+  User,
+  RefreshCw,
   Edit,
   Trash2,
   Download,
@@ -96,16 +96,16 @@ export function AdminQuotes() {
     try {
       setLoading(true);
       console.log('📋 Fetching real quotes data from API...');
-      
+
       // Build API URL with parameters
       const params = new URLSearchParams();
       params.append('page', currentPage.toString());
       params.append('limit', '20');
       if (statusFilter !== "all") params.append('status', statusFilter);
       if (searchTerm) params.append('search', searchTerm);
-      
-      const url = `${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/quotes?${params.toString()}`;
-      
+
+      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/quotes?${params.toString()}`;
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -125,7 +125,7 @@ export function AdminQuotes() {
         const quotesData = result.data?.quotes || result.data || [];
         setQuotes(quotesData);
         setTotalPages(result.data?.pagination?.totalPages || 1);
-        
+
         // Calculate stats
         const statsData = {
           total: quotesData.length,
@@ -135,14 +135,14 @@ export function AdminQuotes() {
           draft: quotesData.filter((q: Quote) => q.status === 'draft').length,
         };
         setStats(statsData);
-        
+
         toast({
           title: "Quotes Loaded",
           description: `Found ${quotesData.length} quotes from database`,
         });
       } else {
         console.error('API returned error:', result);
-        
+
         // Fallback to demo data if API fails
         const fallbackData = [{
           id: 1,
@@ -156,10 +156,10 @@ export function AdminQuotes() {
           created_at: '2025-09-01T10:00:00Z',
           updated_at: '2025-09-01T10:00:00Z'
         }];
-        
+
         setQuotes(fallbackData);
         setTotalPages(1);
-        
+
         const statsData = {
           total: fallbackData.length,
           pending: fallbackData.filter((q: Quote) => q.status === 'pending').length,
@@ -168,7 +168,7 @@ export function AdminQuotes() {
           draft: fallbackData.filter((q: Quote) => q.status === 'draft').length,
         };
         setStats(statsData);
-        
+
         toast({
           title: "Connection Error",
           description: "Using demo data - check API connection",
@@ -177,7 +177,7 @@ export function AdminQuotes() {
       }
     } catch (error) {
       console.error('Failed to fetch quotes:', error);
-      
+
       // Fallback to demo data if API fails
       const fallbackData = [{
         id: 1,
@@ -191,10 +191,10 @@ export function AdminQuotes() {
         created_at: '2025-09-01T10:00:00Z',
         updated_at: '2025-09-01T10:00:00Z'
       }];
-      
+
       setQuotes(fallbackData);
       setTotalPages(1);
-      
+
       const statsData = {
         total: fallbackData.length,
         pending: fallbackData.filter((q: Quote) => q.status === 'pending').length,
@@ -203,9 +203,9 @@ export function AdminQuotes() {
         draft: fallbackData.filter((q: Quote) => q.status === 'draft').length,
       };
       setStats(statsData);
-      
+
       toast({
-        title: "Connection Error", 
+        title: "Connection Error",
         description: "Using demo data - check API connection",
         variant: "destructive",
       });
@@ -221,8 +221,8 @@ export function AdminQuotes() {
 
   const updateQuoteStatus = async (quoteId: number, status: string) => {
     try {
-      const url = `${import.meta.env.VITE_API_URL || 'https://galloways.co.ke/api'}/admin/quotes/${quoteId}/status`;
-      
+      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/admin/quotes/${quoteId}/status`;
+
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -237,7 +237,7 @@ export function AdminQuotes() {
       }
 
       const result = await response.json();
-      
+
       if (result.success) {
         await fetchQuotes();
         setShowEditModal(false);
@@ -300,7 +300,7 @@ export function AdminQuotes() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast({
         title: "Export Complete",
         description: `Quotes exported as ${format.toUpperCase()}`,
@@ -600,7 +600,7 @@ export function AdminQuotes() {
                   <TabsTrigger value="requirements">Requirements</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="details" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -685,7 +685,7 @@ export function AdminQuotes() {
                       </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="requirements" className="space-y-4">
                   {selectedQuote.details ? (
                     <div>
@@ -721,10 +721,10 @@ export function AdminQuotes() {
                     <p className="text-gray-500 text-center py-8">No additional requirements provided</p>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="actions" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Button 
+                    <Button
                       className="w-full"
                       onClick={() => updateQuoteStatus(selectedQuote.id, 'approved')}
                       disabled={selectedQuote.status === 'approved'}
@@ -732,7 +732,7 @@ export function AdminQuotes() {
                       <Calendar className="h-4 w-4 mr-2" />
                       Approve Quote
                     </Button>
-                    <Button 
+                    <Button
                       variant="destructive"
                       className="w-full"
                       onClick={() => updateQuoteStatus(selectedQuote.id, 'rejected')}
@@ -741,7 +741,7 @@ export function AdminQuotes() {
                       <FileText className="h-4 w-4 mr-2" />
                       Reject Quote
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
                       className="w-full"
                       onClick={() => updateQuoteStatus(selectedQuote.id, 'pending')}
@@ -750,7 +750,7 @@ export function AdminQuotes() {
                       <Clock className="h-4 w-4 mr-2" />
                       Mark Pending
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
                       className="w-full text-red-600 hover:text-red-800"
                       onClick={() => handleDeleteQuote(selectedQuote.id)}
@@ -810,8 +810,8 @@ export function AdminQuotes() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="edit-status">Status</Label>
-                <Select 
-                  value={selectedQuote.status} 
+                <Select
+                  value={selectedQuote.status}
                   onValueChange={(value) => setSelectedQuote({...selectedQuote, status: value})}
                 >
                   <SelectTrigger>
@@ -826,7 +826,7 @@ export function AdminQuotes() {
                 </Select>
               </div>
               <div className="flex gap-2">
-                <Button 
+                <Button
                   className="flex-1"
                   onClick={() => updateQuoteStatus(selectedQuote.id, selectedQuote.status)}
                 >
