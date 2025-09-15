@@ -1,12 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Eye, Download, Filter, FileText, Calendar, DollarSign, User, RefreshCw } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Search,
+  Eye,
+  Download,
+  Filter,
+  FileText,
+  Calendar,
+  DollarSign,
+  User,
+  RefreshCw,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Document {
   id: number;
@@ -18,7 +39,7 @@ interface Document {
 }
 
 interface Claim {
-  id: number;
+  Id: number;
   policy_number: string;
   claim_type: string;
   incident_date: string;
@@ -39,8 +60,8 @@ export function AdminClaims() {
   const [loading, setLoading] = useState(true);
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
@@ -48,17 +69,19 @@ export function AdminClaims() {
   const fetchClaims = async () => {
     try {
       setLoading(true);
-      console.log('📋 Fetching real claims data from API...');
+      console.log("📋 Fetching real claims data from API...");
 
       // Fetch real data from Laravel backend API
-      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
+      const url = `${
+        import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+      }/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
 
       const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -66,7 +89,7 @@ export function AdminClaims() {
       }
 
       const result = await response.json();
-      console.log('📋 Real claims data received:', result);
+      console.log("📋 Real claims data received:", result);
 
       if (result && result.success) {
         const claimsData = result.data?.claims || result.data || [];
@@ -78,7 +101,7 @@ export function AdminClaims() {
           description: `Found ${claimsData.length} claims from database`,
         });
       } else {
-        console.error('API returned error:', result);
+        console.error("API returned error:", result);
         setClaims([]);
         toast({
           title: "API Error",
@@ -87,7 +110,7 @@ export function AdminClaims() {
         });
       }
     } catch (error) {
-      console.error('Failed to fetch claims:', error);
+      console.error("Failed to fetch claims:", error);
       setClaims([]);
       toast({
         title: "Connection Error",
@@ -101,12 +124,17 @@ export function AdminClaims() {
 
   const viewClaimDetails = async (claimId: number) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims/${claimId}`);
-      
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL ||
+          "https://gallo-api.onrender.com/api/v1"
+        }/claims/${claimId}`
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       const result = await response.json();
 
       if (result.success) {
@@ -120,7 +148,7 @@ export function AdminClaims() {
         });
       }
     } catch (error) {
-      console.error('Failed to fetch claim details:', error);
+      console.error("Failed to fetch claim details:", error);
       toast({
         title: "Error",
         description: "Failed to fetch claim details.",
@@ -131,13 +159,19 @@ export function AdminClaims() {
 
   const updateClaimStatus = async (claimId: number, newStatus: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/claims/${claimId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL ||
+          "https://gallo-api.onrender.com/api/v1"
+        }/claims/${claimId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -147,7 +181,7 @@ export function AdminClaims() {
 
       if (result.success) {
         fetchClaims(); // Refresh the list
-        if (selectedClaim && selectedClaim.id === claimId) {
+        if (selectedClaim && selectedClaim.Id === claimId) {
           setSelectedClaim({ ...selectedClaim, status: newStatus });
         }
         toast({
@@ -162,7 +196,7 @@ export function AdminClaims() {
         });
       }
     } catch (error) {
-      console.error('Failed to update claim status:', error);
+      console.error("Failed to update claim status:", error);
       toast({
         title: "Error",
         description: "Failed to update claim status.",
@@ -173,19 +207,24 @@ export function AdminClaims() {
 
   const downloadDocument = async (documentId: number, filename: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/documents/${documentId}/download`);
-      
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL ||
+          "https://gallo-api.onrender.com/api/v1"
+        }/documents/${documentId}/download`
+      );
+
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         toast({
           title: "Success",
           description: "Document download started.",
@@ -198,7 +237,7 @@ export function AdminClaims() {
         });
       }
     } catch (error) {
-      console.error('Failed to download document:', error);
+      console.error("Failed to download document:", error);
       toast({
         title: "Error",
         description: "Failed to download document.",
@@ -207,56 +246,77 @@ export function AdminClaims() {
     }
   };
 
-  const exportClaimsData = async (format: 'csv' | 'json' | 'xlsx' = 'csv') => {
+  const exportClaimsData = async (format: "csv" | "json" | "xlsx" = "csv") => {
     try {
       toast({
         title: "Export Started",
         description: `Exporting claims data as ${format.toUpperCase()}...`,
       });
 
-      // Simulate export delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       const exportData = {
-        claims: claims.map(claim => ({
-          id: claim.id,
-          policy_number: claim.policy_number,
-          claim_type: claim.claim_type,
-          claimant: `${claim.first_name} ${claim.last_name}`,
-          email: claim.email,
-          estimated_loss: claim.estimated_loss,
-          status: claim.status,
-          incident_date: claim.incident_date,
-          created_at: claim.created_at,
-          document_count: claim.supporting_documents?.length || 0
-        })),
+        claims: claims.map((claim) => {
+          let documentCount = 0;
+
+          try {
+            if (claim.supporting_documents) {
+              if (typeof claim.supporting_documents === "string") {
+                const parsedDocs = JSON.parse(claim.supporting_documents);
+                documentCount = Array.isArray(parsedDocs)
+                  ? parsedDocs.length
+                  : 0;
+              } else if (Array.isArray(claim.supporting_documents)) {
+                documentCount = claim.supporting_documents.length;
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing supporting documents:", error);
+            documentCount = 0;
+          }
+
+          return {
+            Id: claim.Id,
+            policy_number: claim.policy_number,
+            claim_type: claim.claim_type,
+            claimant: `${claim.first_name} ${claim.last_name}`,
+            email: claim.email,
+            estimated_loss: claim.estimated_loss,
+            status: claim.status,
+            incident_date: claim.incident_date,
+            created_at: claim.created_at,
+            document_count: documentCount,
+          };
+        }),
         timestamp: new Date().toISOString(),
-        format
+        format,
       };
 
       // Create file content based on format
-      let content = '';
-      let filename = `claims-export-${new Date().toISOString().split('T')[0]}`;
-      let mimeType = 'text/plain';
+      let content = "";
+      let filename = `claims-export-${new Date().toISOString().split("T")[0]}`;
+      let mimeType = "text/plain";
 
-      if (format === 'json') {
+      if (format === "json") {
         content = JSON.stringify(exportData, null, 2);
-        filename += '.json';
-        mimeType = 'application/json';
-      } else if (format === 'csv') {
-        const csvHeaders = 'ID,Policy Number,Claim Type,Claimant,Email,Amount,Status,Incident Date,Created At,Documents\n';
+        filename += ".json";
+        mimeType = "application/json";
+      } else if (format === "csv") {
+        const csvHeaders =
+          "ID,Policy Number,Claim Type,Claimant,Email,Amount,Status,Incident Date,Created At,Documents\n";
         const csvData = exportData.claims
-          .map(claim => `${claim.id},"${claim.policy_number}","${claim.claim_type}","${claim.claimant}","${claim.email}",${claim.estimated_loss},"${claim.status}","${claim.incident_date}","${claim.created_at}",${claim.document_count}`)
-          .join('\n');
+          .map(
+            (claim) =>
+              `${claim.Id},"${claim.policy_number}","${claim.claim_type}","${claim.claimant}","${claim.email}",${claim.estimated_loss},"${claim.status}","${claim.incident_date}","${claim.created_at}",${claim.document_count}`
+          )
+          .join("\n");
         content = csvHeaders + csvData;
-        filename += '.csv';
-        mimeType = 'text/csv';
+        filename += ".csv";
+        mimeType = "text/csv";
       }
 
       // Download file
       const blob = new Blob([content], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -269,7 +329,7 @@ export function AdminClaims() {
         description: `Claims data exported as ${format.toUpperCase()}`,
       });
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
       toast({
         title: "Export Failed",
         description: "Failed to export claims data",
@@ -280,11 +340,16 @@ export function AdminClaims() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'processing': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "processing":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -293,18 +358,18 @@ export function AdminClaims() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES'
+    return new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency: "KES",
     }).format(amount);
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   useEffect(() => {
@@ -325,15 +390,30 @@ export function AdminClaims() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Claims Management</h1>
         <div className="flex gap-2">
-          <Button onClick={fetchClaims} variant="outline" size="sm" disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <Button
+            onClick={fetchClaims}
+            variant="outline"
+            size="sm"
+            disabled={loading}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
-          <Button onClick={() => exportClaimsData('csv')} variant="outline" size="sm">
+          <Button
+            onClick={() => exportClaimsData("csv")}
+            variant="outline"
+            size="sm"
+          >
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
-          <Button onClick={() => exportClaimsData('json')} variant="outline" size="sm">
+          <Button
+            onClick={() => exportClaimsData("json")}
+            variant="outline"
+            size="sm"
+          >
             <Download className="h-4 w-4 mr-2" />
             Export JSON
           </Button>
@@ -395,19 +475,27 @@ export function AdminClaims() {
               <tbody>
                 {claims.length > 0 ? (
                   claims.map((claim) => (
-                    <tr key={claim.id} className="border-b hover:bg-gray-50">
-                      <td className="p-3 font-mono text-sm">{claim.policy_number}</td>
+                    <tr key={claim.Id} className="border-b hover:bg-gray-50">
+                      <td className="p-3 font-mono text-sm">
+                        {claim.policy_number}
+                      </td>
                       <td className="p-3">
                         <div>
                           <div className="font-medium">
                             {claim.first_name} {claim.last_name}
                           </div>
-                          <div className="text-sm text-gray-500">{claim.email}</div>
-                          <div className="text-sm text-gray-500">{claim.phone}</div>
+                          <div className="text-sm text-gray-500">
+                            {claim.email}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {claim.phone}
+                          </div>
                         </div>
                       </td>
                       <td className="p-3">{claim.claim_type}</td>
-                      <td className="p-3 font-medium">{formatCurrency(claim.estimated_loss)}</td>
+                      <td className="p-3 font-medium">
+                        {formatCurrency(claim.estimated_loss)}
+                      </td>
                       <td className="p-3">{formatDate(claim.incident_date)}</td>
                       <td className="p-3">
                         <Badge className={getStatusColor(claim.status)}>
@@ -417,7 +505,40 @@ export function AdminClaims() {
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">{claim.supporting_documents?.length || 0} files</span>
+                          <span className="text-sm">
+                            {(() => {
+                              try {
+                                if (!selectedClaim?.supporting_documents)
+                                  return "0 files";
+
+                                if (
+                                  typeof selectedClaim.supporting_documents ===
+                                  "string"
+                                ) {
+                                  const parsedDocs = JSON.parse(
+                                    selectedClaim.supporting_documents
+                                  );
+                                  return Array.isArray(parsedDocs)
+                                    ? `${parsedDocs.length} files`
+                                    : "0 files";
+                                } else if (
+                                  Array.isArray(
+                                    selectedClaim.supporting_documents
+                                  )
+                                ) {
+                                  return `${selectedClaim.supporting_documents.length} files`;
+                                } else {
+                                  return "0 files";
+                                }
+                              } catch (error) {
+                                console.error(
+                                  "Error parsing supporting documents:",
+                                  error
+                                );
+                                return "0 files";
+                              }
+                            })()}
+                          </span>
                         </div>
                       </td>
                       <td className="p-3">
@@ -425,23 +546,28 @@ export function AdminClaims() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => viewClaimDetails(claim.id)}
+                            onClick={() => viewClaimDetails(claim.Id)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Select onValueChange={(status) => updateClaimStatus(claim.id, status)}>
+                          <Select
+                            onValueChange={(status) =>
+                              updateClaimStatus(claim.Id, status)
+                            }
+                          >
                             <SelectTrigger className="w-32">
                               <SelectValue placeholder="Update" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="processing">Processing</SelectItem>
+                              <SelectItem value="processing">
+                                Processing
+                              </SelectItem>
                               <SelectItem value="approved">Approved</SelectItem>
                               <SelectItem value="rejected">Rejected</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                       
                       </td>
                     </tr>
                   ))
@@ -450,7 +576,9 @@ export function AdminClaims() {
                     <td colSpan={8} className="text-center py-12">
                       <div className="text-gray-500">
                         <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                        <h3 className="text-lg font-medium mb-2">No claims found</h3>
+                        <h3 className="text-lg font-medium mb-2">
+                          No claims found
+                        </h3>
                         <p>No claims match your current filters.</p>
                       </div>
                     </td>
@@ -505,23 +633,35 @@ export function AdminClaims() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Policy Number</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Policy Number
+                      </label>
                       <p className="font-mono">{selectedClaim.policy_number}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Claim Type</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Claim Type
+                      </label>
                       <p>{selectedClaim.claim_type}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Estimated Loss</label>
-                      <p className="font-medium">{formatCurrency(selectedClaim.estimated_loss)}</p>
+                      <label className="text-sm font-medium text-gray-500">
+                        Estimated Loss
+                      </label>
+                      <p className="font-medium">
+                        {formatCurrency(selectedClaim.estimated_loss)}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Incident Date</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Incident Date
+                      </label>
                       <p>{formatDate(selectedClaim.incident_date)}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Status</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Status
+                      </label>
                       <Badge className={getStatusColor(selectedClaim.status)}>
                         {selectedClaim.status}
                       </Badge>
@@ -538,23 +678,33 @@ export function AdminClaims() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <label className="text-sm font-medium text-gray-500">First Name</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        First Name
+                      </label>
                       <p>{selectedClaim.first_name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Last Name</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Last Name
+                      </label>
                       <p>{selectedClaim.last_name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Email</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Email
+                      </label>
                       <p>{selectedClaim.email}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Phone</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Phone
+                      </label>
                       <p>{selectedClaim.phone}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500">Submitted</label>
+                      <label className="text-sm font-medium text-gray-500">
+                        Submitted
+                      </label>
                       <p>{formatDate(selectedClaim.created_at)}</p>
                     </div>
                   </CardContent>
@@ -567,7 +717,9 @@ export function AdminClaims() {
                   <CardTitle className="text-lg">Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 whitespace-pre-wrap">{selectedClaim.description}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {selectedClaim.description}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -576,36 +728,61 @@ export function AdminClaims() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Attached Documents ({selectedClaim.supporting_documents?.length || 0})
+                    Attached Documents (
+                    {selectedClaim.supporting_documents
+                      ? typeof selectedClaim.supporting_documents === "string"
+                        ? JSON.parse(selectedClaim.supporting_documents).length
+                        : selectedClaim.supporting_documents.length
+                      : 0}
+                    )
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {(selectedClaim.supporting_documents?.length || 0) > 0 ? (
-                    <div className="grid gap-3">
-                      {selectedClaim.supporting_documents?.map((doc) => (
-                        <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-gray-400" />
-                            <div>
-                              <p className="font-medium">{doc.original_name}</p>
-                              <p className="text-sm text-gray-500">
-                                {formatFileSize(doc.size)} • {formatDate(doc.created_at)}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => downloadDocument(doc.id, doc.original_name)}
+                  {(() => {
+                    // Parse the documents if they were stored as a string
+                    const documents = selectedClaim.supporting_documents
+                      ? typeof selectedClaim.supporting_documents === "string"
+                        ? JSON.parse(selectedClaim.supporting_documents)
+                        : selectedClaim.supporting_documents
+                      : [];
+
+                    return documents.length > 0 ? (
+                      <div className="grid gap-3">
+                        {documents.map((doc: any) => (
+                          <div
+                            key={doc.id}
+                            className="flex items-center justify-between p-3 border rounded-lg"
                           >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center py-4">No documents attached</p>
-                  )}
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-5 w-5 text-gray-400" />
+                              <div>
+                                <p className="font-medium">
+                                  {doc.original_name}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {formatFileSize(doc.size)} •{" "}
+                                  {formatDate(doc.created_at)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                downloadDocument(doc.id, doc.original_name)
+                              }
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-4">
+                        No documents attached
+                      </p>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             </div>

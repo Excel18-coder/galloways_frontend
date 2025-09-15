@@ -6,59 +6,109 @@ import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Label } from "../components/ui/label";
-import { Phone, Mail, FileText, Clock, CheckCircle, Upload } from "lucide-react";
-import { Shield, Car, FileText as FileTextIcon, Home, Briefcase, Users, Layers, HeartPulse, PiggyBank, Coins, Hammer, Wrench, MonitorSmartphone, Plane, UserCheck } from "lucide-react";
+import { Phone, Mail, FileText, CheckCircle, Upload } from "lucide-react";
+import {
+  Shield,
+  Car,
+  FileText as FileTextIcon,
+  Home,
+  Briefcase,
+  Users,
+  HeartPulse,
+  PiggyBank,
+  Wrench,
+  UserCheck,
+} from "lucide-react";
 import { toast } from "../hooks/use-toast";
 import { claimsService } from "../lib/api";
 import { getDownloadUrl } from "../lib/assets";
 
 const claimIcons = {
-  "Machinery Breakdown / Extr. Damage": <Wrench className="inline-block mr-2 text-accent" />,
-  "Windscreen & Window Damage Claim Form": <Car className="inline-block mr-2 text-accent" />,
-  "Personal Accident Claim Form": <UserCheck className="inline-block mr-2 text-accent" />,
-  "Motor Entertainment System Claim Form": <Car className="inline-block mr-2 text-accent" />,
+  "Machinery Breakdown / Extr. Damage": (
+    <Wrench className="inline-block mr-2 text-accent" />
+  ),
+  "Windscreen & Window Damage Claim Form": (
+    <Car className="inline-block mr-2 text-accent" />
+  ),
+  "Personal Accident Claim Form": (
+    <UserCheck className="inline-block mr-2 text-accent" />
+  ),
+  "Motor Entertainment System Claim Form": (
+    <Car className="inline-block mr-2 text-accent" />
+  ),
   "Motor Theft Claim Form": <Car className="inline-block mr-2 text-accent" />,
-  "Public Liability (Third-Party) Claim Form": <Shield className="inline-block mr-2 text-accent" />,
-  "Fidelity Guarantee Claim Form": <PiggyBank className="inline-block mr-2 text-accent" />,
-  "Workmen's Compensation Accident Claim Form": <Users className="inline-block mr-2 text-accent" />,
-  "Claim Documentation Guide 2012": <FileTextIcon className="inline-block mr-2 text-accent" />,
-  "Motor Vehicle Accident Claims": <Car className="inline-block mr-2 text-accent" />,
-  "Motor Vehicle Theft Claims": <Car className="inline-block mr-2 text-accent" />,
-  "Motorcycle Accident Claims": <Car className="inline-block mr-2 text-accent" />,
+  "Public Liability (Third-Party) Claim Form": (
+    <Shield className="inline-block mr-2 text-accent" />
+  ),
+  "Fidelity Guarantee Claim Form": (
+    <PiggyBank className="inline-block mr-2 text-accent" />
+  ),
+  "Workmen's Compensation Accident Claim Form": (
+    <Users className="inline-block mr-2 text-accent" />
+  ),
+  "Claim Documentation Guide 2012": (
+    <FileTextIcon className="inline-block mr-2 text-accent" />
+  ),
+  "Motor Vehicle Accident Claims": (
+    <Car className="inline-block mr-2 text-accent" />
+  ),
+  "Motor Vehicle Theft Claims": (
+    <Car className="inline-block mr-2 text-accent" />
+  ),
+  "Motorcycle Accident Claims": (
+    <Car className="inline-block mr-2 text-accent" />
+  ),
   "Motorcycle Theft Claims": <Car className="inline-block mr-2 text-accent" />,
   "Windscreen Claims": <Car className="inline-block mr-2 text-accent" />,
-  "Burglary / Fire / Micro Insurance Claims": <Home className="inline-block mr-2 text-accent" />,
-  "Fidelity Guarantee Claims": <PiggyBank className="inline-block mr-2 text-accent" />,
-  "Agency Model Claims": <Briefcase className="inline-block mr-2 text-accent" />,
-  "Personal Accident Claims": <UserCheck className="inline-block mr-2 text-accent" />,
+  "Burglary / Fire / Micro Insurance Claims": (
+    <Home className="inline-block mr-2 text-accent" />
+  ),
+  "Fidelity Guarantee Claims": (
+    <PiggyBank className="inline-block mr-2 text-accent" />
+  ),
+  "Agency Model Claims": (
+    <Briefcase className="inline-block mr-2 text-accent" />
+  ),
+  "Personal Accident Claims": (
+    <UserCheck className="inline-block mr-2 text-accent" />
+  ),
   "WIBA Claims": <Users className="inline-block mr-2 text-accent" />,
   "Livestock Claims": <UserCheck className="inline-block mr-2 text-accent" />,
-  "Credit Life Claims": <HeartPulse className="inline-block mr-2 text-accent" />,
+  "Credit Life Claims": (
+    <HeartPulse className="inline-block mr-2 text-accent" />
+  ),
 };
 
 export default function Claims() {
-  const uploadFieldName = import.meta.env.VITE_CLAIM_FILE_FIELD || 'supporting_documents';
-  const uploadMode = (import.meta.env.VITE_CLAIM_UPLOAD_MODE || 'json').toLowerCase(); // 'json' | 'multipart'
+  const uploadFieldName =
+    import.meta.env.VITE_CLAIM_FILE_FIELD || "supporting_documents";
+  const uploadMode = (
+    import.meta.env.VITE_CLAIM_UPLOAD_MODE || "json"
+  ).toLowerCase(); // 'json' | 'multipart'
   const [formData, setFormData] = useState({
-    policy_number: '',
-    claim_type: '',
-    incident_date: '',
-    estimated_loss: '',
-    description: '',
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: ''
+    policy_number: "",
+    claim_type: "",
+    incident_date: "",
+    estimated_loss: "",
+    description: "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
   });
   const [files, setFiles] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -66,68 +116,286 @@ export default function Claims() {
     setFiles(e.target.files);
   };
 
+  // // Function to upload files to Cloudinary
+  // const uploadToCloudinary = async (file: File): Promise<string> => {
+  //   const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/upload`;
+  //   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+  //   if (!uploadPreset || !import.meta.env.VITE_CLOUDINARY_CLOUD_NAME) {
+  //     throw new Error("Cloudinary configuration is missing");
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   formData.append('upload_preset', uploadPreset);
+
+  //   try {
+  //     const response = await fetch(cloudinaryUrl, {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error?.message || 'Failed to upload file to Cloudinary');
+  //     }
+
+  //     const data = await response.json();
+  //     return data.secure_url;
+  //   } catch (error) {
+  //     console.error('Cloudinary upload error:', error);
+  //     throw new Error(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  //   }
+  // };
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!formData.policy_number || !formData.claim_type || !formData.description) {
+  //     toast({
+  //       title: "Validation Error",
+  //       description: "Please fill in all required fields.",
+  //       variant: "destructive"
+  //     });
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     const hasFiles = files && files.length > 0;
+  //     let fileUrls: string[] = [];
+
+  //     // Upload files to Cloudinary if any
+  //     if (hasFiles) {
+  //       try {
+  //         toast({
+  //           title: "Uploading Files",
+  //           description: "Please wait while we upload your documents...",
+  //         });
+
+  //         // Upload all files in parallel
+  //         const uploadPromises = Array.from(files).map(file => uploadToCloudinary(file));
+  //         fileUrls = await Promise.all(uploadPromises);
+
+  //         toast({
+  //           title: "Upload Complete",
+  //           description: "Your documents have been successfully uploaded.",
+  //         });
+  //       } catch (uploadError) {
+  //         console.error('File upload error:', uploadError);
+  //         throw new Error(`File upload failed: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
+  //       }
+  //     }
+
+  //     let payload: any;
+  //     if (uploadMode === 'multipart') {
+  //       // Use FormData for multipart upload
+  //       const formDataToSend = new FormData();
+  //       Object.entries(formData).forEach(([key, value]) => {
+  //         if (key === 'estimated_loss') {
+  //           formDataToSend.append(key, String(parseFloat(value) || 0));
+  //         } else {
+  //           formDataToSend.append(key, value);
+  //         }
+  //       });
+
+  //       // Add file URLs as a JSON string if we uploaded to Cloudinary
+  //       if (fileUrls.length > 0) {
+  //         formDataToSend.append(uploadFieldName, JSON.stringify(fileUrls));
+  //       }
+
+  //       payload = formDataToSend;
+  //     } else {
+  //       // Default: send JSON with Cloudinary URLs
+  //       payload = {
+  //         ...formData,
+  //         estimated_loss: Number.isFinite(Number(formData.estimated_loss)) ? Number(formData.estimated_loss) : 0,
+  //         [uploadFieldName]: fileUrls, // Add Cloudinary URLs to the payload
+  //       };
+  //     }
+
+  //     console.log('📋 Submitting claim to API...');
+  //     const result = await claimsService.createClaim(payload);
+
+  //     if (result.success) {
+  //       setIsSubmitted(true);
+  //       toast({
+  //         title: "Success",
+  //         description: result.message || "Your claim has been submitted successfully. We'll contact you soon with updates."
+  //       });
+  //     } else {
+  //       throw new Error(result.message || 'Failed to submit claim');
+  //     }
+  //   } catch (error: any) {
+  //     console.error('Claim submission error:', error);
+  //     toast({
+  //       title: "Error",
+  //       description: error.message || "Failed to submit claim. Please try again.",
+  //       variant: "destructive"
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Update the uploadToCloudinary function to return the proper Document format
+  const uploadToCloudinary = async (file: File): Promise<Document> => {
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${
+      import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+    }/upload`;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!uploadPreset || !import.meta.env.VITE_CLOUDINARY_CLOUD_NAME) {
+      throw new Error("Cloudinary configuration is missing");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    try {
+      const response = await fetch(cloudinaryUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error?.message || "Failed to upload file to Cloudinary"
+        );
+      }
+
+      const data = await response.json();
+
+      // Format the response to match the Document interface
+      return {
+        id: Date.now(), // Generate a temporary ID (backend will assign a real one)
+        original_name: file.name,
+        size: data.bytes,
+        created_at: new Date().toISOString(),
+        path: data.secure_url,
+        mime_type: file.type,
+      };
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw new Error(
+        `Failed to upload ${file.name}: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
+  // Update the handleSubmit function to handle Document objects instead of strings
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.policy_number || !formData.claim_type || !formData.description) {
+
+    if (
+      !formData.policy_number ||
+      !formData.claim_type ||
+      !formData.description
+    ) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       const hasFiles = files && files.length > 0;
+      let uploadedDocuments: Document[] = [];
+
+      // Upload files to Cloudinary if any
+      if (hasFiles) {
+        try {
+          toast({
+            title: "Uploading Files",
+            description: "Please wait while we upload your documents...",
+          });
+
+          // Upload all files in parallel
+          const uploadPromises = Array.from(files).map((file) =>
+            uploadToCloudinary(file)
+          );
+
+          uploadedDocuments = await Promise.all(uploadPromises);
+          console.log("Uploaded Documents:", uploadedDocuments);
+
+          toast({
+            title: "Upload Complete",
+            description: "Your documents have been successfully uploaded.",
+          });
+        } catch (uploadError) {
+          console.error("File upload error:", uploadError);
+          throw new Error(
+            `File upload failed: ${
+              uploadError instanceof Error
+                ? uploadError.message
+                : "Unknown error"
+            }`
+          );
+        }
+      }
 
       let payload: any;
-      if (hasFiles && uploadMode === 'multipart') {
+      if (uploadMode === "multipart") {
+        // Use FormData for multipart upload
         const formDataToSend = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
-          if (key === 'estimated_loss') {
+          if (key === "estimated_loss") {
             formDataToSend.append(key, String(parseFloat(value) || 0));
           } else {
             formDataToSend.append(key, value);
           }
         });
-        Array.from(files as FileList).forEach((file) => {
-          formDataToSend.append(uploadFieldName, file);
-        });
+
+        // Add file URLs as a JSON string if we uploaded to Cloudinary
+        if (uploadedDocuments.length > 0) {
+          formDataToSend.append(
+            uploadFieldName,
+            JSON.stringify(uploadedDocuments)
+          );
+        }
+
         payload = formDataToSend;
       } else {
-        // Default: send JSON so NestJS DTO validation works and avoids Multer field errors
+        // Default: send JSON with Document objects
         payload = {
           ...formData,
-          estimated_loss: Number.isFinite(Number(formData.estimated_loss)) ? Number(formData.estimated_loss) : 0,
-          supporting_documents: [],
+          estimated_loss: Number.isFinite(Number(formData.estimated_loss))
+            ? Number(formData.estimated_loss)
+            : 0,
+          [uploadFieldName]: uploadedDocuments, // Add Document objects to the payload
         };
-
-        if (hasFiles && uploadMode !== 'multipart') {
-          console.warn('Attachments present but upload mode is JSON; skipping file upload. Set VITE_CLAIM_UPLOAD_MODE=multipart to enable.');
-        }
       }
 
-      console.log('📋 Submitting claim to API...');
+      console.log("📋 Submitting claim to API...");
       const result = await claimsService.createClaim(payload);
-      
+
       if (result.success) {
         setIsSubmitted(true);
         toast({
           title: "Success",
-          description: result.message || "Your claim has been submitted successfully. We'll contact you soon with updates."
+          description:
+            result.message ||
+            "Your claim has been submitted successfully. We'll contact you soon with updates.",
         });
       } else {
-        throw new Error(result.message || 'Failed to submit claim');
+        throw new Error(result.message || "Failed to submit claim");
       }
     } catch (error: any) {
-      console.error('Claim submission error:', error);
+      console.error("Claim submission error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to submit claim. Please try again.",
-        variant: "destructive"
+        description:
+          error.message || "Failed to submit claim. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -136,7 +404,7 @@ export default function Claims() {
 
   if (isSubmitted) {
     return (
-  <div className="h-screen bg-background">
+      <div className="h-screen bg-background">
         <Header />
         <main className="pt-20 py-16">
           <div className="max-w-2xl mx-auto px-4 text-center">
@@ -146,7 +414,8 @@ export default function Claims() {
                 Claim Submitted Successfully!
               </h2>
               <p className="text-muted-foreground mb-6">
-                Your claim has been received and is being processed. You'll receive email updates on the status.
+                Your claim has been received and is being processed. You'll
+                receive email updates on the status.
               </p>
               <Button onClick={() => window.location.reload()}>
                 Submit Another Claim
@@ -160,7 +429,7 @@ export default function Claims() {
   }
 
   return (
-  <div className="h-screen bg-background">
+    <div className="h-screen bg-background">
       <Header />
       <main className="pt-20">
         {/* Hero Section */}
@@ -170,7 +439,8 @@ export default function Claims() {
               Fast and Transparent Claims with Galloways
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Experience hassle-free claims processing with our streamlined system and dedicated support team
+              Experience hassle-free claims processing with our streamlined
+              system and dedicated support team
             </p>
           </div>
         </section>
@@ -182,7 +452,9 @@ export default function Claims() {
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Simple 4-Step Claims Process
               </h2>
-              <p className="text-muted-foreground">Follow these easy steps to submit your claim</p>
+              <p className="text-muted-foreground">
+                Follow these easy steps to submit your claim
+              </p>
             </div>
 
             <div className="grid md:grid-cols-4 gap-8 mb-16">
@@ -190,27 +462,29 @@ export default function Claims() {
                 {
                   step: 1,
                   title: "Report Incident",
-                  description: "Contact us immediately after the incident occurs",
-                  icon: <Phone className="w-8 h-8" />
+                  description:
+                    "Contact us immediately after the incident occurs",
+                  icon: <Phone className="w-8 h-8" />,
                 },
                 {
                   step: 2,
                   title: "Submit Documents",
-                  description: "Upload required documents through our secure portal",
-                  icon: <Upload className="w-8 h-8" />
+                  description:
+                    "Upload required documents through our secure portal",
+                  icon: <Upload className="w-8 h-8" />,
                 },
                 {
                   step: 3,
                   title: "Assessment",
                   description: "Our experts review and assess your claim",
-                  icon: <FileText className="w-8 h-8" />
+                  icon: <FileText className="w-8 h-8" />,
                 },
                 {
                   step: 4,
                   title: "Settlement",
                   description: "Receive your settlement once approved",
-                  icon: <CheckCircle className="w-8 h-8" />
-                }
+                  icon: <CheckCircle className="w-8 h-8" />,
+                },
               ].map((step, index) => (
                 <Card key={index} className="p-6 text-center">
                   <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -220,7 +494,9 @@ export default function Claims() {
                     {step.step}
                   </div>
                   <h3 className="font-semibold mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {step.description}
+                  </p>
                 </Card>
               ))}
             </div>
@@ -234,7 +510,9 @@ export default function Claims() {
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Submit Your Claim Online
               </h2>
-              <p className="text-muted-foreground">Fill out the form below to start your claim process</p>
+              <p className="text-muted-foreground">
+                Fill out the form below to start your claim process
+              </p>
             </div>
 
             <Card className="p-8">
@@ -242,18 +520,18 @@ export default function Claims() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="policy_number">Policy Number *</Label>
-                    <Input 
-                      id="policy_number" 
+                    <Input
+                      id="policy_number"
                       name="policy_number"
                       value={formData.policy_number}
                       onChange={handleInputChange}
-                      placeholder="Enter your policy number" 
+                      placeholder="Enter your policy number"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="claim_type">Claim Type *</Label>
-                    <select 
+                    <select
                       id="claim_type"
                       name="claim_type"
                       value={formData.claim_type}
@@ -269,10 +547,18 @@ export default function Claims() {
                       <option value="Travel">Travel</option>
                       <option value="Life">Life</option>
                       <option value="Public liability">Public liability</option>
-                      <option value="Fidelity guarantee">Fidelity guarantee</option>
-                      <option value="Worksmen compensation accident">Worksmen compensation accident</option>
-                      <option value="Windscreen and window damage">Windscreen and window damage</option>
-                      <option value="Motor entertainment">Motor entertainment</option>
+                      <option value="Fidelity guarantee">
+                        Fidelity guarantee
+                      </option>
+                      <option value="Worksmen compensation accident">
+                        Worksmen compensation accident
+                      </option>
+                      <option value="Windscreen and window damage">
+                        Windscreen and window damage
+                      </option>
+                      <option value="Motor entertainment">
+                        Motor entertainment
+                      </option>
                       <option value="Motor theft">Motor theft</option>
                     </select>
                   </div>
@@ -281,22 +567,24 @@ export default function Claims() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="incident_date">Date of Incident</Label>
-                    <Input 
-                      id="incident_date" 
+                    <Input
+                      id="incident_date"
                       name="incident_date"
                       value={formData.incident_date}
                       onChange={handleInputChange}
-                      type="date" 
+                      type="date"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="estimated_loss">Estimated Loss Amount</Label>
-                    <Input 
-                      id="estimated_loss" 
+                    <Label htmlFor="estimated_loss">
+                      Estimated Loss Amount
+                    </Label>
+                    <Input
+                      id="estimated_loss"
                       name="estimated_loss"
                       value={formData.estimated_loss}
                       onChange={handleInputChange}
-                      placeholder="Enter amount in KES" 
+                      placeholder="Enter amount in KES"
                     />
                   </div>
                 </div>
@@ -304,46 +592,46 @@ export default function Claims() {
                 <div className="grid md:grid-cols-4 gap-6">
                   <div>
                     <Label htmlFor="first_name">First Name</Label>
-                    <Input 
-                      id="first_name" 
+                    <Input
+                      id="first_name"
                       name="first_name"
                       value={formData.first_name}
                       onChange={handleInputChange}
-                      placeholder="John" 
+                      placeholder="John"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="last_name">Last Name</Label>
-                    <Input 
-                      id="last_name" 
+                    <Input
+                      id="last_name"
                       name="last_name"
                       value={formData.last_name}
                       onChange={handleInputChange}
-                      placeholder="Doe" 
+                      placeholder="Doe"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="email">Email Address</Label>
-                    <Input 
-                      id="email" 
+                    <Input
+                      id="email"
                       name="email"
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="your@email.com" 
+                      placeholder="your@email.com"
                       required
                     />
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input 
-                      id="phone" 
+                    <Input
+                      id="phone"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="+254 700 000 000" 
+                      placeholder="+254 700 000 000"
                       required
                     />
                   </div>
@@ -351,8 +639,8 @@ export default function Claims() {
 
                 <div>
                   <Label htmlFor="description">Incident Description *</Label>
-                  <Textarea 
-                    id="description" 
+                  <Textarea
+                    id="description"
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
@@ -366,20 +654,26 @@ export default function Claims() {
                   <Label htmlFor="documents">Upload Supporting Documents</Label>
                   <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
                     <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-2">Drag and drop files here or click to browse</p>
-                    <p className="text-sm text-muted-foreground">Supported formats: PDF, JPG, PNG, DOC (Max 10MB)</p>
-                    <Input 
-                      id="documents" 
-                      type="file" 
-                      multiple 
+                    <p className="text-muted-foreground mb-2">
+                      Drag and drop files here or click to browse
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Supported formats: PDF, JPG, PNG, DOC (Max 10MB)
+                    </p>
+                    <Input
+                      id="documents"
+                      type="file"
+                      multiple
                       onChange={handleFileChange}
-                      className="hidden" 
+                      className="hidden"
                     />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       className="mt-4"
-                      onClick={() => document.getElementById('documents')?.click()}
+                      onClick={() =>
+                        document.getElementById("documents")?.click()
+                      }
                     >
                       Select Files
                     </Button>
@@ -387,7 +681,9 @@ export default function Claims() {
                       <div className="mt-4 text-sm text-left">
                         <p className="font-medium">Selected files:</p>
                         {Array.from(files).map((file, index) => (
-                          <p key={index} className="text-muted-foreground">• {file.name}</p>
+                          <p key={index} className="text-muted-foreground">
+                            • {file.name}
+                          </p>
                         ))}
                       </div>
                     )}
@@ -395,10 +691,10 @@ export default function Claims() {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isLoading}
-                    size="lg" 
+                    size="lg"
                     className="flex-1"
                   >
                     {isLoading ? "Submitting..." : "Submit Claim"}
@@ -415,12 +711,20 @@ export default function Claims() {
         {/* Claims Downloads & Requirements Section */}
         <section className="py-20 px-4 bg-muted/50">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-primary mb-8 text-center">Claims Downloads & Requirements</h2>
-            <p className="text-lg text-muted-foreground mb-12 text-center">Download the appropriate claim form and review the required documents before submission to ensure faster processing.</p>
+            <h2 className="text-3xl font-bold text-primary mb-8 text-center">
+              Claims Downloads & Requirements
+            </h2>
+            <p className="text-lg text-muted-foreground mb-12 text-center">
+              Download the appropriate claim form and review the required
+              documents before submission to ensure faster processing.
+            </p>
             <div className="grid md:grid-cols-2 gap-8">
               {/* Motor Vehicle Accident Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Motor Vehicle Accident Claims"]}Motor Vehicle Accident Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Motor Vehicle Accident Claims"]}Motor Vehicle
+                  Accident Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Original Police Abstract</li>
@@ -434,7 +738,10 @@ export default function Claims() {
               </div>
               {/* Motor Vehicle Theft Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Motor Vehicle Theft Claims"]}Motor Vehicle Theft Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Motor Vehicle Theft Claims"]}Motor Vehicle Theft
+                  Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Copy of Log Book</li>
@@ -448,7 +755,10 @@ export default function Claims() {
               </div>
               {/* Motorcycle Accident Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Motorcycle Accident Claims"]}Motorcycle Accident Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Motorcycle Accident Claims"]}Motorcycle Accident
+                  Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Police Abstract</li>
@@ -461,7 +771,9 @@ export default function Claims() {
               </div>
               {/* Motorcycle Theft Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Motorcycle Theft Claims"]}Motorcycle Theft Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Motorcycle Theft Claims"]}Motorcycle Theft Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Police Abstract</li>
@@ -475,7 +787,9 @@ export default function Claims() {
               </div>
               {/* Windscreen Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Windscreen Claims"]}Windscreen Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Windscreen Claims"]}Windscreen Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Photo of Broken Windscreen</li>
@@ -488,7 +802,10 @@ export default function Claims() {
               </div>
               {/* Burglary / Fire / Micro Insurance Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Burglary / Fire / Micro Insurance Claims"]}Burglary / Fire / Micro Insurance Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Burglary / Fire / Micro Insurance Claims"]}
+                  Burglary / Fire / Micro Insurance Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Police Abstract</li>
@@ -502,7 +819,10 @@ export default function Claims() {
               </div>
               {/* Fidelity Guarantee Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Fidelity Guarantee Claims"]}Fidelity Guarantee Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Fidelity Guarantee Claims"]}Fidelity Guarantee
+                  Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Employment Details of Staff Involved</li>
@@ -514,7 +834,9 @@ export default function Claims() {
               </div>
               {/* Agency Model Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Agency Model Claims"]}Agency Model Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Agency Model Claims"]}Agency Model Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Police Abstract</li>
@@ -532,7 +854,10 @@ export default function Claims() {
               </div>
               {/* Personal Accident Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Personal Accident Claims"]}Personal Accident Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Personal Accident Claims"]}Personal Accident
+                  Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Doctor-Stamped Medical Report (Page 4)</li>
@@ -547,7 +872,9 @@ export default function Claims() {
               </div>
               {/* WIBA Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["WIBA Claims"]}WIBA Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["WIBA Claims"]}WIBA Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Original DOSH 1 Form</li>
@@ -562,7 +889,9 @@ export default function Claims() {
               </div>
               {/* Livestock Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Livestock Claims"]}Livestock Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Livestock Claims"]}Livestock Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Veterinary Certificate of Loss</li>
@@ -575,7 +904,9 @@ export default function Claims() {
               </div>
               {/* Credit Life Claims */}
               <div className="p-6 bg-card rounded-lg shadow">
-                <h3 className="text-xl font-bold mb-2">{claimIcons["Credit Life Claims"]}Credit Life Claims</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {claimIcons["Credit Life Claims"]}Credit Life Claims
+                </h3>
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Death Certificate / Medical Report (for Disability)</li>
@@ -598,48 +929,158 @@ export default function Claims() {
           <h3 className="text-2xl font-semibold mb-4">General Claim Forms</h3>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Machinery Breakdown / Extr. Damage"]}Machinery Breakdown / Extr. Damage</h4>
-              <a href={getDownloadUrl("Machinery_Breakdown_Extr_Damage-Claim_Form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Machinery Breakdown / Extr. Damage"]}Machinery
+                Breakdown / Extr. Damage
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Machinery_Breakdown_Extr_Damage-Claim_Form.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2"><FileTextIcon className="inline-block mr-2 text-accent" />Claim Form- Damage or Loss (Amended)</h4>
-              <a href={getDownloadUrl("Claim_Forms_-_Damage_or_Loss-amended.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                <FileTextIcon className="inline-block mr-2 text-accent" />
+                Claim Form- Damage or Loss (Amended)
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Claim_Forms_-_Damage_or_Loss-amended.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2"><Car className="inline-block mr-2 text-accent" />Claim Form Motor (Amended)</h4>
-              <a href={getDownloadUrl("Claim_Form_Motor_-_Amended.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                <Car className="inline-block mr-2 text-accent" />
+                Claim Form Motor (Amended)
+              </h4>
+              <a
+                href={getDownloadUrl("Claim_Form_Motor_-_Amended.pdf")}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Windscreen & Window Damage Claim Form"]}Windscreen & Window Damage Claim Form</h4>
-              <a href={getDownloadUrl("Windscreen & window damage claim form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Windscreen & Window Damage Claim Form"]}Windscreen
+                & Window Damage Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Windscreen & window damage claim form.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Personal Accident Claim Form"]}Personal Accident Claim Form</h4>
-              <a href={getDownloadUrl("Personal_Accident_Claim_Form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Personal Accident Claim Form"]}Personal Accident
+                Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl("Personal_Accident_Claim_Form.pdf")}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Motor Entertainment System Claim Form"]}Motor Entertainment System Claim Form</h4>
-              <a href={getDownloadUrl("Motor_Entertainment_System_Claim_Form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Motor Entertainment System Claim Form"]}Motor
+                Entertainment System Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Motor_Entertainment_System_Claim_Form.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Motor Theft Claim Form"]}Motor Theft Claim Form</h4>
-              <a href={getDownloadUrl("Motor Theft Claim Form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Motor Theft Claim Form"]}Motor Theft Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl("Motor Theft Claim Form.pdf")}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Public Liability (Third-Party) Claim Form"]}Public Liability (Third-Party) Claim Form</h4>
-              <a href={getDownloadUrl("Public_Liability_(THIRDPARTY)_Claim_Form.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Public Liability (Third-Party) Claim Form"]}Public
+                Liability (Third-Party) Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Public_Liability_(THIRDPARTY)_Claim_Form.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Fidelity Guarantee Claim Form"]}Fidelity Guarantee Claim Form</h4>
-              <a href={getDownloadUrl("Fidelity_Guarantee_Claim_Forms.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Fidelity Guarantee Claim Form"]}Fidelity Guarantee
+                Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl("Fidelity_Guarantee_Claim_Forms.pdf")}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Workmen's Compensation Accident Claim Form"]}Workmen's Compensation Accident Claim Form</h4>
-              <a href={getDownloadUrl("Workmen's_Compenstion_Accident_Claim_Form_-_amended.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download Form</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Workmen's Compensation Accident Claim Form"]}
+                Workmen's Compensation Accident Claim Form
+              </h4>
+              <a
+                href={getDownloadUrl(
+                  "Workmen's_Compenstion_Accident_Claim_Form_-_amended.pdf"
+                )}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download Form
+              </a>
             </div>
             <div className="p-6 bg-card rounded-lg shadow">
-              <h4 className="text-xl font-bold mb-2">{claimIcons["Claim Documentation Guide 2012"]}Claim Documentation Guide 2012</h4>
-              <a href={getDownloadUrl("claim_documentation_guide.pdf")} className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90" download>📄 Download PDF</a>
+              <h4 className="text-xl font-bold mb-2">
+                {claimIcons["Claim Documentation Guide 2012"]}Claim
+                Documentation Guide 2012
+              </h4>
+              <a
+                href={getDownloadUrl("claim_documentation_guide.pdf")}
+                className="inline-block mb-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+                download
+              >
+                📄 Download PDF
+              </a>
             </div>
           </div>
         </div>
@@ -651,7 +1092,9 @@ export default function Claims() {
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Need Help with Your Claim?
               </h2>
-              <p className="text-muted-foreground">Our claims support team is here to assist you</p>
+              <p className="text-muted-foreground">
+                Our claims support team is here to assist you
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -663,9 +1106,12 @@ export default function Claims() {
                 <p className="text-muted-foreground mb-4">
                   Speak directly with our claims specialists
                 </p>
-                <p className="font-semibold mb-2">+254720769993/+254758301346</p>
+                <p className="font-semibold mb-2">
+                  +254720769993/+254758301346
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  Monday - Friday: 8:00 AM - 6:00 PM<br />
+                  Monday - Friday: 8:00 AM - 6:00 PM
+                  <br />
                   Saturday: 9:00 AM - 2:00 PM
                 </p>
               </Card>
@@ -694,7 +1140,9 @@ export default function Claims() {
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 What Our Clients Say
               </h2>
-              <p className="text-muted-foreground">Real experiences from satisfied customers</p>
+              <p className="text-muted-foreground">
+                Real experiences from satisfied customers
+              </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -702,32 +1150,41 @@ export default function Claims() {
                 {
                   name: "Sarah Wanjiku",
                   role: "Motor Insurance Client",
-                  testimonial: "My claim was processed within 48 hours. Exceptional service and support throughout the process.",
-                  rating: 5
+                  testimonial:
+                    "My claim was processed within 48 hours. Exceptional service and support throughout the process.",
+                  rating: 5,
                 },
                 {
                   name: "John Kimani",
-                  role: "Health Insurance Client", 
-                  testimonial: "Galloways made my medical claim so easy. The online portal is user-friendly and efficient.",
-                  rating: 5
+                  role: "Health Insurance Client",
+                  testimonial:
+                    "Galloways made my medical claim so easy. The online portal is user-friendly and efficient.",
+                  rating: 5,
                 },
                 {
                   name: "Grace Muthoni",
                   role: "Property Insurance Client",
-                  testimonial: "Professional and transparent claims handling. They kept me informed at every step.",
-                  rating: 5
-                }
+                  testimonial:
+                    "Professional and transparent claims handling. They kept me informed at every step.",
+                  rating: 5,
+                },
               ].map((testimonial, index) => (
                 <Card key={index} className="p-6">
                   <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-400">★</span>
+                      <span key={i} className="text-yellow-400">
+                        ★
+                      </span>
                     ))}
                   </div>
-                  <p className="text-muted-foreground mb-4 italic">"{testimonial.testimonial}"</p>
+                  <p className="text-muted-foreground mb-4 italic">
+                    "{testimonial.testimonial}"
+                  </p>
                   <div>
                     <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {testimonial.role}
+                    </p>
                   </div>
                 </Card>
               ))}
