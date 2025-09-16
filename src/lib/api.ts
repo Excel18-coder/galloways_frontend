@@ -286,7 +286,7 @@ const outsourcingRequests = {
     data: OutsourcingData
   ): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/outsourcing-requests`, {
+      const response = await fetch(`${API_BASE_URL}outsourcing-requests-requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -355,19 +355,19 @@ const outsourcingRequests = {
     }
   },
   getClaims: async (): Promise<ApiResponse> =>
-    request("/outsourcing-requests", { method: "GET" }),
+    request("outsourcing-requests-requests", { method: "GET" }),
 
   getRequests: async (): Promise<ApiResponse> =>
-    request("/outsourcing-requests", { method: "GET" }),
+    request("outsourcing-requests-requests", { method: "GET" }),
 
   getRequest: async (id: string): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}`, { method: "GET" }),
+    request(`/outsourcing-requests-requests/${id}`, { method: "GET" }),
 
   updateRequestStatus: async (
     id: string,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}/status`, {
+    request(`/outsourcing-requests-requests/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),
@@ -827,17 +827,17 @@ const adminService = {
   getAllConsultations: async (): Promise<
     ApiResponse<PaginatedResponse<any>>
   > => {
-    return request(`/consultations`, { method: "GET" });
+    return request(`/outsourcing-requests`, { method: "GET" });
   },
 
   getConsultationById: async (id: number): Promise<ApiResponse> =>
-    request(`/consultations/${id}`, { method: "GET" }),
+    request(`/outsourcing-requests/${id}`, { method: "GET" }),
 
   updateConsultationStatus: async (
     id: number,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/consultations/${id}/status`, {
+    request(`/outsourcing-requests/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),
@@ -882,16 +882,16 @@ const adminService = {
     page = 1,
     limit = 50
   ): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/outsourcing?page=${page}&limit=${limit}`, { method: "GET" }),
+    request(`/outsourcing-requests?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getOutsourcingById: async (id: number): Promise<ApiResponse> =>
-    request(`/outsourcing/${id}`, { method: "GET" }),
+    request(`/outsourcing-requests/${id}`, { method: "GET" }),
 
   updateOutsourcingStatus: async (
     id: number,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/outsourcing/${id}/status`, {
+    request(`/outsourcing-requests/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),

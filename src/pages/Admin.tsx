@@ -64,8 +64,8 @@ export default function Admin() {
         return <AdminQuotes />;
       case "diaspora":
         return <AdminDiaspora />;
-      // case "outsourcing":
-      //   return <AdminOutsourcing />;
+      case "outsourcing":
+        return <AdminOutsourcing />;
       default:
         return <AdminDashboard />;
     }

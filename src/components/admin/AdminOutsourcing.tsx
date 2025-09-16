@@ -4,9 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Briefcase,
@@ -14,21 +25,16 @@ import {
   Edit,
   Trash2,
   Search,
-  Filter,
   RefreshCw,
   Download,
   CheckCircle,
   Clock,
-  AlertTriangle,
   XCircle,
-  Plus,
-  Users,
-  Calendar,
   DollarSign,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
-// API import disabled for build
 import { toast } from "sonner";
+import { adminService } from "@/lib/api";
 
 interface OutsourcingRequest {
   id: string;
@@ -59,8 +65,20 @@ interface OutsourcingStats {
   avgBudget: number;
 }
 
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    totalPages: number;
+    currentPage: number;
+    total: number;
+    perPage: number;
+  };
+}
+
 export function AdminOutsourcing() {
-  const [outsourcingRequests, setOutsourcingRequests] = useState<OutsourcingRequest[]>([]);
+  const [outsourcingRequests, setOutsourcingRequests] = useState<
+    OutsourcingRequest[]
+  >([]);
   const [stats, setStats] = useState<OutsourcingStats>({
     total: 0,
     pending: 0,
@@ -69,7 +87,7 @@ export function AdminOutsourcing() {
     inProgress: 0,
     completed: 0,
     totalValue: 0,
-    avgBudget: 0
+    avgBudget: 0,
   });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,32 +95,33 @@ export function AdminOutsourcing() {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedRequest, setSelectedRequest] = useState<OutsourcingRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<OutsourcingRequest | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchOutsourcingRequests = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const filterStatus = statusFilter === "all" ? undefined : statusFilter;
-      const result = await console.log(
-        currentPage, 
-        20, 
-        filterStatus, 
+      const result = await adminService.getAllOutsourcingRequests(
+        currentPage,
+        20,
+        filterStatus,
         searchTerm || undefined
       );
 
       if (result.success) {
-        setOutsourcingRequests(result.data.outsourcingRequests || []);
+        setOutsourcingRequests(result.data.data || []);
         setTotalPages(result.data.pagination?.totalPages || 1);
       } else {
-        console.error('API returned error:', result);
+        console.error("API returned error:", result);
         setOutsourcingRequests([]);
         toast.error("Failed to fetch outsourcing requests");
       }
     } catch (error) {
-      console.error('Failed to fetch outsourcing requests:', error);
+      console.error("Failed to fetch outsourcing requests:", error);
       setOutsourcingRequests([]);
       toast.error("Failed to fetch outsourcing requests data");
     } finally {
@@ -112,52 +131,117 @@ export function AdminOutsourcing() {
 
   const fetchOutsourcingStats = useCallback(async () => {
     try {
-      const result = await console.log();
-      if (result.success) {
-        setStats(result.data);
+      const metricsResult = await adminService.getSystemMetrics();
+      if (metricsResult.success) {
+        // Extract outsourcing stats from system metrics
+        const metrics = metricsResult.data;
+        setStats({
+          total: metrics.totalOutsourcingRequests || 0,
+          pending: 0, // These would need to come from a specific outsourcing stats endpoint
+          approved: 0,
+          rejected: 0,
+          inProgress: 0,
+          completed: 0,
+          totalValue: 0,
+          avgBudget: 0,
+        });
+      } else {
+        // Fallback to default stats if metrics call fails
+        setStats({
+          total: outsourcingRequests.length,
+          pending: outsourcingRequests.filter((r) => r.status === "pending")
+            .length,
+          approved: outsourcingRequests.filter((r) => r.status === "approved")
+            .length,
+          rejected: outsourcingRequests.filter((r) => r.status === "rejected")
+            .length,
+          inProgress: outsourcingRequests.filter(
+            (r) => r.status === "in_progress"
+          ).length,
+          completed: outsourcingRequests.filter((r) => r.status === "completed")
+            .length,
+          totalValue: 0,
+          avgBudget: 0,
+        });
       }
     } catch (error) {
-      console.error('Failed to fetch outsourcing stats:', error);
-      toast.error("Failed to fetch outsourcing statistics");
+      console.error("Failed to fetch outsourcing stats:", error);
+      // Fallback to calculating from existing data
+      setStats({
+        total: outsourcingRequests.length,
+        pending: outsourcingRequests.filter((r) => r.status === "pending")
+          .length,
+        approved: outsourcingRequests.filter((r) => r.status === "approved")
+          .length,
+        rejected: outsourcingRequests.filter((r) => r.status === "rejected")
+          .length,
+        inProgress: outsourcingRequests.filter(
+          (r) => r.status === "in_progress"
+        ).length,
+        completed: outsourcingRequests.filter((r) => r.status === "completed")
+          .length,
+        totalValue: 0,
+        avgBudget: 0,
+      });
     }
-  }, []);
+  }, [outsourcingRequests]);
 
   useEffect(() => {
     fetchOutsourcingRequests();
-    fetchOutsourcingStats();
-  }, [fetchOutsourcingRequests, fetchOutsourcingStats]);
+  }, [fetchOutsourcingRequests]);
 
-    const handleStatusUpdate = async (requestId: string, newStatus: string) => {
+  useEffect(() => {
+    if (outsourcingRequests.length > 0) {
+      fetchOutsourcingStats();
+    }
+  }, [outsourcingRequests, fetchOutsourcingStats]);
+
+  const handleStatusUpdate = async (requestId: string, newStatus: string) => {
     try {
-      await console.log(parseInt(requestId), newStatus);
+      await adminService.updateOutsourcingStatus(
+        parseInt(requestId),
+        newStatus
+      );
+      toast.success("Status updated successfully");
       await fetchOutsourcingRequests();
+      setShowDetailsModal(false);
+      setShowEditModal(false);
     } catch (error) {
-      console.error('Error updating outsourcing status:', error);
+      console.error("Error updating outsourcing status:", error);
+      toast.error("Failed to update status");
     }
   };
 
-    const handleDeleteRequest = async (requestId: string) => {
-    if (window.confirm('Are you sure you want to delete this outsourcing request?')) {
+  const handleDeleteRequest = async (requestId: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this outsourcing request?"
+      )
+    ) {
       try {
-        await console.log(parseInt(requestId));
-        await fetchOutsourcingRequests();
+        // Note: The adminService doesn't have a delete method for outsourcing requests
+        // This would need to be implemented in the API
+        toast.error("Delete functionality not implemented in API");
       } catch (error) {
-        console.error('Error deleting outsourcing request:', error);
+        console.error("Error deleting outsourcing request:", error);
+        toast.error("Failed to delete request");
       }
     }
   };
 
-  const exportData = async (format: 'csv' | 'json') => {
+  const exportData = async (format: "csv" | "json") => {
     try {
-      const result = await console.log(format);
+      const result = await adminService.exportData("outsourcing", { format });
       if (result.success) {
-        const blob = new Blob([result.data], { 
-          type: format === 'csv' ? 'text/csv' : 'application/json' 
+        const blob = new Blob([result.data], {
+          type: format === "csv" ? "text/csv" : "application/json",
         });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `outsourcing_requests_${new Date().toISOString().split('T')[0]}.${format}`;
+        a.download = `outsourcing_requests_${
+          new Date().toISOString().split("T")[0]
+        }.${format}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -165,43 +249,53 @@ export function AdminOutsourcing() {
         toast.success(`Outsourcing data exported as ${format.toUpperCase()}`);
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
       toast.error("Failed to export outsourcing data");
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'in_progress': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
-      case 'high': return 'text-red-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-green-600';
-      default: return 'text-gray-600';
+      case "high":
+        return "text-red-600";
+      case "medium":
+        return "text-yellow-600";
+      case "low":
+        return "text-green-600";
+      default:
+        return "text-gray-600";
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES'
+    return new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency: "KES",
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
     });
   };
 
@@ -209,13 +303,15 @@ export function AdminOutsourcing() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Outsourcing Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Outsourcing Management
+        </h1>
         <div className="flex gap-2">
-          <Button onClick={() => exportData('csv')} variant="outline">
+          <Button onClick={() => exportData("csv")} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
-          <Button onClick={() => exportData('json')} variant="outline">
+          <Button onClick={() => exportData("json")} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export JSON
           </Button>
@@ -230,7 +326,9 @@ export function AdminOutsourcing() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Requests
+            </CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -248,9 +346,7 @@ export function AdminOutsourcing() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.inProgress}</div>
-            <p className="text-xs text-muted-foreground">
-              Active projects
-            </p>
+            <p className="text-xs text-muted-foreground">Active projects</p>
           </CardContent>
         </Card>
 
@@ -260,7 +356,9 @@ export function AdminOutsourcing() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.totalValue)}</div>
+            <div className="text-2xl font-bold">
+              {formatCurrency(stats.totalValue)}
+            </div>
             <p className="text-xs text-muted-foreground">
               Avg: {formatCurrency(stats.avgBudget)}
             </p>
@@ -269,12 +367,17 @@ export function AdminOutsourcing() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Completion Rate
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}%
+              {stats.total > 0
+                ? Math.round((stats.completed / stats.total) * 100)
+                : 0}
+              %
             </div>
             <p className="text-xs text-muted-foreground">
               {stats.completed} completed
@@ -364,39 +467,59 @@ export function AdminOutsourcing() {
                   <tbody>
                     {outsourcingRequests.length > 0 ? (
                       outsourcingRequests.map((request) => (
-                        <tr key={request.id} className="border-b hover:bg-gray-50">
+                        <tr
+                          key={request.id}
+                          className="border-b hover:bg-gray-50"
+                        >
                           <td className="p-3">
                             <div>
-                              <div className="font-medium">{request.organizationName}</div>
-                              <div className="text-sm text-gray-500">{request.coreFunctions}</div>
+                              <div className="font-medium">
+                                {request.organizationName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {request.coreFunctions}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <div>
-                              <div className="font-medium">{request.location}</div>
-                              <div className="text-sm text-gray-500">{request.address}</div>
+                              <div className="font-medium">
+                                {request.location}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {request.address}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <div className="text-sm">
-                              {Array.isArray(request.services) 
-                                ? request.services.slice(0, 2).join(', ')
+                              {Array.isArray(request.services)
+                                ? request.services.slice(0, 2).join(", ")
                                 : request.services}
-                              {Array.isArray(request.services) && request.services.length > 2 && '...'}
+                              {Array.isArray(request.services) &&
+                                request.services.length > 2 &&
+                                "..."}
                             </div>
                           </td>
-                          <td className="p-3 font-medium">{request.budgetRange}</td>
+                          <td className="p-3 font-medium">
+                            {request.budgetRange}
+                          </td>
                           <td className="p-3">
-                            <div className="text-sm text-gray-600 truncate max-w-32" title={request.natureOfOutsourcing}>
+                            <div
+                              className="text-sm text-gray-600 truncate max-w-32"
+                              title={request.natureOfOutsourcing}
+                            >
                               {request.natureOfOutsourcing}
                             </div>
                           </td>
                           <td className="p-3">
                             <Badge className={getStatusColor(request.status)}>
-                              {request.status.replace('_', ' ')}
+                              {request.status.replace("_", " ")}
                             </Badge>
                           </td>
-                          <td className="p-3">{formatDate(request.createdAt)}</td>
+                          <td className="p-3">
+                            {formatDate(request.createdAt)}
+                          </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               <Button
@@ -433,7 +556,10 @@ export function AdminOutsourcing() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={8} className="p-8 text-center text-gray-500">
+                        <td
+                          colSpan={8}
+                          className="p-8 text-center text-gray-500"
+                        >
                           No outsourcing requests found
                         </td>
                       </tr>
@@ -447,7 +573,9 @@ export function AdminOutsourcing() {
                 <div className="flex justify-center items-center gap-2 mt-6">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     Previous
@@ -457,7 +585,9 @@ export function AdminOutsourcing() {
                   </span>
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Next
@@ -483,125 +613,175 @@ export function AdminOutsourcing() {
                   <TabsTrigger value="requirements">Requirements</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="details" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium">Organization Name</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.organizationName}</p>
+                      <Label className="text-sm font-medium">
+                        Organization Name
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.organizationName}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Core Functions</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.coreFunctions}</p>
+                      <Label className="text-sm font-medium">
+                        Core Functions
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.coreFunctions}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Contact Email</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.contactEmail}</p>
+                      <Label className="text-sm font-medium">
+                        Contact Email
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.contactEmail || "Not provided"}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Contact Phone</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.contactPhone}</p>
+                      <Label className="text-sm font-medium">
+                        Contact Phone
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.contactPhone || "Not provided"}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Location</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.location}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.location}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Address</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.address}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.address}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Budget Range</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.budgetRange}</p>
+                      <Label className="text-sm font-medium">
+                        Budget Range
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.budgetRange}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Timeline</Label>
-                      <p className="text-sm text-gray-600">{selectedRequest.timeline}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedRequest.timeline || "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Status</Label>
                       <Badge className={getStatusColor(selectedRequest.status)}>
-                        {selectedRequest.status.replace('_', ' ')}
+                        {selectedRequest.status.replace("_", " ")}
                       </Badge>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Services Required</Label>
+                      <Label className="text-sm font-medium">
+                        Services Required
+                      </Label>
                       <div className="flex flex-wrap gap-2 mt-1">
-                        {Array.isArray(selectedRequest.services) 
-                          ? selectedRequest.services.map((service, index) => (
-                              <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                {service}
-                              </span>
-                            ))
-                          : <p className="text-sm text-gray-600">{selectedRequest.services}</p>
-                        }
+                        {Array.isArray(selectedRequest.services) ? (
+                          selectedRequest.services.map((service, index) => (
+                            <span
+                              key={index}
+                              className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+                            >
+                              {service}
+                            </span>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-600">
+                            {selectedRequest.services}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <Label className="text-sm font-medium">Nature of Outsourcing</Label>
+                    <Label className="text-sm font-medium">
+                      Nature of Outsourcing
+                    </Label>
                     <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg">
                       {selectedRequest.natureOfOutsourcing}
                     </p>
                   </div>
-                  
+
                   {selectedRequest.specificRequirements && (
                     <div>
-                      <Label className="text-sm font-medium">Specific Requirements</Label>
+                      <Label className="text-sm font-medium">
+                        Specific Requirements
+                      </Label>
                       <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg whitespace-pre-wrap">
                         {selectedRequest.specificRequirements}
                       </p>
                     </div>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="requirements" className="space-y-4">
                   {selectedRequest.specificRequirements ? (
                     <div>
-                      <Label className="text-sm font-medium">Specific Requirements</Label>
+                      <Label className="text-sm font-medium">
+                        Specific Requirements
+                      </Label>
                       <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg whitespace-pre-wrap">
                         {selectedRequest.specificRequirements}
                       </p>
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-8">No specific requirements provided</p>
+                    <p className="text-gray-500 text-center py-8">
+                      No specific requirements provided
+                    </p>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="actions" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Button 
+                    <Button
                       className="w-full"
-                      onClick={() => handleStatusUpdate(selectedRequest.id, 'APPROVED')}
-                      disabled={selectedRequest.status === 'approved'}
+                      onClick={() =>
+                        handleStatusUpdate(selectedRequest.id, "approved")
+                      }
+                      disabled={selectedRequest.status === "approved"}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Approve Request
                     </Button>
-                    <Button 
+                    <Button
                       variant="destructive"
                       className="w-full"
-                      onClick={() => handleStatusUpdate(selectedRequest.id, 'REJECTED')}
-                      disabled={selectedRequest.status === 'rejected'}
+                      onClick={() =>
+                        handleStatusUpdate(selectedRequest.id, "rejected")
+                      }
+                      disabled={selectedRequest.status === "rejected"}
                     >
                       <XCircle className="h-4 w-4 mr-2" />
                       Reject Request
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => handleStatusUpdate(selectedRequest.id, 'IN_PROGRESS')}
-                      disabled={selectedRequest.status === 'in_progress'}
+                      onClick={() =>
+                        handleStatusUpdate(selectedRequest.id, "in_progress")
+                      }
+                      disabled={selectedRequest.status === "in_progress"}
                     >
                       <Clock className="h-4 w-4 mr-2" />
                       Mark In Progress
                     </Button>
-                    <Button 
+                    <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => handleStatusUpdate(selectedRequest.id, 'COMPLETED')}
-                      disabled={selectedRequest.status === 'completed'}
+                      onClick={() =>
+                        handleStatusUpdate(selectedRequest.id, "completed")
+                      }
+                      disabled={selectedRequest.status === "completed"}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Mark Completed
@@ -625,9 +805,11 @@ export function AdminOutsourcing() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select 
-                    value={selectedRequest.status} 
-                    onValueChange={(value) => setSelectedRequest({...selectedRequest, status: value})}
+                  <Select
+                    value={selectedRequest.status}
+                    onValueChange={(value) =>
+                      setSelectedRequest({ ...selectedRequest, status: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -643,9 +825,11 @@ export function AdminOutsourcing() {
                 </div>
                 <div>
                   <Label htmlFor="priority">Priority</Label>
-                  <Select 
-                    value={selectedRequest.status} 
-                    onValueChange={(value) => setSelectedRequest({...selectedRequest, status: value})}
+                  <Select
+                    value={selectedRequest.status}
+                    onValueChange={(value) =>
+                      setSelectedRequest({ ...selectedRequest, status: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -658,12 +842,22 @@ export function AdminOutsourcing() {
                   </Select>
                 </div>
               </div>
-              
+
               <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditModal(false)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={() => handleStatusUpdate(selectedRequest.id, selectedRequest.status)}>
+                <Button
+                  onClick={() =>
+                    handleStatusUpdate(
+                      selectedRequest.id,
+                      selectedRequest.status
+                    )
+                  }
+                >
                   Save Changes
                 </Button>
               </div>
