@@ -1,12 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
   Eye,
@@ -24,10 +35,11 @@ import {
   MapPin,
   Clock,
   Package,
-  MessageSquare
-} from 'lucide-react';
+  MessageSquare,
+} from "lucide-react";
 // API import disabled for build
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from "@/hooks/use-toast";
+import { adminService } from "@/lib/api";
 
 interface Quote {
   id: number;
@@ -43,8 +55,8 @@ interface Quote {
   contactMethod: string;
   bestTime?: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   user?: {
     id: number;
     name: string;
@@ -71,8 +83,8 @@ export function AdminQuotes() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState<QuoteStats>({
@@ -95,31 +107,17 @@ export function AdminQuotes() {
   const fetchQuotes = async () => {
     try {
       setLoading(true);
-      console.log('📋 Fetching real quotes data from API...');
+      console.log("📋 Fetching real quotes data from API...");
 
       // Build API URL with parameters
       const params = new URLSearchParams();
-      params.append('page', currentPage.toString());
-      params.append('limit', '20');
-      if (statusFilter !== "all") params.append('status', statusFilter);
-      if (searchTerm) params.append('search', searchTerm);
+      params.append("page", currentPage.toString());
+      params.append("limit", "20");
+      if (statusFilter !== "all") params.append("status", statusFilter);
+      if (searchTerm) params.append("search", searchTerm);
 
-      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/quotes?${params.toString()}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      console.log('📋 Real quotes data received:', result);
+      const result = await adminService.getAllQuotes(params);
+      console.log("📋 Real quotes data received:", result);
 
       if (result.success) {
         const quotesData = result.data?.quotes || result.data || [];
@@ -129,10 +127,13 @@ export function AdminQuotes() {
         // Calculate stats
         const statsData = {
           total: quotesData.length,
-          pending: quotesData.filter((q: Quote) => q.status === 'pending').length,
-          approved: quotesData.filter((q: Quote) => q.status === 'approved').length,
-          rejected: quotesData.filter((q: Quote) => q.status === 'rejected').length,
-          draft: quotesData.filter((q: Quote) => q.status === 'draft').length,
+          pending: quotesData.filter((q: Quote) => q.status === "pending")
+            .length,
+          approved: quotesData.filter((q: Quote) => q.status === "approved")
+            .length,
+          rejected: quotesData.filter((q: Quote) => q.status === "rejected")
+            .length,
+          draft: quotesData.filter((q: Quote) => q.status === "draft").length,
         };
         setStats(statsData);
 
@@ -141,31 +142,40 @@ export function AdminQuotes() {
           description: `Found ${quotesData.length} quotes from database`,
         });
       } else {
-        console.error('API returned error:', result);
+        console.error("API returned error:", result);
 
         // Fallback to demo data if API fails
-        const fallbackData = [{
-          id: 1,
-          client_name: 'Jane Smith',
-          client_email: 'jane@example.com',
-          client_phone: '+254700000001',
-          insurance_type: 'Motor Insurance',
-          coverage_amount: '1000000',
-          premium_estimate: '45000',
-          status: 'pending',
-          created_at: '2025-09-01T10:00:00Z',
-          updated_at: '2025-09-01T10:00:00Z'
-        }];
+        const fallbackData = [
+          {
+            id: 1,
+            client_name: "Jane Smith",
+            client_email: "jane@example.com",
+            client_phone: "+254700000001",
+            insurance_type: "Motor Insurance",
+            coverage_amount: "1000000",
+            premium_estimate: "45000",
+            status: "pending",
+            created_at: "2025-09-01T10:00:00Z",
+            updated_at: "2025-09-01T10:00:00Z",
+          },
+        ];
 
         setQuotes(fallbackData);
         setTotalPages(1);
 
         const statsData = {
-          total: fallbackData.length,
-          pending: fallbackData.filter((q: Quote) => q.status === 'pending').length,
-          approved: fallbackData.filter((q: Quote) => q.status === 'approved').length,
-          rejected: fallbackData.filter((q: Quote) => q.status === 'rejected').length,
-          draft: fallbackData.filter((q: Quote) => q.status === 'draft').length,
+          total: quotes.length,
+          pending: quotes.filter(
+            (q: Quote) => q.status.toLowerCase() === "pending"
+          ).length,
+          approved: quotes.filter(
+            (q: Quote) => q.status.toLowerCase() === "approved"
+          ).length,
+          rejected: quotes.filter(
+            (q: Quote) => q.status.toLowerCase() === "rejected"
+          ).length,
+          draft: quotes.filter((q: Quote) => q.status.toLowerCase() === "draft")
+            .length,
         };
         setStats(statsData);
 
@@ -176,31 +186,40 @@ export function AdminQuotes() {
         });
       }
     } catch (error) {
-      console.error('Failed to fetch quotes:', error);
+      console.error("Failed to fetch quotes:", error);
 
       // Fallback to demo data if API fails
-      const fallbackData = [{
-        id: 1,
-        client_name: 'Jane Smith',
-        client_email: 'jane@example.com',
-        client_phone: '+254700000001',
-        insurance_type: 'Motor Insurance',
-        coverage_amount: '1000000',
-        premium_estimate: '45000',
-        status: 'pending',
-        created_at: '2025-09-01T10:00:00Z',
-        updated_at: '2025-09-01T10:00:00Z'
-      }];
+      const fallbackData = [
+        {
+          id: 1,
+          client_name: "Jane Smith",
+          client_email: "jane@example.com",
+          client_phone: "+254700000001",
+          insurance_type: "Motor Insurance",
+          coverage_amount: "1000000",
+          premium_estimate: "45000",
+          status: "pending",
+          created_at: "2025-09-01T10:00:00Z",
+          updated_at: "2025-09-01T10:00:00Z",
+        },
+      ];
 
       setQuotes(fallbackData);
       setTotalPages(1);
 
       const statsData = {
-        total: fallbackData.length,
-        pending: fallbackData.filter((q: Quote) => q.status === 'pending').length,
-        approved: fallbackData.filter((q: Quote) => q.status === 'approved').length,
-        rejected: fallbackData.filter((q: Quote) => q.status === 'rejected').length,
-        draft: fallbackData.filter((q: Quote) => q.status === 'draft').length,
+        total: quotes.length,
+        pending: quotes.filter(
+          (q: Quote) => q.status.toLowerCase() === "pending"
+        ).length,
+        approved: quotes.filter(
+          (q: Quote) => q.status.toLowerCase() === "approved"
+        ).length,
+        rejected: quotes.filter(
+          (q: Quote) => q.status.toLowerCase() === "rejected"
+        ).length,
+        draft: quotes.filter((q: Quote) => q.status.toLowerCase() === "draft")
+          .length,
       };
       setStats(statsData);
 
@@ -221,15 +240,17 @@ export function AdminQuotes() {
 
   const updateQuoteStatus = async (quoteId: number, status: string) => {
     try {
-      const url = `${import.meta.env.VITE_API_URL || 'https://gallo-api.onrender.com/api/v1'}/admin/quotes/${quoteId}/status`;
+      const url = `${
+        import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+      }/quotes/${quoteId}/status`;
 
       const response = await fetch(url, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status }),
       });
 
       if (!response.ok) {
@@ -256,7 +277,7 @@ export function AdminQuotes() {
         });
       }
     } catch (error: any) {
-      console.error('Update quote status error:', error);
+      console.error("Update quote status error:", error);
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update quote status",
@@ -266,9 +287,25 @@ export function AdminQuotes() {
   };
 
   const handleDeleteQuote = async (quoteId: number) => {
-    if (window.confirm('Are you sure you want to delete this quote? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this quote? This action cannot be undone."
+      )
+    ) {
       try {
-        await console.log(quoteId);
+        const url = `${
+          import.meta.env.VITE_API_URL ||
+          "https://gallo-api.onrender.com/api/v1"
+        }/quotes/${quoteId}`;
+
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
         await fetchQuotes();
         setShowDetailsModal(false);
         toast({
@@ -276,7 +313,7 @@ export function AdminQuotes() {
           description: "Quote has been successfully deleted.",
         });
       } catch (error) {
-        console.error('Delete quote error:', error);
+        console.error("Delete quote error:", error);
         toast({
           title: "Delete Failed",
           description: "Failed to delete quote.",
@@ -286,14 +323,14 @@ export function AdminQuotes() {
     }
   };
 
-  const exportQuotes = async (format: 'csv' | 'json') => {
+  const exportQuotes = async (format: "csv" | "json") => {
     try {
-      const response = await console.log('quotes', format);
+      const response = await console.log("quotes", format);
       const blob = new Blob([response.data], {
-        type: format === 'csv' ? 'text/csv' : 'application/json'
+        type: format === "csv" ? "text/csv" : "application/json",
       });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `quotes-export.${format}`;
       document.body.appendChild(a);
@@ -306,7 +343,7 @@ export function AdminQuotes() {
         description: `Quotes exported as ${format.toUpperCase()}`,
       });
     } catch (error) {
-      console.error('Export error:', error);
+      console.error("Export error:", error);
       toast({
         title: "Export Failed",
         description: "Failed to export quotes data.",
@@ -317,19 +354,24 @@ export function AdminQuotes() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      case 'draft': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-blue-100 text-blue-800 border-blue-200';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "approved":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "draft":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      default:
+        return "bg-blue-100 text-blue-800 border-blue-200";
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
     });
   };
 
@@ -339,11 +381,11 @@ export function AdminQuotes() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Quote Management</h1>
         <div className="flex gap-2">
-          <Button onClick={() => exportQuotes('csv')} variant="outline">
+          <Button onClick={() => exportQuotes("csv")} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
-          <Button onClick={() => exportQuotes('json')} variant="outline">
+          <Button onClick={() => exportQuotes("json")} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export JSON
           </Button>
@@ -372,7 +414,9 @@ export function AdminQuotes() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.pending}
+            </div>
           </CardContent>
         </Card>
 
@@ -382,7 +426,9 @@ export function AdminQuotes() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.approved}
+            </div>
           </CardContent>
         </Card>
 
@@ -392,7 +438,9 @@ export function AdminQuotes() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.rejected}
+            </div>
           </CardContent>
         </Card>
 
@@ -402,7 +450,9 @@ export function AdminQuotes() {
             <Edit className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
+            <div className="text-2xl font-bold text-gray-600">
+              {stats.draft}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -480,17 +530,27 @@ export function AdminQuotes() {
                   <tbody>
                     {quotes.length > 0 ? (
                       quotes.map((quote) => (
-                        <tr key={quote.id} className="border-b hover:bg-gray-50">
+                        <tr
+                          key={quote.id}
+                          className="border-b hover:bg-gray-50"
+                        >
                           <td className="p-3">
                             <div>
-                              <div className="font-medium">{quote.firstName} {quote.lastName}</div>
-                              <div className="text-sm text-gray-500">{quote.email}</div>
+                              <div className="font-medium">
+                                {quote.firstName} {quote.lastName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {quote.email}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               <Package className="h-4 w-4 text-gray-400" />
-                              <span className="truncate max-w-32" title={quote.product}>
+                              <span
+                                className="truncate max-w-32"
+                                title={quote.product}
+                              >
                                 {quote.product}
                               </span>
                             </div>
@@ -498,25 +558,32 @@ export function AdminQuotes() {
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4 text-gray-400" />
-                              <span>{quote.location || 'Not specified'}</span>
+                              <span>{quote.location || "Not specified"}</span>
                             </div>
                           </td>
-                          <td className="p-3">{quote.budget || 'Not specified'}</td>
+                          <td className="p-3">
+                            {quote.budget || "Not specified"}
+                          </td>
                           <td className="p-3">
                             <div className="text-sm">
                               <div className="flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
                                 {quote.phone}
                               </div>
-                              <div className="text-gray-500">{quote.contactMethod}</div>
+                              <div className="text-gray-500">
+                                {quote.contactMethod}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <Badge className={getStatusColor(quote.status)}>
-                              {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                              {quote.status.charAt(0).toUpperCase() +
+                                quote.status.slice(1)}
                             </Badge>
                           </td>
-                          <td className="p-3">{formatDate(quote.createdAt)}</td>
+                          <td className="p-3">
+                            {formatDate(quote.created_at)}
+                          </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
                               <Button
@@ -550,7 +617,10 @@ export function AdminQuotes() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={8} className="p-8 text-center text-gray-500">
+                        <td
+                          colSpan={8}
+                          className="p-8 text-center text-gray-500"
+                        >
                           No quotes found
                         </td>
                       </tr>
@@ -564,7 +634,9 @@ export function AdminQuotes() {
                 <div className="flex justify-center items-center gap-2 mt-6">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     Previous
@@ -574,7 +646,9 @@ export function AdminQuotes() {
                   </span>
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Next
@@ -604,92 +678,154 @@ export function AdminQuotes() {
                 <TabsContent value="details" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium">Customer Name</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.firstName} {selectedQuote.lastName}</p>
+                      <Label className="text-sm font-medium">
+                        Customer Name
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.firstName} {selectedQuote.lastName}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Email</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.email}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.email}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Phone</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.phone}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.phone}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Location</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.location || 'Not specified'}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.location || "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Product</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.product}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.product}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Budget</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.budget || 'Not specified'}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.budget || "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Coverage</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.coverage || 'Not specified'}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.coverage || "Not specified"}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium">Contact Method</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.contactMethod}</p>
+                      <Label className="text-sm font-medium">
+                        Contact Method
+                      </Label>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.contactMethod}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Best Time</Label>
-                      <p className="text-sm text-gray-600">{selectedQuote.bestTime || 'Not specified'}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedQuote.bestTime || "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Status</Label>
                       <Badge className={getStatusColor(selectedQuote.status)}>
-                        {selectedQuote.status.charAt(0).toUpperCase() + selectedQuote.status.slice(1)}
+                        {selectedQuote.status.charAt(0).toUpperCase() +
+                          selectedQuote.status.slice(1)}
                       </Badge>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Created</Label>
-                      <p className="text-sm text-gray-600">{formatDate(selectedQuote.createdAt)}</p>
+                      <p className="text-sm text-gray-600">
+                        {formatDate(selectedQuote.created_at)}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-sm font-medium">Updated</Label>
-                      <p className="text-sm text-gray-600">{formatDate(selectedQuote.updatedAt)}</p>
+                      <p className="text-sm text-gray-600">
+                        {formatDate(selectedQuote.updated_at)}
+                      </p>
                     </div>
-                      <div className="col-span-2">
-                        <Label className="text-sm font-medium">Attached Documents</Label>
-                        {selectedQuote.documents && selectedQuote.documents.length > 0 ? (
-                          <ul className="mt-2 space-y-2">
-                            {selectedQuote.documents.map((doc: any) => {
-                              // File type icon logic
-                              const ext = doc.originalName.split('.').pop()?.toLowerCase();
-                              let icon = <FileText className="h-4 w-4 text-muted-foreground" />;
-                              if (["pdf"].includes(ext)) icon = <FileText className="h-4 w-4 text-red-600" />;
-                              if (["jpg","jpeg","png","gif","svg"].includes(ext)) icon = <span className="h-4 w-4 inline-block bg-gray-300 rounded">IMG</span>;
-                              if (["doc","docx"].includes(ext)) icon = <FileText className="h-4 w-4 text-blue-600" />;
-                              return (
-                                <li key={doc.id} className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1">
-                                  {icon}
-                                  <span className="truncate max-w-xs" title={doc.originalName}>{doc.originalName}</span>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => console.log(doc.id, doc.originalName)}
-                                  >
-                                    Download
-                                  </Button>
-                                </li>
+                    <div className="col-span-2">
+                      <Label className="text-sm font-medium">
+                        Attached Documents
+                      </Label>
+                      {selectedQuote.documents &&
+                      selectedQuote.documents.length > 0 ? (
+                        <ul className="mt-2 space-y-2">
+                          {selectedQuote.documents.map((doc: any) => {
+                            // File type icon logic
+                            const ext = doc.originalName
+                              .split(".")
+                              .pop()
+                              ?.toLowerCase();
+                            let icon = (
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                            );
+                            if (["pdf"].includes(ext))
+                              icon = (
+                                <FileText className="h-4 w-4 text-red-600" />
                               );
-                            })}
-                          </ul>
-                        ) : (
-                          <p className="text-gray-500 mt-2">No documents attached</p>
-                        )}
-                      </div>
+                            if (
+                              ["jpg", "jpeg", "png", "gif", "svg"].includes(ext)
+                            )
+                              icon = (
+                                <span className="h-4 w-4 inline-block bg-gray-300 rounded">
+                                  IMG
+                                </span>
+                              );
+                            if (["doc", "docx"].includes(ext))
+                              icon = (
+                                <FileText className="h-4 w-4 text-blue-600" />
+                              );
+                            return (
+                              <li
+                                key={doc.id}
+                                className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1"
+                              >
+                                {icon}
+                                <span
+                                  className="truncate max-w-xs"
+                                  title={doc.originalName}
+                                >
+                                  {doc.originalName}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    console.log(doc.id, doc.originalName)
+                                  }
+                                >
+                                  Download
+                                </Button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-500 mt-2">
+                          No documents attached
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="requirements" className="space-y-4">
                   {selectedQuote.details ? (
                     <div>
-                      <Label className="text-sm font-medium">Insurance Product Details</Label>
+                      <Label className="text-sm font-medium">
+                        Insurance Product Details
+                      </Label>
                       {(() => {
                         let detailsObj;
                         try {
@@ -697,28 +833,44 @@ export function AdminQuotes() {
                         } catch {
                           detailsObj = selectedQuote.details;
                         }
-                        if (typeof detailsObj === 'object' && detailsObj !== null) {
+                        if (
+                          typeof detailsObj === "object" &&
+                          detailsObj !== null
+                        ) {
                           return (
                             <table className="w-full text-sm bg-gray-50 rounded-lg mt-2">
                               <tbody>
-                                {Object.entries(detailsObj).map(([key, value]) => (
-                                  <tr key={key} className="border-b last:border-b-0">
-                                    <td className="py-2 px-3 font-medium text-gray-700 capitalize whitespace-nowrap">{key.replace(/([A-Z])/g, ' $1')}</td>
-                                    <td className="py-2 px-3 text-gray-600 break-all">{String(value)}</td>
-                                  </tr>
-                                ))}
+                                {Object.entries(detailsObj).map(
+                                  ([key, value]) => (
+                                    <tr
+                                      key={key}
+                                      className="border-b last:border-b-0"
+                                    >
+                                      <td className="py-2 px-3 font-medium text-gray-700 capitalize whitespace-nowrap">
+                                        {key.replace(/([A-Z])/g, " $1")}
+                                      </td>
+                                      <td className="py-2 px-3 text-gray-600 break-all">
+                                        {String(value)}
+                                      </td>
+                                    </tr>
+                                  )
+                                )}
                               </tbody>
                             </table>
                           );
                         } else {
                           return (
-                            <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg whitespace-pre-wrap">{selectedQuote.details}</p>
+                            <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg whitespace-pre-wrap">
+                              {selectedQuote.details}
+                            </p>
                           );
                         }
                       })()}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-8">No additional requirements provided</p>
+                    <p className="text-gray-500 text-center py-8">
+                      No additional requirements provided
+                    </p>
                   )}
                 </TabsContent>
 
@@ -726,8 +878,10 @@ export function AdminQuotes() {
                   <div className="grid grid-cols-2 gap-4">
                     <Button
                       className="w-full"
-                      onClick={() => updateQuoteStatus(selectedQuote.id, 'approved')}
-                      disabled={selectedQuote.status === 'approved'}
+                      onClick={() =>
+                        updateQuoteStatus(selectedQuote.id, "approved")
+                      }
+                      disabled={selectedQuote.status === "approved"}
                     >
                       <Calendar className="h-4 w-4 mr-2" />
                       Approve Quote
@@ -735,8 +889,10 @@ export function AdminQuotes() {
                     <Button
                       variant="destructive"
                       className="w-full"
-                      onClick={() => updateQuoteStatus(selectedQuote.id, 'rejected')}
-                      disabled={selectedQuote.status === 'rejected'}
+                      onClick={() =>
+                        updateQuoteStatus(selectedQuote.id, "rejected")
+                      }
+                      disabled={selectedQuote.status === "rejected"}
                     >
                       <FileText className="h-4 w-4 mr-2" />
                       Reject Quote
@@ -744,8 +900,10 @@ export function AdminQuotes() {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => updateQuoteStatus(selectedQuote.id, 'pending')}
-                      disabled={selectedQuote.status === 'pending'}
+                      onClick={() =>
+                        updateQuoteStatus(selectedQuote.id, "pending")
+                      }
+                      disabled={selectedQuote.status === "pending"}
                     >
                       <Clock className="h-4 w-4 mr-2" />
                       Mark Pending
@@ -763,19 +921,24 @@ export function AdminQuotes() {
                     <Button
                       className="w-full flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
                       onClick={() => {
-                        let phone = selectedQuote.phone || '';
-                        phone = phone.replace(/\D/g, '');
+                        let phone = selectedQuote.phone || "";
+                        phone = phone.replace(/\D/g, "");
                         // Kenyan format: 07... or 254...
-                        if (phone.startsWith('0')) {
-                          phone = '254' + phone.slice(1);
-                        } else if (phone.startsWith('254')) {
+                        if (phone.startsWith("0")) {
+                          phone = "254" + phone.slice(1);
+                        } else if (phone.startsWith("254")) {
                           // already correct
-                        } else if (phone.startsWith('7')) {
-                          phone = '254' + phone;
+                        } else if (phone.startsWith("7")) {
+                          phone = "254" + phone;
                         }
                         // fallback: if not 254, use as is
-                        const message = encodeURIComponent(`Hello ${selectedQuote.firstName}, regarding your quote for ${selectedQuote.product}: ...`);
-                        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                        const message = encodeURIComponent(
+                          `Hello ${selectedQuote.firstName}, regarding your quote for ${selectedQuote.product}: ...`
+                        );
+                        window.open(
+                          `https://wa.me/${phone}?text=${message}`,
+                          "_blank"
+                        );
                       }}
                     >
                       <MessageSquare className="h-4 w-4" />
@@ -784,9 +947,15 @@ export function AdminQuotes() {
                     <Button
                       className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => {
-                        const subject = encodeURIComponent(`Your Insurance Quote Request for ${selectedQuote.product}`);
-                        const body = encodeURIComponent(`Hello ${selectedQuote.firstName},\n\nThank you for your quote request for ${selectedQuote.product}. ...`);
-                        window.open(`mailto:${selectedQuote.email}?subject=${subject}&body=${body}`);
+                        const subject = encodeURIComponent(
+                          `Your Insurance Quote Request for ${selectedQuote.product}`
+                        );
+                        const body = encodeURIComponent(
+                          `Hello ${selectedQuote.firstName},\n\nThank you for your quote request for ${selectedQuote.product}. ...`
+                        );
+                        window.open(
+                          `mailto:${selectedQuote.email}?subject=${subject}&body=${body}`
+                        );
                       }}
                     >
                       <Mail className="h-4 w-4" />
@@ -812,7 +981,9 @@ export function AdminQuotes() {
                 <Label htmlFor="edit-status">Status</Label>
                 <Select
                   value={selectedQuote.status}
-                  onValueChange={(value) => setSelectedQuote({...selectedQuote, status: value})}
+                  onValueChange={(value) =>
+                    setSelectedQuote({ ...selectedQuote, status: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -828,11 +999,16 @@ export function AdminQuotes() {
               <div className="flex gap-2">
                 <Button
                   className="flex-1"
-                  onClick={() => updateQuoteStatus(selectedQuote.id, selectedQuote.status)}
+                  onClick={() =>
+                    updateQuoteStatus(selectedQuote.id, selectedQuote.status)
+                  }
                 >
                   Save Changes
                 </Button>
-                <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowEditModal(false)}
+                >
                   Cancel
                 </Button>
               </div>

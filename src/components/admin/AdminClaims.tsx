@@ -28,6 +28,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface Document {
   id: number;
@@ -65,6 +66,8 @@ export function AdminClaims() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
+
+  console.log("Claims", claims);
 
   const fetchClaims = async () => {
     try {
@@ -163,7 +166,7 @@ export function AdminClaims() {
         `${
           import.meta.env.VITE_API_URL ||
           "https://gallo-api.onrender.com/api/v1"
-        }/claims/${claimId}`,
+        }/claims/${claimId}/status`,
         {
           method: "PUT",
           headers: {
@@ -205,46 +208,46 @@ export function AdminClaims() {
     }
   };
 
-  const downloadDocument = async (documentId: number, filename: string) => {
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL ||
-          "https://gallo-api.onrender.com/api/v1"
-        }/documents/${documentId}/download`
-      );
+  // const downloadDocument = async (documentId: number, filename: string) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${
+  //         import.meta.env.VITE_API_URL ||
+  //         "https://gallo-api.onrender.com/api/v1"
+  //       }/documents/${documentId}/download`
+  //     );
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+  //     if (response.ok) {
+  //       const blob = await response.blob();
+  //       const url = window.URL.createObjectURL(blob);
+  //       const a = document.createElement("a");
+  //       a.href = url;
+  //       a.download = filename;
+  //       document.body.appendChild(a);
+  //       a.click();
+  //       document.body.removeChild(a);
+  //       window.URL.revokeObjectURL(url);
 
-        toast({
-          title: "Success",
-          description: "Document download started.",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to download document.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Failed to download document:", error);
-      toast({
-        title: "Error",
-        description: "Failed to download document.",
-        variant: "destructive",
-      });
-    }
-  };
+  //       toast({
+  //         title: "Success",
+  //         description: "Document download started.",
+  //       });
+  //     } else {
+  //       toast({
+  //         title: "Error",
+  //         description: "Failed to download document.",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to download document:", error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to download document.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
   const exportClaimsData = async (format: "csv" | "json" | "xlsx" = "csv") => {
     try {
@@ -254,38 +257,7 @@ export function AdminClaims() {
       });
 
       const exportData = {
-        claims: claims.map((claim) => {
-          let documentCount = 0;
-
-          try {
-            if (claim.supporting_documents) {
-              if (typeof claim.supporting_documents === "string") {
-                const parsedDocs = JSON.parse(claim.supporting_documents);
-                documentCount = Array.isArray(parsedDocs)
-                  ? parsedDocs.length
-                  : 0;
-              } else if (Array.isArray(claim.supporting_documents)) {
-                documentCount = claim.supporting_documents.length;
-              }
-            }
-          } catch (error) {
-            console.error("Error parsing supporting documents:", error);
-            documentCount = 0;
-          }
-
-          return {
-            Id: claim.Id,
-            policy_number: claim.policy_number,
-            claim_type: claim.claim_type,
-            claimant: `${claim.first_name} ${claim.last_name}`,
-            email: claim.email,
-            estimated_loss: claim.estimated_loss,
-            status: claim.status,
-            incident_date: claim.incident_date,
-            created_at: claim.created_at,
-            document_count: documentCount,
-          };
-        }),
+        claims: claims,
         timestamp: new Date().toISOString(),
         format,
       };
@@ -305,7 +277,7 @@ export function AdminClaims() {
         const csvData = exportData.claims
           .map(
             (claim) =>
-              `${claim.Id},"${claim.policy_number}","${claim.claim_type}","${claim.claimant}","${claim.email}",${claim.estimated_loss},"${claim.status}","${claim.incident_date}","${claim.created_at}",${claim.document_count}`
+              `${claim.Id},"${claim.policy_number}","${claim.claim_type}","${claim.claimant}","${claim.email}",${claim.estimated_loss},"${claim.status}","${claim.incident_date}","${claim.created_at}",${claim.supporting_documents.length}`
           )
           .join("\n");
         content = csvHeaders + csvData;
@@ -506,38 +478,7 @@ export function AdminClaims() {
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-gray-400" />
                           <span className="text-sm">
-                            {(() => {
-                              try {
-                                if (!selectedClaim?.supporting_documents)
-                                  return "0 files";
-
-                                if (
-                                  typeof selectedClaim.supporting_documents ===
-                                  "string"
-                                ) {
-                                  const parsedDocs = JSON.parse(
-                                    selectedClaim.supporting_documents
-                                  );
-                                  return Array.isArray(parsedDocs)
-                                    ? `${parsedDocs.length} files`
-                                    : "0 files";
-                                } else if (
-                                  Array.isArray(
-                                    selectedClaim.supporting_documents
-                                  )
-                                ) {
-                                  return `${selectedClaim.supporting_documents.length} files`;
-                                } else {
-                                  return "0 files";
-                                }
-                              } catch (error) {
-                                console.error(
-                                  "Error parsing supporting documents:",
-                                  error
-                                );
-                                return "0 files";
-                              }
-                            })()}
+                            {`${claim?.supporting_documents?.length} files`}
                           </span>
                         </div>
                       </td>
@@ -729,26 +670,17 @@ export function AdminClaims() {
                   <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5" />
                     Attached Documents (
-                    {selectedClaim.supporting_documents
-                      ? typeof selectedClaim.supporting_documents === "string"
-                        ? JSON.parse(selectedClaim.supporting_documents).length
-                        : selectedClaim.supporting_documents.length
-                      : 0}
-                    )
+                    {selectedClaim.supporting_documents.length || 0})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {(() => {
                     // Parse the documents if they were stored as a string
-                    const documents = selectedClaim.supporting_documents
-                      ? typeof selectedClaim.supporting_documents === "string"
-                        ? JSON.parse(selectedClaim.supporting_documents)
-                        : selectedClaim.supporting_documents
-                      : [];
+                    const documents = selectedClaim.supporting_documents;
 
                     return documents.length > 0 ? (
                       <div className="grid gap-3">
-                        {documents.map((doc: any) => (
+                        {documents.map((doc) => (
                           <div
                             key={doc.id}
                             className="flex items-center justify-between p-3 border rounded-lg"
@@ -765,14 +697,10 @@ export function AdminClaims() {
                                 </p>
                               </div>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                downloadDocument(doc.id, doc.original_name)
-                              }
-                            >
-                              <Download className="h-4 w-4" />
+                            <Button variant="outline" size="sm">
+                              <Link download to={doc.path}>
+                                <Download className="h-4 w-4" />
+                              </Link>
                             </Button>
                           </div>
                         ))}
