@@ -115,7 +115,7 @@ export function AdminDashboard() {
                 userGrowthRate: 12.3,
                 claimsGrowthRate: 8.7,
                 quoteGrowthRate: 15.2,
-                revenueGrowthRate: 22.1,
+                revenueGrowthRate: 22.1,kw
                 lastUpdated: new Date().toISOString(),
               },
             };

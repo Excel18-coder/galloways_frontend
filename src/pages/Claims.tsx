@@ -80,11 +80,6 @@ const claimIcons = {
 };
 
 export default function Claims() {
-  const uploadFieldName =
-    import.meta.env.VITE_CLAIM_FILE_FIELD || "supporting_documents";
-  const uploadMode = (
-    import.meta.env.VITE_CLAIM_UPLOAD_MODE || "json"
-  ).toLowerCase(); // 'json' | 'multipart'
   const [formData, setFormData] = useState({
     policy_number: "",
     claim_type: "",
@@ -116,291 +111,66 @@ export default function Claims() {
     setFiles(e.target.files);
   };
 
-  // // Function to upload files to Cloudinary
-  // const uploadToCloudinary = async (file: File): Promise<string> => {
-  //   const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/upload`;
-  //   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  //   if (!uploadPreset || !import.meta.env.VITE_CLOUDINARY_CLOUD_NAME) {
-  //     throw new Error("Cloudinary configuration is missing");
-  //   }
+  if (
+    !formData.policy_number ||
+    !formData.claim_type ||
+    !formData.description
+  ) {
+    toast({
+      title: "Validation Error",
+      description: "Please fill in all required fields.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   formData.append('upload_preset', uploadPreset);
+  setIsLoading(true);
 
-  //   try {
-  //     const response = await fetch(cloudinaryUrl, {
-  //       method: 'POST',
-  //       body: formData,
-  //     });
+  try {
+    // Create FormData object to handle file uploads
+    const formDataToSend = new FormData();
 
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       throw new Error(errorData.error?.message || 'Failed to upload file to Cloudinary');
-  //     }
+    // Append all form fields
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
+    });
 
-  //     const data = await response.json();
-  //     return data.secure_url;
-  //   } catch (error) {
-  //     console.error('Cloudinary upload error:', error);
-  //     throw new Error(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  //   }
-  // };
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (!formData.policy_number || !formData.claim_type || !formData.description) {
-  //     toast({
-  //       title: "Validation Error",
-  //       description: "Please fill in all required fields.",
-  //       variant: "destructive"
-  //     });
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-
-  //   try {
-  //     const hasFiles = files && files.length > 0;
-  //     let fileUrls: string[] = [];
-
-  //     // Upload files to Cloudinary if any
-  //     if (hasFiles) {
-  //       try {
-  //         toast({
-  //           title: "Uploading Files",
-  //           description: "Please wait while we upload your documents...",
-  //         });
-
-  //         // Upload all files in parallel
-  //         const uploadPromises = Array.from(files).map(file => uploadToCloudinary(file));
-  //         fileUrls = await Promise.all(uploadPromises);
-
-  //         toast({
-  //           title: "Upload Complete",
-  //           description: "Your documents have been successfully uploaded.",
-  //         });
-  //       } catch (uploadError) {
-  //         console.error('File upload error:', uploadError);
-  //         throw new Error(`File upload failed: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`);
-  //       }
-  //     }
-
-  //     let payload: any;
-  //     if (uploadMode === 'multipart') {
-  //       // Use FormData for multipart upload
-  //       const formDataToSend = new FormData();
-  //       Object.entries(formData).forEach(([key, value]) => {
-  //         if (key === 'estimated_loss') {
-  //           formDataToSend.append(key, String(parseFloat(value) || 0));
-  //         } else {
-  //           formDataToSend.append(key, value);
-  //         }
-  //       });
-
-  //       // Add file URLs as a JSON string if we uploaded to Cloudinary
-  //       if (fileUrls.length > 0) {
-  //         formDataToSend.append(uploadFieldName, JSON.stringify(fileUrls));
-  //       }
-
-  //       payload = formDataToSend;
-  //     } else {
-  //       // Default: send JSON with Cloudinary URLs
-  //       payload = {
-  //         ...formData,
-  //         estimated_loss: Number.isFinite(Number(formData.estimated_loss)) ? Number(formData.estimated_loss) : 0,
-  //         [uploadFieldName]: fileUrls, // Add Cloudinary URLs to the payload
-  //       };
-  //     }
-
-  //     console.log('📋 Submitting claim to API...');
-  //     const result = await claimsService.createClaim(payload);
-
-  //     if (result.success) {
-  //       setIsSubmitted(true);
-  //       toast({
-  //         title: "Success",
-  //         description: result.message || "Your claim has been submitted successfully. We'll contact you soon with updates."
-  //       });
-  //     } else {
-  //       throw new Error(result.message || 'Failed to submit claim');
-  //     }
-  //   } catch (error: any) {
-  //     console.error('Claim submission error:', error);
-  //     toast({
-  //       title: "Error",
-  //       description: error.message || "Failed to submit claim. Please try again.",
-  //       variant: "destructive"
-  //     });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Update the uploadToCloudinary function to return the proper Document format
-  const uploadToCloudinary = async (file: File): Promise<Document> => {
-    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${
-      import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-    }/upload`;
-    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!uploadPreset || !import.meta.env.VITE_CLOUDINARY_CLOUD_NAME) {
-      throw new Error("Cloudinary configuration is missing");
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-
-    try {
-      const response = await fetch(cloudinaryUrl, {
-        method: "POST",
-        body: formData,
+    // Append each file individually to create an array
+    if (files && files.length > 0) {
+      Array.from(files).forEach((file) => {
+        formDataToSend.append("supporting_documents", file);
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error?.message || "Failed to upload file to Cloudinary"
-        );
-      }
-
-      const data = await response.json();
-
-      // Format the response to match the Document interface
-      return {
-        id: Date.now(), // Generate a temporary ID (backend will assign a real one)
-        original_name: file.name,
-        size: data.bytes,
-        created_at: new Date().toISOString(),
-        path: data.secure_url,
-        mime_type: file.type,
-      };
-    } catch (error) {
-      console.error("Cloudinary upload error:", error);
-      throw new Error(
-        `Failed to upload ${file.name}: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-  };
-
-  // Update the handleSubmit function to handle Document objects instead of strings
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !formData.policy_number ||
-      !formData.claim_type ||
-      !formData.description
-    ) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
     }
 
-    setIsLoading(true);
+    console.log("📋 Submitting claim to API...");
+    const result = await claimsService.createClaim(formDataToSend);
 
-    try {
-      const hasFiles = files && files.length > 0;
-      let uploadedDocuments: Document[] = [];
-
-      // Upload files to Cloudinary if any
-      if (hasFiles) {
-        try {
-          toast({
-            title: "Uploading Files",
-            description: "Please wait while we upload your documents...",
-          });
-
-          // Upload all files in parallel
-          const uploadPromises = Array.from(files).map((file) =>
-            uploadToCloudinary(file)
-          );
-
-          uploadedDocuments = await Promise.all(uploadPromises);
-          console.log("Uploaded Documents:", uploadedDocuments);
-
-          toast({
-            title: "Upload Complete",
-            description: "Your documents have been successfully uploaded.",
-          });
-        } catch (uploadError) {
-          console.error("File upload error:", uploadError);
-          throw new Error(
-            `File upload failed: ${
-              uploadError instanceof Error
-                ? uploadError.message
-                : "Unknown error"
-            }`
-          );
-        }
-      }
-
-      let payload: any;
-      if (uploadMode === "multipart") {
-        // Use FormData for multipart upload
-        const formDataToSend = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-          if (key === "estimated_loss") {
-            formDataToSend.append(key, String(parseFloat(value) || 0));
-          } else {
-            formDataToSend.append(key, value);
-          }
-        });
-
-        // Add file URLs as a JSON string if we uploaded to Cloudinary
-        if (uploadedDocuments.length > 0) {
-          formDataToSend.append(
-            uploadFieldName,
-            JSON.stringify(uploadedDocuments)
-          );
-        }
-
-        payload = formDataToSend;
-      } else {
-        // Default: send JSON with Document objects
-        payload = {
-          ...formData,
-          estimated_loss: Number.isFinite(Number(formData.estimated_loss))
-            ? Number(formData.estimated_loss)
-            : 0,
-          [uploadFieldName]: uploadedDocuments, // Add Document objects to the payload
-        };
-      }
-
-      console.log("📋 Submitting claim to API...");
-      const result = await claimsService.createClaim(payload);
-
-      if (result.success) {
-        setIsSubmitted(true);
-        toast({
-          title: "Success",
-          description:
-            result.message ||
-            "Your claim has been submitted successfully. We'll contact you soon with updates.",
-        });
-      } else {
-        throw new Error(result.message || "Failed to submit claim");
-      }
-    } catch (error: any) {
-      console.error("Claim submission error:", error);
+    if (result.success) {
+      setIsSubmitted(true);
       toast({
-        title: "Error",
+        title: "Success",
         description:
-          error.message || "Failed to submit claim. Please try again.",
-        variant: "destructive",
+          result.message ||
+          "Your claim has been submitted successfully. We'll contact you soon with updates.",
       });
-    } finally {
-      setIsLoading(false);
+    } else {
+      throw new Error(result.message || "Failed to submit claim");
     }
-  };
+  } catch (error: any) {
+    console.error("Claim submission error:", error);
+    toast({
+      title: "Error",
+      description:
+        error.message || "Failed to submit claim. Please try again.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (isSubmitted) {
     return (
@@ -728,7 +498,7 @@ export default function Claims() {
                 <div className="font-semibold mb-2">Required Attachments:</div>
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Original Police Abstract</li>
-                  <li>Copy of Driver’s License</li>
+                  <li>Copy of Driver's License</li>
                   <li>Copy of Log Book</li>
                   <li>Proposal Form</li>
                   <li>Valuation Report</li>
@@ -746,7 +516,7 @@ export default function Claims() {
                 <ul className="list-disc ml-6 text-muted-foreground">
                   <li>Copy of Log Book</li>
                   <li>Original Police Abstract</li>
-                  <li>Copy of Driver’s License</li>
+                  <li>Copy of Driver's License</li>
                   <li>Statement by Insured/Driver</li>
                   <li>Proposal Form</li>
                   <li>Valuation Report</li>
@@ -780,7 +550,7 @@ export default function Claims() {
                   <li>Statement by Insured & Rider</li>
                   <li>Copy of Log Book</li>
                   <li>Purchase Receipt</li>
-                  <li>Copy of Rider’s License</li>
+                  <li>Copy of Rider's License</li>
                   <li>Claim PDF Voucher</li>
                   <li>Risk Note</li>
                 </ul>

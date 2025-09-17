@@ -159,27 +159,28 @@ const CONTACT_METHODS = [
   },
 ];
 
-
-
 // ============= UTILITY FUNCTIONS =============
 const generateReferenceNumber = () => `GIQ-${Date.now().toString().slice(-8)}`;
 
 const collectFormData = (formElement) => {
-  const formData = {};
+  const formData = new FormData();
   const inputs = formElement.querySelectorAll("input, select, textarea");
 
   inputs.forEach((input) => {
     if (input.name) {
       if (input.type === "checkbox") {
-        formData[input.name] = input.checked;
+        formData.append(input.name, input.checked);
       } else if (input.type === "radio") {
         if (input.checked) {
-          formData[input.name] = input.value;
+          formData.append(input.name, input.value);
         }
       } else if (input.type === "file") {
-        formData[input.name] = input.files;
+        // Handle file inputs
+        for (let i = 0; i < input.files.length; i++) {
+          formData.append(input.name, input.files[i]);
+        }
       } else {
-        formData[input.name] = input.value;
+        formData.append(input.name, input.value);
       }
     }
   });
@@ -189,76 +190,6 @@ const collectFormData = (formElement) => {
 
 const showToast = (title, description, variant = "default") => {
   console.log(`Toast: ${title} - ${description} (${variant})`);
-};
-
-const FormField = ({ field }) => {
-  const baseInputClass =
-    "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
-
-  switch (field.type) {
-    case "text":
-    case "number":
-    case "date":
-      return (
-        <div>
-          <Label htmlFor={field.id}>
-            {field.label} {field.required && "*"}
-          </Label>
-          <Input
-            id={field.id}
-            name={field.id}
-            type={field.type}
-            required={field.required}
-          />
-        </div>
-      );
-    case "textarea":
-      return (
-        <div>
-          <Label htmlFor={field.id}>
-            {field.label} {field.required && "*"}
-          </Label>
-          <Textarea id={field.id} name={field.id} required={field.required} />
-        </div>
-      );
-    case "select":
-      return (
-        <div>
-          <Label htmlFor={field.id}>
-            {field.label} {field.required && "*"}
-          </Label>
-          <select
-            id={field.id}
-            name={field.id}
-            className={baseInputClass}
-            required={field.required}
-          >
-            <option value="">Select</option>
-            {field.options.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    case "checkboxes":
-      return (
-        <div>
-          <Label>{field.label}</Label>
-          <div className="flex flex-wrap gap-4 mt-2">
-            {field.options.map((opt) => (
-              <label key={opt} className="flex items-center gap-2">
-                <input type="checkbox" name={field.id} value={opt} />
-                {opt}
-              </label>
-            ))}
-          </div>
-        </div>
-      );
-    default:
-      return <div>Unsupported field type</div>;
-  }
 };
 
 const PersonalInfoSection = () => (
@@ -341,7 +272,6 @@ const InsuranceDetailsSection = ({ selectedProduct, onProductChange }) => (
         ))}
       </select>
     </div>
-
 
     <div className="grid md:grid-cols-2 gap-4">
       <div>
@@ -451,7 +381,7 @@ const FileUploadSection = () => (
         </p>
         <input
           type="file"
-          name="document"
+          name="documents"
           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
           multiple
           className="block mx-auto mt-2"
@@ -515,34 +445,19 @@ export default function Quotes() {
       const formData = collectFormData(formElement);
 
       // Add metadata
-      const submissionData = {
-        ...formData,
-        selectedProduct,
-        status: isDraft ? "DRAFT" : "SUBMITTED",
-        timestamp: new Date().toISOString(),
-      };
+      formData.append("selectedProduct", selectedProduct);
+      formData.append("status", isDraft ? "DRAFT" : "SUBMITTED");
+      formData.append("timestamp", new Date().toISOString());
 
-      const response = await quotesService.createQuote(submissionData);
-      console.log("Response:", response);
-      if (response.success) {
-        setSuccess(true);
-      }
-      if (response.success) {
-        setSuccess(true);
-      }
+      const response = await quotesService.createQuote(formData);
 
-      if (!isDraft) {
+      if (response.success) {
         const refNumber = generateReferenceNumber();
         setRefNum(refNumber);
         setSuccess(true);
         showToast(
           "Quote Submitted Successfully!",
           `Your quote request (Ref: ${refNumber}) has been submitted. We'll contact you within 24 hours.`
-        );
-      } else {
-        showToast(
-          "Draft Saved Successfully!",
-          `Your quote draft has been saved. Reference: DRAFT-${generateReferenceNumber()}`
         );
       }
     } catch (error) {

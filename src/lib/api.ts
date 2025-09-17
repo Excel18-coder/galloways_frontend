@@ -66,32 +66,34 @@ interface OutsourcingData {
   budget_range: string;
 }
 
-// Enhanced helper for HTTP requests with better error handling
 async function request<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  if (DEBUG) {
-    console.log(`API Request: ${options.method || "GET"} ${url}`);
+  // Don't stringify if it's FormData
+  if (!(options.body instanceof FormData)) {
+    options.headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
     if (options.body) {
-      console.log("Request body:", options.body);
+      options.body = JSON.stringify(options.body);
     }
   }
 
   try {
     const res = await fetch(url, {
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
-
         ...options.headers,
       },
       mode: "cors",
       credentials: "omit",
       ...options,
     });
+
 
     if (DEBUG) {
       console.log(`API Response: ${res.status} ${res.statusText}`);
@@ -159,15 +161,14 @@ const authService = {
 
 // Claims Service
 const claimsService = {
-  createClaim: async (data: ClaimData): Promise<ApiResponse> => {
+  createClaim: async (data: FormData): Promise<ApiResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/claims`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify(data),
+        body: data,
       });
 
       const contentType = response.headers.get("content-type");
@@ -245,8 +246,14 @@ const claimsService = {
 
 // Quotes Service
 const quotesService = {
-  createQuote: async (data: any): Promise<ApiResponse> =>
-    request("/quotes", { method: "POST", body: JSON.stringify(data) }),
+  createQuote: async (formData: any): Promise<ApiResponse> =>
+    request("/quotes", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
+    }),
 
   getQuotes: async (): Promise<ApiResponse> =>
     request("/quotes", { method: "GET" }),
@@ -898,7 +905,9 @@ const adminService = {
     page = 1,
     limit = 50
   ): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/outsourcing-requests?page=${page}&limit=${limit}`, { method: "GET" }),
+    request(`/outsourcing-requests?page=${page}&limit=${limit}`, {
+      method: "GET",
+    }),
 
   getOutsourcingById: async (id: number): Promise<ApiResponse> =>
     request(`/outsourcing-requests/${id}`, { method: "GET" }),
