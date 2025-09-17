@@ -28,7 +28,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
 
 interface Document {
   id: number;
@@ -697,11 +696,16 @@ export function AdminClaims() {
                                 </p>
                               </div>
                             </div>
-                            <Button variant="outline" size="sm">
-                              <Link download to={doc.path}>
+                            <a
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={doc.path}
+                            >
+                              <Button variant="outline" size="sm">
                                 <Download className="h-4 w-4" />
-                              </Link>
-                            </Button>
+                              </Button>
+                            </a>
                           </div>
                         ))}
                       </div>

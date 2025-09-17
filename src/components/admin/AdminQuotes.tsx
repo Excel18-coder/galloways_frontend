@@ -798,15 +798,16 @@ export function AdminQuotes() {
                                 >
                                   {doc.originalName}
                                 </span>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() =>
-                                    console.log(doc.id, doc.originalName)
-                                  }
+                                <a
+                                  href={doc.url}
+                                  download
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                 >
-                                  Download
-                                </Button>
+                                  <Button size="sm" variant="outline">
+                                    Download
+                                  </Button>
+                                </a>
                               </li>
                             );
                           })}

@@ -286,7 +286,7 @@ const outsourcingRequests = {
     data: OutsourcingData
   ): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE_URL}outsourcing-requests-requests`, {
+      const response = await fetch(`${API_BASE_URL}/outsourcing-requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -828,6 +828,22 @@ const adminService = {
     ApiResponse<PaginatedResponse<any>>
   > => {
     return request(`/outsourcing-requests`, { method: "GET" });
+  },
+  // create consultation
+  createConsultation: async (data: any): Promise<ApiResponse> => {
+    try {
+      const response = await request(`/outsourcing-requests`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      return {
+        success: !response.error,
+        data: response.error ? null : response.data,
+        message: response.error || "Consultation created successfully",
+      };
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to create consultation");
+    }
   },
 
   getConsultationById: async (id: number): Promise<ApiResponse> =>
