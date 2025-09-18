@@ -64,7 +64,7 @@ interface Quote {
   };
   documents?: Array<{
     id: number;
-    originalName: string;
+    public_id: string;
     [key: string]: any;
   }>;
 }
@@ -762,44 +762,22 @@ export function AdminQuotes() {
                       selectedQuote.documents.length > 0 ? (
                         <ul className="mt-2 space-y-2">
                           {selectedQuote.documents.map((doc: any) => {
-                            // File type icon logic
-                            const ext = doc.originalName
-                              ?.split(".")
-                              ?.pop()
-                              ?.toLowerCase();
-                            let icon = (
-                              <FileText className="h-4 w-4 text-muted-foreground" />
-                            );
-                            if (["pdf"].includes(ext))
-                              icon = (
-                                <FileText className="h-4 w-4 text-red-600" />
-                              );
-                            if (
-                              ["jpg", "jpeg", "png", "gif", "svg"].includes(ext)
-                            )
-                              icon = (
-                                <span className="h-4 w-4 inline-block bg-gray-300 rounded">
-                                  IMG
-                                </span>
-                              );
-                            if (["doc", "docx"].includes(ext))
-                              icon = (
-                                <FileText className="h-4 w-4 text-blue-600" />
-                              );
                             return (
                               <li
                                 key={doc.id}
-                                className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1"
+                                className="flex items-center justify-between gap-2 bg-gray-100 dark:bg-gray-600 rounded px-2 py-1"
                               >
-                                {icon}
-                                <span
-                                  className="truncate max-w-xs"
-                                  title={doc.originalName}
-                                >
-                                  {doc.originalName}
-                                </span>
+                                <div className="flex items-center gap-2 flex-1">
+                                  <FileText className="h-4 w-4 text-gray-600" />
+                                  <span
+                                    className="truncate max-w-xs"
+                                    title={doc.public_id}
+                                  >
+                                    {doc.public_id}
+                                  </span>
+                                </div>
                                 <a
-                                  href={doc.url}
+                                  href={doc.path}
                                   download
                                   target="_blank"
                                   rel="noopener noreferrer"
