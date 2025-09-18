@@ -764,8 +764,8 @@ export function AdminQuotes() {
                           {selectedQuote.documents.map((doc: any) => {
                             // File type icon logic
                             const ext = doc.originalName
-                              .split(".")
-                              .pop()
+                              ?.split(".")
+                              ?.pop()
                               ?.toLowerCase();
                             let icon = (
                               <FileText className="h-4 w-4 text-muted-foreground" />
