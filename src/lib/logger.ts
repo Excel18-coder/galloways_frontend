@@ -1,4 +1,4 @@
-// Environment-aware logging utility
+
 // Only logs in development mode to keep production clean
 
 const isDev = import.meta.env.MODE === 'development';
