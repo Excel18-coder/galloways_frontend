@@ -30,38 +30,6 @@ export default function Consultancy() {
   const { toast } = useToast();
   const [openServiceIdx, setOpenServiceIdx] = useState<number | null>(null);
 
-  const testConsultationAPI = async () => {
-    try {
-      console.log("🧪 Testing consultation API connection...");
-      const result = await consultationsService.testConnection();
-      console.log("🧪 Test result:", result);
-
-      if (result.success) {
-        toast({
-          title: "API Connection Test",
-          description: `✅ Connected successfully! Found ${
-            result.data?.count || 0
-          } existing consultations.`,
-        });
-      } else {
-        toast({
-          title: "API Connection Test",
-          description: `❌ Connection failed: ${result.message}`,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("🧪 Test error:", error);
-      toast({
-        title: "API Connection Test",
-        description: `❌ Test failed: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleMPesaPayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPaymentLoading(true);
@@ -101,7 +69,7 @@ export default function Consultancy() {
         serviceType: "mpesa-consultation",
         status: "PENDING",
       };
-
+      
       console.log("📋 Sending consultation data to API:", consultationData);
       const consultationResult = await consultationsService.createConsultation(
         consultationData

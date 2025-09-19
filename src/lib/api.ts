@@ -488,7 +488,7 @@ const bookingConsultantsService = {
   getConsultations: async (): Promise<ApiResponse> =>
     request("/booking-consultants", { method: "GET" }),
 
-  getConsultation: async (id: string): Promise<ApiResponse> =>
+  getConsultation: async (id: number): Promise<ApiResponse> =>
     request(`/booking-consultants/${id}`, { method: "GET" }),
 
   updateConsultationStatus: async (

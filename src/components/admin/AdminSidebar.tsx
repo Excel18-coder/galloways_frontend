@@ -27,82 +27,89 @@ interface AdminSidebarProps {
 }
 
 const menuItems = [
-  { 
-    id: "dashboard", 
-    label: "Dashboard", 
+  {
+    id: "dashboard",
+    label: "Dashboard",
     icon: LayoutDashboard,
     description: "System Overview",
-    color: "from-blue-500 to-blue-600"
+    color: "from-blue-500 to-blue-600",
   },
-  { 
-    id: "users", 
-    label: "Users", 
+  {
+    id: "users",
+    label: "Users",
     icon: Users,
     description: "User Management",
-    color: "from-green-500 to-green-600"
+    color: "from-green-500 to-green-600",
   },
-  { 
-    id: "claims", 
-    label: "Claims", 
+  {
+    id: "claims",
+    label: "Claims",
     icon: FileText,
     description: "Claims Processing",
-    color: "from-purple-500 to-purple-600"
+    color: "from-purple-500 to-purple-600",
   },
-  { 
-    id: "quotes", 
-    label: "Quotes", 
+  {
+    id: "quotes",
+    label: "Quotes",
     icon: MessageSquare,
     description: "Quote Management",
-    color: "from-blue-500 to-purple-600"
+    color: "from-blue-500 to-purple-600",
   },
-  { 
-    id: "diaspora", 
-    label: "Diaspora", 
+  {
+    id: "diaspora",
+    label: "Diaspora",
     icon: Globe,
     description: "Diaspora Requests",
-    color: "from-cyan-500 to-blue-600"
+    color: "from-cyan-500 to-blue-600",
   },
-  { 
-    id: "outsourcing", 
-    label: "Outsourcing", 
+  {
+    id: "outsourcing",
+    label: "Outsourcing",
     icon: Briefcase,
     description: "Outsourcing Requests",
-    color: "from-amber-500 to-orange-600"
+    color: "from-amber-500 to-orange-600",
   },
-  { 
-    id: "consultations", 
-    label: "Consultations", 
+  {
+    id: "consultations",
+    label: "Consultations",
+    icon: Calendar,
+    description: "Normal Consultation",
+    color: "from-orange-500 to-orange-600",
+  },
+  {
+    id: "consultations-booking",
+    label: "Booked Consultation",
     icon: Calendar,
     description: "Booking Management",
-    color: "from-orange-500 to-orange-600"
+    color: "from-orange-500 to-orange-600",
   },
-  { 
-    id: "payments", 
-    label: "Payments", 
+  {
+    id: "payments",
+    label: "Payments",
     icon: CreditCard,
     description: "Financial Overview",
-    color: "from-emerald-500 to-emerald-600"
+    color: "from-emerald-500 to-emerald-600",
   },
-  { 
-    id: "notifications", 
-    label: "Notifications", 
+  {
+    id: "notifications",
+    label: "Notifications",
     icon: Bell,
     description: "System Alerts",
-    color: "from-red-500 to-red-600"
+    color: "from-red-500 to-red-600",
   },
-  { 
-    id: "analytics", 
-    label: "Analytics", 
+  {
+    id: "analytics",
+    label: "Analytics",
     icon: BarChart3,
     description: "Data Insights",
-    color: "from-indigo-500 to-indigo-600"
+    color: "from-indigo-500 to-indigo-600",
   },
-  { 
-    id: "settings", 
-    label: "Settings", 
+  {
+    id: "settings",
+    label: "Settings",
     icon: Settings,
     description: "System Config",
-    color: "from-slate-500 to-slate-600"
+    color: "from-slate-500 to-slate-600",
   },
 ];
 

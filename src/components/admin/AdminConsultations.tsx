@@ -32,36 +32,49 @@ import {
   MessageSquare,
   CalendarPlus,
   AlertTriangle,
+  Building,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { adminService } from "@/lib/api";
+import { adminService, bookingConsultantsService } from "@/lib/api";
 
 interface Consultation {
   id: number;
-  user_id: number;
+  user_id?: number;
   full_name: string;
   phone: string;
-  time: string;
+  email?: string;
+  organization?: string;
+  time?: string;
   consult_type: string;
-  date: string;
-  service_type: string;
-  country: string | null;
-  status: string;
+  date?: string;
+  preferred_date?: string;
+  preferred_time?: string;
+  service_type?: string;
+  country?: string | null;
+  details?: string;
+  status?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 // Header Component
 function HeaderSection({
   onRefresh,
   loading,
+  consultationType,
 }: {
   onRefresh: () => void;
   loading: boolean;
+  consultationType: "booking" | "normal";
 }) {
+  const title =
+    consultationType === "booking"
+      ? "Booking Consultants Management"
+      : "Consultations Management";
+
   return (
     <div className="flex justify-between items-center">
-      <h1 className="text-3xl font-bold">Consultations Management</h1>
+      <h1 className="text-3xl font-bold">{title}</h1>
       <Button
         onClick={onRefresh}
         variant="outline"
@@ -83,11 +96,13 @@ function FiltersSection({
   onSearchChange,
   statusFilter,
   onStatusFilterChange,
+  consultationType,
 }: {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   statusFilter: string;
   onStatusFilterChange: (value: string) => void;
+  consultationType: "booking" | "normal";
 }) {
   return (
     <Card>
@@ -102,20 +117,22 @@ function FiltersSection({
               className="pl-10"
             />
           </div>
-          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+          {consultationType === "normal" && (
+            <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="contacted">Contacted</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
           <Button variant="outline" size="icon">
             <Filter className="h-4 w-4" />
           </Button>
@@ -126,11 +143,20 @@ function FiltersSection({
 }
 
 // Client Info Component
-function ClientInfo({ consultation }: { consultation: Consultation }) {
+function ClientInfo({
+  consultation,
+  consultationType,
+}: {
+  consultation: Consultation;
+  consultationType: "booking" | "normal";
+}) {
   return (
     <div>
       <div className="font-medium">{consultation.full_name}</div>
       <div className="text-sm text-gray-500">{consultation.phone}</div>
+      {consultationType === "booking" && consultation.email && (
+        <div className="text-sm text-gray-500">{consultation.email}</div>
+      )}
     </div>
   );
 }
@@ -160,26 +186,62 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // Scheduled Time Component
-function ScheduledTime({ consultation }: { consultation: Consultation }) {
+function ScheduledTime({
+  consultation,
+  consultationType,
+}: {
+  consultation: Consultation;
+  consultationType: "booking" | "normal";
+}) {
   const formatTime = (timeString: string) => {
-    const date = new Date(timeString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return timeString; // Return as-is if parsing fails
+    }
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch (error) {
+      return dateString; // Return as-is if parsing fails
+    }
   };
+
+  const dateField =
+    consultationType === "booking"
+      ? consultation.preferred_date
+      : consultation.date;
+  const timeField =
+    consultationType === "booking"
+      ? consultation.preferred_time
+      : consultation.time;
 
   return (
     <div className="flex items-center gap-2">
       <Calendar className="h-4 w-4 text-gray-400" />
       <div>
-        <div className="text-sm">{formatDate(consultation.date)}</div>
-        <div className="text-xs text-gray-500">
-          {formatTime(consultation.time)}
-        </div>
+        {dateField && <div className="text-sm">{formatDate(dateField)}</div>}
+        {timeField && (
+          <div className="text-xs text-gray-500">{formatTime(timeField)}</div>
+        )}
       </div>
+    </div>
+  );
+}
+
+// Organization Info Component
+function OrganizationInfo({ consultation }: { consultation: Consultation }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Building className="h-4 w-4 text-gray-400" />
+      <span>{consultation.organization || "N/A"}</span>
     </div>
   );
 }
@@ -197,10 +259,12 @@ function CountryInfo({ consultation }: { consultation: Consultation }) {
 // Consultation Actions Component
 function ConsultationActions({
   consultation,
+  consultationType,
   onViewDetails,
   onUpdateStatus,
 }: {
   consultation: Consultation;
+  consultationType: "booking" | "normal";
   onViewDetails: (id: number) => void;
   onUpdateStatus: (id: number, status: string) => void;
 }) {
@@ -213,21 +277,23 @@ function ConsultationActions({
       >
         <Eye className="h-4 w-4" />
       </Button>
-      <Select
-        onValueChange={(status) => onUpdateStatus(consultation.id, status)}
-      >
-        <SelectTrigger className="w-32">
-          <SelectValue placeholder="Update" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="pending">Pending</SelectItem>
-          <SelectItem value="contacted">Contacted</SelectItem>
-          <SelectItem value="confirmed">Confirmed</SelectItem>
-          <SelectItem value="scheduled">Scheduled</SelectItem>
-          <SelectItem value="completed">Completed</SelectItem>
-          <SelectItem value="cancelled">Cancelled</SelectItem>
-        </SelectContent>
-      </Select>
+      {consultationType === "normal" && consultation.status && (
+        <Select
+          onValueChange={(status) => onUpdateStatus(consultation.id, status)}
+        >
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Update" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="contacted">Contacted</SelectItem>
+            <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }
@@ -279,6 +345,7 @@ function PaginationControls({
 // Consultation Details Modal Component
 function ConsultationDetailsModal({
   consultation,
+  consultationType,
   open,
   onOpenChange,
   onSendWhatsApp,
@@ -287,6 +354,7 @@ function ConsultationDetailsModal({
   onCallClient,
 }: {
   consultation: Consultation | null;
+  consultationType: "booking" | "normal";
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSendWhatsApp: (consultation: Consultation) => void;
@@ -299,13 +367,24 @@ function ConsultationDetailsModal({
   };
 
   const formatTime = (timeString: string) => {
-    const date = new Date(timeString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return timeString; // Return as-is if parsing fails
+    }
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch (error) {
+      return dateString; // Return as-is if parsing fails
+    }
   };
 
   if (!consultation) return null;
@@ -343,7 +422,30 @@ function ConsultationDetailsModal({
                     {consultation.phone}
                   </p>
                 </div>
-                {consultation.country && (
+                {consultationType === "booking" && consultation.email && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Email
+                    </label>
+                    <p className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      {consultation.email}
+                    </p>
+                  </div>
+                )}
+                {consultationType === "booking" &&
+                  consultation.organization && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Organization
+                      </label>
+                      <p className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-gray-400" />
+                        {consultation.organization}
+                      </p>
+                    </div>
+                  )}
+                {consultationType === "normal" && consultation.country && (
                   <div>
                     <label className="text-sm font-medium text-gray-500">
                       Country
@@ -365,81 +467,122 @@ function ConsultationDetailsModal({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Service Type
-                  </label>
-                  <p>{consultation.service_type}</p>
-                </div>
+                {consultationType === "normal" && consultation.service_type && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Service Type
+                    </label>
+                    <p>{consultation.service_type}</p>
+                  </div>
+                )}
                 <div>
                   <label className="text-sm font-medium text-gray-500">
                     Consultation Type
                   </label>
                   <p>{consultation.consult_type}</p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Scheduled Date
-                  </label>
-                  <p>{formatDate(consultation.date)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Scheduled Time
-                  </label>
-                  <p className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-400" />
-                    {formatTime(consultation.time)}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Status
-                  </label>
-                  <StatusBadge status={consultation.status} />
-                </div>
+                {consultationType === "normal" && consultation.date && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Scheduled Date
+                    </label>
+                    <p>{formatDate(consultation.date)}</p>
+                  </div>
+                )}
+                {consultationType === "booking" &&
+                  consultation.preferred_date && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Preferred Date
+                      </label>
+                      <p>{formatDate(consultation.preferred_date)}</p>
+                    </div>
+                  )}
+                {consultationType === "normal" && consultation.time && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Scheduled Time
+                    </label>
+                    <p className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-400" />
+                      {formatTime(consultation.time)}
+                    </p>
+                  </div>
+                )}
+                {consultationType === "booking" &&
+                  consultation.preferred_time && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">
+                        Preferred Time
+                      </label>
+                      <p className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        {formatTime(consultation.preferred_time)}
+                      </p>
+                    </div>
+                  )}
+                {consultationType === "normal" && consultation.status && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Status
+                    </label>
+                    <StatusBadge status={consultation.status} />
+                  </div>
+                )}
                 <div>
                   <label className="text-sm font-medium text-gray-500">
                     Requested On
                   </label>
                   <p>{formatDateTime(consultation.created_at)}</p>
                 </div>
+                {consultationType === "booking" && consultation.details && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">
+                      Additional Details
+                    </label>
+                    <p className="text-sm mt-1 p-2 bg-gray-50 rounded-md">
+                      {consultation.details}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
 
           {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3 flex-wrap">
-                <Button
-                  onClick={() => onCallClient(consultation.phone)}
-                  variant="outline"
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call Client
-                </Button>
-                <Button
-                  onClick={() => onSendWhatsApp(consultation)}
-                  variant="outline"
-                  className="bg-green-50 hover:bg-green-100 border-green-200"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  WhatsApp Client
-                </Button>
-                <Button
-                  onClick={() => onScheduleMeeting(consultation)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <CalendarPlus className="h-4 w-4 mr-2" />
-                  Schedule Meeting
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {consultationType === "normal" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3 flex-wrap">
+                  <Button
+                    onClick={() => onCallClient(consultation.phone)}
+                    variant="outline"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call Client
+                  </Button>
+                  <Button
+                    onClick={() => onSendWhatsApp(consultation)}
+                    variant="outline"
+                    className="bg-green-50 hover:bg-green-100 border-green-200"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    WhatsApp Client
+                  </Button>
+                  <Button
+                    onClick={() => onScheduleMeeting(consultation)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <CalendarPlus className="h-4 w-4 mr-2" />
+                    Schedule Meeting
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -481,9 +624,9 @@ function ScheduleMeetingModal({
 
       // Format the date from consultation
       let formattedDate = "";
-      if (consultation.date) {
+      if (consultation.preferred_date) {
         try {
-          const date = new Date(consultation.date);
+          const date = new Date(consultation.preferred_date);
           if (!isNaN(date.getTime())) {
             formattedDate = date.toISOString().split("T")[0];
           }
@@ -494,11 +637,14 @@ function ScheduleMeetingModal({
 
       // Format the time from consultation
       let formattedTime = "";
-      if (consultation.time) {
+      if (consultation.preferred_time) {
         try {
-          const date = new Date(consultation.time);
+          const date = new Date(consultation.preferred_time);
           if (!isNaN(date.getTime())) {
-            formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            formattedTime = date.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
           }
         } catch (error) {
           console.log("Time parsing error:", error);
@@ -582,11 +728,9 @@ function ScheduleMeetingModal({
             <h4 className="font-medium text-blue-900">
               Client: {consultation.full_name}
             </h4>
-            <p className="text-sm text-blue-700">
-              {consultation.phone}
-            </p>
+            <p className="text-sm text-blue-700">{consultation.phone}</p>
             <p className="text-sm text-blue-600">
-              Service: {consultation.service_type}
+              Consultation Type: {consultation.consult_type}
             </p>
           </div>
 
@@ -805,7 +949,11 @@ function ScheduleMeetingModal({
 }
 
 // Main AdminConsultations Component
-export function AdminConsultations() {
+export function AdminConsultations({
+  consultationType = "normal",
+}: {
+  consultationType?: "booking" | "normal";
+}) {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedConsultation, setSelectedConsultation] =
@@ -821,9 +969,11 @@ export function AdminConsultations() {
   const fetchConsultations = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await adminService.getAllConsultations();
+      const response =
+        consultationType === "booking"
+          ? await bookingConsultantsService.getConsultations()
+          : await adminService.getAllConsultations();
 
-      console.log(response);
       if (response.success) {
         setConsultations(response.data || []);
         setTotalPages(response.data?.pagination?.totalPages || 1);
@@ -844,7 +994,7 @@ export function AdminConsultations() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, statusFilter, searchTerm, toast]);
+  }, [currentPage, statusFilter, searchTerm, toast, consultationType]);
 
   useEffect(() => {
     fetchConsultations();
@@ -852,7 +1002,10 @@ export function AdminConsultations() {
 
   const viewConsultationDetails = async (consultationId: number) => {
     try {
-      const response = await adminService.getConsultationById(consultationId);
+      const response =
+        consultationType === "booking"
+          ? await bookingConsultantsService.getConsultation(consultationId)
+          : await adminService.getConsultationById(consultationId);
 
       if (response.success) {
         setSelectedConsultation(response.data);
@@ -880,6 +1033,8 @@ export function AdminConsultations() {
     newStatus: string
   ) => {
     try {
+      if (consultationType !== "normal") return;
+
       const response = await adminService.updateConsultationStatus(
         consultationId,
         newStatus
@@ -952,8 +1107,8 @@ export function AdminConsultations() {
     }
 
     const message = encodeURIComponent(
-      `Hello ${consultation.full_name}, this is regarding your consultation request for ${consultation.service_type}. ` +
-        `We would like to discuss the details of your consultation scheduled for ${formatDate(consultation.date)}. ` +
+      `Hello ${consultation.full_name}, this is regarding your consultation request for ${consultation.consult_type}. ` +
+        `We would like to discuss the details of your consultation. ` +
         `Please let us know if you have any questions or need to reschedule. Best regards, Galloways Kenya Team.`
     );
 
@@ -968,8 +1123,10 @@ export function AdminConsultations() {
       description: `Message sent to ${consultation.full_name} at ${clientPhone}`,
     });
 
-    // Update consultation status to indicate contact was made
-    updateConsultationStatus(consultation.id, "contacted");
+    // Update consultation status to indicate contact was made (only for normal consultations)
+    if (consultationType === "normal" && consultation.status) {
+      updateConsultationStatus(consultation.id, "contacted");
+    }
   };
 
   // Schedule meeting functionality
@@ -1041,20 +1198,28 @@ export function AdminConsultations() {
 
   return (
     <div className="space-y-6">
-      <HeaderSection onRefresh={fetchConsultations} loading={loading} />
+      <HeaderSection
+        onRefresh={fetchConsultations}
+        loading={loading}
+        consultationType={consultationType}
+      />
 
       <FiltersSection
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        consultationType={consultationType}
       />
 
       {/* Consultations Table */}
       <Card>
         <CardHeader>
           <CardTitle>
-            Consultations List ({consultations.length} records)
+            {consultationType === "booking"
+              ? "Booking Consultants"
+              : "Consultations"}{" "}
+            List ({consultations.length} records)
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -1063,11 +1228,24 @@ export function AdminConsultations() {
               <thead>
                 <tr className="border-b">
                   <th className="text-left p-3 font-medium">Client</th>
-                  <th className="text-left p-3 font-medium">Service Type</th>
-                  <th className="text-left p-3 font-medium">Consultation Type</th>
-                  <th className="text-left p-3 font-medium">Scheduled</th>
-                  <th className="text-left p-3 font-medium">Country</th>
-                  <th className="text-left p-3 font-medium">Status</th>
+                  {consultationType === "booking" && (
+                    <th className="text-left p-3 font-medium">Organization</th>
+                  )}
+                  <th className="text-left p-3 font-medium">
+                    Consultation Type
+                  </th>
+                  {consultationType === "normal" && (
+                    <th className="text-left p-3 font-medium">Service Type</th>
+                  )}
+                  <th className="text-left p-3 font-medium">
+                    {consultationType === "booking" ? "Preferred" : "Scheduled"}
+                  </th>
+                  {consultationType === "normal" && (
+                    <th className="text-left p-3 font-medium">Country</th>
+                  )}
+                  {consultationType === "normal" && (
+                    <th className="text-left p-3 font-medium">Status</th>
+                  )}
                   <th className="text-left p-3 font-medium">Requested</th>
                   <th className="text-left p-3 font-medium">Actions</th>
                 </tr>
@@ -1080,25 +1258,47 @@ export function AdminConsultations() {
                       className="border-b hover:bg-gray-50"
                     >
                       <td className="p-3">
-                        <ClientInfo consultation={consultation} />
+                        <ClientInfo
+                          consultation={consultation}
+                          consultationType={consultationType}
+                        />
                       </td>
-                      <td className="p-3">{consultation.service_type}</td>
+                      {consultationType === "booking" && (
+                        <td className="p-3">
+                          <OrganizationInfo consultation={consultation} />
+                        </td>
+                      )}
                       <td className="p-3">{consultation.consult_type}</td>
+                      {consultationType === "normal" && (
+                        <td className="p-3">
+                          {consultation.service_type || "General"}
+                        </td>
+                      )}
                       <td className="p-3">
-                        <ScheduledTime consultation={consultation} />
+                        <ScheduledTime
+                          consultation={consultation}
+                          consultationType={consultationType}
+                        />
                       </td>
-                      <td className="p-3">
-                        <CountryInfo consultation={consultation} />
-                      </td>
-                      <td className="p-3">
-                        <StatusBadge status={consultation.status} />
-                      </td>
+                      {consultationType === "normal" && (
+                        <td className="p-3">
+                          <CountryInfo consultation={consultation} />
+                        </td>
+                      )}
+                      {consultationType === "normal" && (
+                        <td className="p-3">
+                          <StatusBadge
+                            status={consultation.status || "pending"}
+                          />
+                        </td>
+                      )}
                       <td className="p-3">
                         {formatDate(consultation.created_at)}
                       </td>
                       <td className="p-3">
                         <ConsultationActions
                           consultation={consultation}
+                          consultationType={consultationType}
                           onViewDetails={viewConsultationDetails}
                           onUpdateStatus={updateConsultationStatus}
                         />
@@ -1107,7 +1307,10 @@ export function AdminConsultations() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="text-center py-12">
+                    <td
+                      colSpan={consultationType === "booking" ? 7 : 8}
+                      className="text-center py-12"
+                    >
                       <NoConsultationsFound />
                     </td>
                   </tr>
@@ -1129,6 +1332,7 @@ export function AdminConsultations() {
 
       <ConsultationDetailsModal
         consultation={selectedConsultation}
+        consultationType={consultationType}
         open={showDetailsModal}
         onOpenChange={setShowDetailsModal}
         onSendWhatsApp={sendWhatsAppMessage}
@@ -1137,13 +1341,15 @@ export function AdminConsultations() {
         onCallClient={handleCallClient}
       />
 
-      <ScheduleMeetingModal
-        consultation={selectedConsultation}
-        open={showScheduleModal}
-        onOpenChange={setShowScheduleModal}
-        onScheduleMeeting={handleScheduleMeeting}
-        onSendWhatsAppDetails={handleSendWhatsAppDetails}
-      />
+      {consultationType === "normal" && (
+        <ScheduleMeetingModal
+          consultation={selectedConsultation}
+          open={showScheduleModal}
+          onOpenChange={setShowScheduleModal}
+          onScheduleMeeting={handleScheduleMeeting}
+          onSendWhatsAppDetails={handleSendWhatsAppDetails}
+        />
+      )}
     </div>
   );
 }
