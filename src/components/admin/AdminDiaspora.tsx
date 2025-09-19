@@ -1,13 +1,34 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Eye, Filter, Globe, Calendar, Clock, User, Phone, Mail, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Eye,
+  Filter,
+  Globe,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  RefreshCw,
+} from "lucide-react";
 // API import disabled for build
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from "@/hooks/use-toast";
+import { adminService } from "@/lib/api";
 
 interface DiasporaRequest {
   id: number;
@@ -15,25 +36,22 @@ interface DiasporaRequest {
   email: string;
   phone: string;
   country: string;
-  timezone: string;
-  serviceInterest: string;
-  scheduledAt?: string;
+  consult_time: string;
+  details: string;
+  created_at?: string;
   status: string;
-  createdAt: string;
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-  };
 }
 
 export function AdminDiaspora() {
-  const [diasporaRequests, setDiasporaRequests] = useState<DiasporaRequest[]>([]);
+  const [diasporaRequests, setDiasporaRequests] = useState<DiasporaRequest[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
-  const [selectedRequest, setSelectedRequest] = useState<DiasporaRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<DiasporaRequest | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
@@ -41,15 +59,15 @@ export function AdminDiaspora() {
   const fetchDiasporaRequests = async () => {
     try {
       setLoading(true);
-      
+
       const filterStatus = statusFilter === "all" ? undefined : statusFilter;
-      const result = await console.log(currentPage, 20, filterStatus, searchTerm || undefined);
+      const result = await adminService.getAllDiasporaRequests();
 
       if (result.success) {
-        setDiasporaRequests(result.data.diasporaRequests || []);
-        setTotalPages(result.data.pagination?.totalPages || 1);
+        setDiasporaRequests(result.data || []);
+        setTotalPages(result.data.pagination || 1);
       } else {
-        console.error('API returned error:', result);
+        console.error("API returned error:", result);
         setDiasporaRequests([]);
         toast({
           title: "Error",
@@ -58,7 +76,7 @@ export function AdminDiaspora() {
         });
       }
     } catch (error) {
-      console.error('Failed to fetch diaspora requests:', error);
+      console.error("Failed to fetch diaspora requests:", error);
       setDiasporaRequests([]);
       toast({
         title: "Error",
@@ -81,8 +99,11 @@ export function AdminDiaspora() {
 
   const updateRequestStatus = async (requestId: number, status: string) => {
     try {
-      const result = await console.log(requestId, status);
-      
+      const result = await adminService.updateDiasporaStatus(
+        requestId,
+        status
+      );
+
       if (result.success) {
         await fetchDiasporaRequests();
         toast({
@@ -97,7 +118,7 @@ export function AdminDiaspora() {
         });
       }
     } catch (error: any) {
-      console.error('Update diaspora request status error:', error);
+      console.error("Update diaspora request status error:", error);
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update request status",
@@ -108,29 +129,49 @@ export function AdminDiaspora() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'contacted': return 'bg-blue-100 text-blue-800';
-      case 'scheduled': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "contacted":
+        return "bg-blue-100 text-blue-800";
+      case "scheduled":
+        return "bg-purple-100 text-purple-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getCountryFlag = (country: string) => {
     const flags: Record<string, string> = {
-      'USA': '🇺🇸', 'UK': '🇬🇧', 'Canada': '🇨🇦', 'Australia': '🇦🇺',
-      'Germany': '🇩🇪', 'France': '🇫🇷', 'Japan': '🇯🇵', 'South Africa': '🇿🇦',
-      'UAE': '🇦🇪', 'Saudi Arabia': '🇸🇦', 'Qatar': '🇶🇦', 'Kuwait': '🇰🇼'
+      USA: "🇺🇸",
+      UK: "🇬🇧",
+      Canada: "🇨🇦",
+      Australia: "🇦🇺",
+      Germany: "🇩🇪",
+      France: "🇫🇷",
+      Japan: "🇯🇵",
+      "South Africa": "🇿🇦",
+      UAE: "🇦🇪",
+      "Saudi Arabia": "🇸🇦",
+      Qatar: "🇶🇦",
+      Kuwait: "🇰🇼",
     };
-    return flags[country] || '🌍';
+    return flags[country] || "🌍";
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <h2 className="text-2xl font-bold">Diaspora Services</h2>
-        <Button onClick={fetchDiasporaRequests} variant="outline" size="sm" disabled={loading}>
+        <Button
+          onClick={fetchDiasporaRequests}
+          variant="outline"
+          size="sm"
+          disabled={loading}
+        >
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
         </Button>
@@ -174,7 +215,9 @@ export function AdminDiaspora() {
       {/* Diaspora Requests List */}
       <Card>
         <CardHeader>
-          <CardTitle>Diaspora Service Requests ({diasporaRequests.length})</CardTitle>
+          <CardTitle>
+            Diaspora Service Requests ({diasporaRequests.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -189,7 +232,10 @@ export function AdminDiaspora() {
           ) : (
             <div className="space-y-4">
               {diasporaRequests.map((request) => (
-                <div key={request.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                <div
+                  key={request.id}
+                  className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -197,7 +243,9 @@ export function AdminDiaspora() {
                         <Badge className={getStatusColor(request.status)}>
                           {request.status}
                         </Badge>
-                        <span className="text-lg">{getCountryFlag(request.country)}</span>
+                        <span className="text-lg">
+                          {getCountryFlag(request.country)}
+                        </span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -210,17 +258,18 @@ export function AdminDiaspora() {
                         </div>
                         <div className="flex items-center gap-1">
                           <User className="h-4 w-4" />
-                          {request.serviceInterest}
+                          {request.details}
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {new Date(request.createdAt).toLocaleDateString()}
+                          {new Date(request.created_at).toLocaleDateString()}
                         </div>
                       </div>
-                      {request.scheduledAt && (
+                      {request.created_at && (
                         <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          Scheduled: {new Date(request.scheduledAt).toLocaleString()}
+                          Scheduled:{" "}
+                          {new Date(request.created_at).toLocaleString()}
                         </div>
                       )}
                     </div>
@@ -235,7 +284,9 @@ export function AdminDiaspora() {
                       </Button>
                       <Select
                         value={request.status}
-                        onValueChange={(status) => updateRequestStatus(request.id, status)}
+                        onValueChange={(status) =>
+                          updateRequestStatus(request.id, status)
+                        }
                       >
                         <SelectTrigger className="w-32">
                           <SelectValue />
@@ -261,7 +312,7 @@ export function AdminDiaspora() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
               >
                 Previous
@@ -272,7 +323,9 @@ export function AdminDiaspora() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
               >
                 Next
@@ -312,75 +365,33 @@ export function AdminDiaspora() {
                 </div>
                 <div>
                   <label className="font-semibold">Timezone:</label>
-                  <p>{selectedRequest.timezone}</p>
+                  <p>{selectedRequest.consult_time}</p>
                 </div>
                 <div>
                   <label className="font-semibold">Service Interest:</label>
-                  <p>{selectedRequest.serviceInterest}</p>
+                  <p>{selectedRequest.details}</p>
                 </div>
               </div>
-              <div className="flex gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={async () => {
-                    try {
-                      const result = await console.log({
-                        type: 'project-consultation',
-                        diasporaRequestId: selectedRequest.id,
-                        name: selectedRequest.name,
-                        email: selectedRequest.email,
-                        phone: selectedRequest.phone,
-                        country: selectedRequest.country,
-                        timezone: selectedRequest.timezone,
-                        serviceInterest: selectedRequest.serviceInterest,
-                        createdAt: selectedRequest.createdAt
-                      });
-                      if (result.success) {
-                        toast({
-                          title: 'Project-Based Consultation Created',
-                          description: 'Consultation has been created and will appear in the dashboard.',
-                        });
-                        fetchDiasporaRequests();
-                      } else {
-                        toast({
-                          title: 'Error',
-                          description: result.message || 'Failed to create project-based consultation.',
-                          variant: 'destructive',
-                        });
-                      }
-                    } catch (error) {
-                      toast({
-                        title: 'Error',
-                        description: error.message || 'Failed to create project-based consultation.',
-                        variant: 'destructive',
-                      });
-                    }
-                  }}
-                >
-                  Project-Based Consultation
-                </Button>
-              </div>
-              
-              {selectedRequest.scheduledAt && (
+
+              {selectedRequest.created_at && (
                 <div>
-                  <label className="font-semibold">Scheduled Appointment:</label>
+                  <label className="font-semibold">Created At:</label>
                   <p className="text-green-600">
-                    {new Date(selectedRequest.scheduledAt).toLocaleString()}
+                    {new Date(selectedRequest.created_at).toLocaleString()}
                   </p>
                 </div>
               )}
-              
+
               <div className="flex items-center gap-2">
                 <label className="font-semibold">Status:</label>
                 <Badge className={getStatusColor(selectedRequest.status)}>
                   {selectedRequest.status}
                 </Badge>
               </div>
-              
+
               <div>
                 <label className="font-semibold">Submitted:</label>
-                <p>{new Date(selectedRequest.createdAt).toLocaleString()}</p>
+                <p>{new Date(selectedRequest.created_at).toLocaleString()}</p>
               </div>
             </div>
           )}

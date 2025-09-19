@@ -383,19 +383,19 @@ const outsourcingRequests = {
 // Diaspora Service
 const diasporaService = {
   createRequest: async (data: any): Promise<ApiResponse> =>
-    request("/diaspora", { method: "POST", body: JSON.stringify(data) }),
+    request("/diaspora-requests", { method: "POST", body:data }),
 
   getRequests: async (): Promise<ApiResponse> =>
-    request("/diaspora", { method: "GET" }),
+    request("/diaspora-requests", { method: "GET" }),
 
   getRequest: async (id: string): Promise<ApiResponse> =>
-    request(`/diaspora/${id}`, { method: "GET" }),
+    request(`/diaspora-requests/${id}`, { method: "GET" }),
 
   updateRequestStatus: async (
     id: string,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/diaspora/${id}/status`, {
+    request(`/diaspora-requests/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),
@@ -834,12 +834,12 @@ const adminService = {
   getAllConsultations: async (): Promise<
     ApiResponse<PaginatedResponse<any>>
   > => {
-    return request(`/outsourcing-requests`, { method: "GET" });
+    return request(`/consultations`, { method: "GET" });
   },
   // create consultation
   createConsultation: async (data: any): Promise<ApiResponse> => {
     try {
-      const response = await request(`/outsourcing-requests`, {
+      const response = await request(`/consultations`, {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -854,13 +854,13 @@ const adminService = {
   },
 
   getConsultationById: async (id: number): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}`, { method: "GET" }),
+    request(`/consultations/${id}`, { method: "GET" }),
 
   updateConsultationStatus: async (
     id: number,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}/status`, {
+    request(`/consultations/${id}/status`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),
@@ -886,18 +886,18 @@ const adminService = {
     page = 1,
     limit = 50
   ): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/diaspora?page=${page}&limit=${limit}`, { method: "GET" }),
+    request(`/diaspora-requests?page=${page}&limit=${limit}`, { method: "GET" }),
 
   getDiasporaById: async (id: number): Promise<ApiResponse> =>
-    request(`/diaspora/${id}`, { method: "GET" }),
+    request(`/diaspora-requests/${id}`, { method: "GET" }),
 
   updateDiasporaStatus: async (
     id: number,
     status: string
   ): Promise<ApiResponse> =>
-    request(`/diaspora/${id}/status`, {
+    request(`/diaspora-requests/${id}/status`, {
       method: "PUT",
-      body: JSON.stringify({ status }),
+      body: { status },
     }),
 
   // Outsourcing
@@ -918,8 +918,11 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/outsourcing-requests/${id}/status`, {
       method: "PUT",
-      body: JSON.stringify({ status }),
+      body: { status },
     }),
+
+deleteOutsourcingRequest: async (id: number): Promise<ApiResponse> =>
+    request(`/outsourcing-requests/${id}`, { method: "DELETE" }), 
 
   // Payments
   getAllPayments: async (

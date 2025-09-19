@@ -38,20 +38,20 @@ import { adminService } from "@/lib/api";
 
 interface OutsourcingRequest {
   id: string;
-  organizationName: string;
-  coreFunctions: string;
+  organization_name: string;
+  core_functions: string;
   services: string[] | string;
   location: string;
   address: string;
-  budgetRange: string;
-  natureOfOutsourcing: string;
-  contactEmail?: string;
+  budget_range: string;
+  nature_of_outsourcing: string;
+  email?: string;
   contactPhone?: string;
   timeline?: string;
   specificRequirements?: string;
   status: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface OutsourcingStats {
@@ -113,8 +113,8 @@ export function AdminOutsourcing() {
       );
 
       if (result.success) {
-        setOutsourcingRequests(result.data.data || []);
-        setTotalPages(result.data.pagination?.totalPages || 1);
+        setOutsourcingRequests(result.data || []);
+        setTotalPages(result.data || 1);
       } else {
         console.error("API returned error:", result);
         setOutsourcingRequests([]);
@@ -219,9 +219,15 @@ export function AdminOutsourcing() {
       )
     ) {
       try {
-        // Note: The adminService doesn't have a delete method for outsourcing requests
-        // This would need to be implemented in the API
-        toast.error("Delete functionality not implemented in API");
+        const result = await adminService.deleteOutsourcingRequest(
+          parseInt(requestId)
+        );
+        if (result.success) {
+          toast.success("Outsourcing request deleted successfully");
+          await fetchOutsourcingRequests();
+        } else {
+          toast.error("Failed to delete outsourcing request");
+        }
       } catch (error) {
         console.error("Error deleting outsourcing request:", error);
         toast.error("Failed to delete request");
@@ -474,10 +480,10 @@ export function AdminOutsourcing() {
                           <td className="p-3">
                             <div>
                               <div className="font-medium">
-                                {request.organizationName}
+                                {request.organization_name}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {request.coreFunctions}
+                                {request.core_functions}
                               </div>
                             </div>
                           </td>
@@ -502,14 +508,14 @@ export function AdminOutsourcing() {
                             </div>
                           </td>
                           <td className="p-3 font-medium">
-                            {request.budgetRange}
+                            {request.budget_range}
                           </td>
                           <td className="p-3">
                             <div
                               className="text-sm text-gray-600 truncate max-w-32"
-                              title={request.natureOfOutsourcing}
+                              title={request.nature_of_outsourcing}
                             >
-                              {request.natureOfOutsourcing}
+                              {request.nature_of_outsourcing}
                             </div>
                           </td>
                           <td className="p-3">
@@ -518,7 +524,7 @@ export function AdminOutsourcing() {
                             </Badge>
                           </td>
                           <td className="p-3">
-                            {formatDate(request.createdAt)}
+                            {formatDate(request.created_at)}
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
@@ -621,7 +627,7 @@ export function AdminOutsourcing() {
                         Organization Name
                       </Label>
                       <p className="text-sm text-gray-600">
-                        {selectedRequest.organizationName}
+                        {selectedRequest.organization_name}
                       </p>
                     </div>
                     <div>
@@ -629,7 +635,7 @@ export function AdminOutsourcing() {
                         Core Functions
                       </Label>
                       <p className="text-sm text-gray-600">
-                        {selectedRequest.coreFunctions}
+                        {selectedRequest.core_functions}
                       </p>
                     </div>
                     <div>
@@ -637,7 +643,7 @@ export function AdminOutsourcing() {
                         Contact Email
                       </Label>
                       <p className="text-sm text-gray-600">
-                        {selectedRequest.contactEmail || "Not provided"}
+                        {selectedRequest.email || "Not provided"}
                       </p>
                     </div>
                     <div>
@@ -665,7 +671,7 @@ export function AdminOutsourcing() {
                         Budget Range
                       </Label>
                       <p className="text-sm text-gray-600">
-                        {selectedRequest.budgetRange}
+                        {selectedRequest.budget_range}
                       </p>
                     </div>
                     <div>
@@ -708,7 +714,7 @@ export function AdminOutsourcing() {
                       Nature of Outsourcing
                     </Label>
                     <p className="text-sm text-gray-600 mt-1 p-3 bg-gray-50 rounded-lg">
-                      {selectedRequest.natureOfOutsourcing}
+                      {selectedRequest.nature_of_outsourcing}
                     </p>
                   </div>
 
