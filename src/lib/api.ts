@@ -383,7 +383,7 @@ const outsourcingRequests = {
 // Diaspora Service
 const diasporaService = {
   createRequest: async (data: any): Promise<ApiResponse> =>
-    request("/diaspora-requests", { method: "POST", body:data }),
+    request("/diaspora-requests", { method: "POST", body: data }),
 
   getRequests: async (): Promise<ApiResponse> =>
     request("/diaspora-requests", { method: "GET" }),
@@ -767,14 +767,14 @@ const adminService = {
         success: !response.error,
         data: response.error
           ? {
-              data: [],
-              pagination: {
-                totalPages: 1,
-                currentPage: 1,
-                total: 0,
-                perPage: limit,
-              },
-            }
+            data: [],
+            pagination: {
+              totalPages: 1,
+              currentPage: 1,
+              total: 0,
+              perPage: limit,
+            },
+          }
           : response.data,
         message: response.error || "Claims loaded successfully",
       };
@@ -862,7 +862,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/consultations/${id}/status`, {
       method: "PUT",
-      body: JSON.stringify({ status }),
+      body: { status },
     }),
 
   // Quotes
@@ -921,8 +921,8 @@ const adminService = {
       body: { status },
     }),
 
-deleteOutsourcingRequest: async (id: number): Promise<ApiResponse> =>
-    request(`/outsourcing-requests/${id}`, { method: "DELETE" }), 
+  deleteOutsourcingRequest: async (id: number): Promise<ApiResponse> =>
+    request(`/outsourcing-requests/${id}`, { method: "DELETE" }),
 
   // Payments
   getAllPayments: async (
