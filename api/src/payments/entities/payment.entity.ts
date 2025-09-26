@@ -18,7 +18,7 @@ export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   user_id: number;
 
   @Column('decimal', { precision: 15, scale: 2 })
@@ -27,14 +27,41 @@ export class Payment {
   @Column({ length: 10, default: 'KES' })
   currency: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   method: string;
+
+  @Column({ length: 255, nullable: true })
+  paymentMethod: string;
+
+  @Column({ length: 255, nullable: true })
+  paymentProvider: string;
+
+  @Column({ length: 255, nullable: true })
+  transactionId: string;
 
   @Column({ length: 50, default: 'pending' })
   status: string;
 
   @Column({ length: 255 })
   reference: string;
+
+  @Column({ length: 255, nullable: true })
+  customerEmail: string;
+
+  @Column({ length: 255, nullable: true })
+  customerPhone: string;
+
+  @Column({ length: 255, nullable: true })
+  customerName: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  consultationId: number;
+
+  @Column({ nullable: true })
+  diasporaRequestId: number;
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, unknown> | null;

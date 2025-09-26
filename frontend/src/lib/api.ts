@@ -284,6 +284,26 @@ const paymentsService = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  // M-Pesa STK Push
+  initiateSTKPush: async (data: {
+    phoneNumber: string;
+    amount: number;
+    accountReference: string;
+    transactionDesc: string;
+    userId?: number;
+    consultationId?: number;
+  }): Promise<ApiResponse> =>
+    request("/payments/mpesa/stkpush", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  querySTKPushStatus: async (checkoutRequestId: string): Promise<ApiResponse> =>
+    request(`/payments/mpesa/status/${checkoutRequestId}`, { method: "GET" }),
+
+  getPaymentByCheckoutRequestId: async (checkoutRequestId: string): Promise<ApiResponse> =>
+    request(`/payments/mpesa/payment/${checkoutRequestId}`, { method: "GET" }),
 };
 
 // Outsourcing Service
@@ -862,7 +882,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/consultations/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   // Quotes
@@ -897,7 +917,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/diaspora-requests/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   // Outsourcing
@@ -918,7 +938,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/outsourcing-requests/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   deleteOutsourcingRequest: async (id: number): Promise<ApiResponse> =>

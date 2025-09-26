@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put, Query } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
+import { MpesaService, MpesaSTKPushResponse } from './mpesa.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { InitiateSTKPushDto } from './dto/initiate-stk-push.dto';
 import { Payment } from './entities/payment.entity';
 
 interface ApiResponse<T = any> {
@@ -13,7 +15,10 @@ interface ApiResponse<T = any> {
 
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(
+    private readonly paymentsService: PaymentsService,
+    private readonly mpesaService: MpesaService,
+  ) {}
 
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto): Promise<ApiResponse<Payment>> {
@@ -54,5 +59,36 @@ export class PaymentsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<null>> {
     return this.paymentsService.remove(id);
+  }
+
+  // M-Pesa STK Push endpoints
+  @Post('mpesa/stkpush')
+  async initiateSTKPush(@Body() body: InitiateSTKPushDto): Promise<{ success: boolean; data?: MpesaSTKPushResponse; message: string; error?: string }> {
+    return this.mpesaService.initiateSTKPush(body);
+  }
+
+  @Post('mpesa/callback')
+  async handleMpesaCallback(@Body() callbackData: any) {
+    return this.mpesaService.handleCallback(callbackData);
+  }
+
+  @Post('mpesa/timeout')
+  async handleMpesaTimeout(@Body() timeoutData: any) {
+    // Handle timeout callback
+    return { success: true, message: 'Timeout callback received' };
+  }
+
+  @Get('mpesa/status/:checkoutRequestId')
+  async querySTKPushStatus(@Param('checkoutRequestId') checkoutRequestId: string) {
+    return this.mpesaService.querySTKPushStatus(checkoutRequestId);
+  }
+
+  @Get('mpesa/payment/:checkoutRequestId')
+  async getPaymentByCheckoutRequestId(@Param('checkoutRequestId') checkoutRequestId: string) {
+    const payment = await this.mpesaService.getPaymentByCheckoutRequestId(checkoutRequestId);
+    if (payment) {
+      return { success: true, data: payment, message: 'Payment found' };
+    }
+    return { success: false, message: 'Payment not found' };
   }
 }

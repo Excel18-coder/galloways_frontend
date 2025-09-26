@@ -5,6 +5,9 @@ import { User } from '../users/entities/user.entity';
 import { Claim } from '../claims/entities/claim.entity';
 import { Consultation } from '../consultations/entities/consultation.entity';
 import { OutsourcingRequest } from '../outsourcing_requests/entities/outsourcing_request.entity';
+import { Payment } from '../payments/entities/payment.entity';
+import { DiasporaRequest } from '../diaspora_requests/entities/diaspora_request.entity';
+import { Quote } from '../quotes/entities/quote.entity';
 import { DashboardStats } from './dto/dashboard-stats.dto';
 
 @Injectable()
@@ -22,15 +25,14 @@ export class DashboardService {
         @InjectRepository(OutsourcingRequest)
         private outsourcingRequestRepository: Repository<OutsourcingRequest>,
 
-        // Add other repositories as needed
-        // @InjectRepository(Payment)
-        // private paymentRepository: Repository<Payment>,
+        @InjectRepository(Payment)
+        private paymentRepository: Repository<Payment>,
 
-        // @InjectRepository(Quote)
-        // private quoteRepository: Repository<Quote>,
+        @InjectRepository(Quote)
+        private quoteRepository: Repository<Quote>,
 
-        // @InjectRepository(DiasporaRequest)
-        // private diasporaRequestRepository: Repository<DiasporaRequest>,
+        @InjectRepository(DiasporaRequest)
+        private diasporaRequestRepository: Repository<DiasporaRequest>,
     ) { }
 
     async getComprehensiveDashboard(): Promise<{ success: boolean, data: DashboardStats }> {
@@ -49,10 +51,15 @@ export class DashboardService {
                 totalClaims,
                 totalConsultations,
                 totalOutsourcingRequests,
+                totalPayments,
+                totalQuotes,
+                totalDiasporaRequests,
+                totalRevenue,
                 currentMonthUsers,
                 lastMonthUsers,
                 currentMonthClaims,
                 lastMonthClaims,
+                currentMonthRevenue,
                 // Add more queries as needed based on your entities
             ] = await Promise.all([
                 // Total counts
@@ -60,6 +67,17 @@ export class DashboardService {
                 this.claimRepository.count(),
                 this.consultationRepository.count(),
                 this.outsourcingRequestRepository.count(),
+                this.paymentRepository.count(),
+                this.quoteRepository.count(),
+                this.diasporaRequestRepository.count(),
+                
+                // Revenue calculation
+                this.paymentRepository
+                    .createQueryBuilder('payment')
+                    .select('COALESCE(SUM(payment.amount), 0)', 'total')
+                    .where('payment.status = :status', { status: 'completed' })
+                    .getRawOne()
+                    .then(result => parseFloat(result?.total || '0')),
 
                 // Current month data for growth calculations
                 this.userRepository
@@ -84,20 +102,23 @@ export class DashboardService {
                     .where('claim.created_at >= :start', { start: lastMonthStart })
                     .andWhere('claim.created_at <= :end', { end: lastMonthEnd })
                     .getCount(),
+
+                // Current month revenue
+                this.paymentRepository
+                    .createQueryBuilder('payment')
+                    .select('COALESCE(SUM(payment.amount), 0)', 'total')
+                    .where('payment.status = :status', { status: 'completed' })
+                    .andWhere('payment.created_at >= :start', { start: currentMonthStart })
+                    .getRawOne()
+                    .then(result => parseFloat(result?.total || '0')),
             ]);
 
             // Calculate growth rates
             const userGrowthRate = this.calculateGrowthRate(currentMonthUsers, lastMonthUsers);
             const claimsGrowthRate = this.calculateGrowthRate(currentMonthClaims, lastMonthClaims);
 
-            // TODO: Implement these queries based on your actual entities and requirements
-            const totalPayments = 0; // await this.paymentRepository.count();
-            const totalQuotes = 0; // await this.quoteRepository.count();
-            const totalDiasporaRequests = 0; // await this.diasporaRequestRepository.count();
-
-            // Revenue calculations (implement based on your payment/order entities)
-            const totalRevenue = 0; // await this.calculateTotalRevenue();
-            const monthlyRevenue = 0; // await this.calculateMonthlyRevenue(currentMonthStart);
+            // Monthly revenue is already calculated above as currentMonthRevenue
+            const monthlyRevenue = currentMonthRevenue;
 
             // Conversion rate (customize based on your business logic)
             const conversionRate = totalUsers > 0 ? (totalClaims / totalUsers) * 100 : 0;

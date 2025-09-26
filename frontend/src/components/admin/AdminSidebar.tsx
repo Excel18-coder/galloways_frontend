@@ -14,7 +14,8 @@ import {
   Crown,
   MessageSquare,
   Globe,
-  Briefcase
+  Briefcase,
+  FolderOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -103,6 +104,13 @@ const menuItems = [
     icon: BarChart3,
     description: "Data Insights",
     color: "from-indigo-500 to-indigo-600",
+  },
+  {
+    id: "resources",
+    label: "Resources",
+    icon: FolderOpen,
+    description: "File Management",
+    color: "from-teal-500 to-teal-600",
   },
   {
     id: "settings",

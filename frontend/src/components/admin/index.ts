@@ -14,3 +14,5 @@ export { AdminSidebar } from './AdminSidebar';
 export { AdminTopbar } from './AdminTopbar';
 export { AdminNotifications } from './AdminNotifications';
 export { AdminAnalytics } from './AdminAnalytics';
+export { AdminResources } from './AdminResources';
+export { AdminLogin } from './AdminLogin';

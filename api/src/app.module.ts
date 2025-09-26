@@ -24,6 +24,7 @@ import { BookingConsultantsModule } from './booking-consultants/booking-consulta
 
 import { DashboardModule } from './dashboard/dashboard.module';
 import { BasedConsultationModule } from './based-consultation/based-consultation.module';
+import { ResourcesModule } from './resources/resources.module';
 
 @Module({
   imports: [
@@ -60,6 +61,8 @@ import { BasedConsultationModule } from './based-consultation/based-consultation
     DashboardModule,
 
     BasedConsultationModule,
+
+    ResourcesModule,
   ],
   controllers: [AppController],
   providers: [

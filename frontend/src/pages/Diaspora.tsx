@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Globe, Heart, Shield, Home, Clock, Calendar } from "lucide-react";
 import { useState } from "react";
-import { diasporaService } from "@/lib/api";
+import { diasporaService, paymentsService } from "@/lib/api";
 
 export default function Diaspora() {
   const [isPaying, setIsPaying] = useState(false);
@@ -244,14 +244,113 @@ export default function Diaspora() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Payment Information Section */}
+        <section className="py-12 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 rounded-xl shadow-lg border-2 border-primary/20">
+              <h2 className="text-2xl font-bold mb-6 text-center text-primary">
+                Alternative Payment Methods
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Bank Transfer */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <Home className="w-5 h-5 mr-2" />
+                    Bank Transfer (KCB)
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="font-medium">Account Name:</span>
+                      <br />
+                      <span className="text-muted-foreground">William Sialuma Analo</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Account Number:</span>
+                      <br />
+                      <span className="text-muted-foreground font-mono">1274400929</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Bank:</span>
+                      <br />
+                      <span className="text-muted-foreground">Kenya Commercial Bank (KCB)</span>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* M-PESA Options */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <Globe className="w-5 h-5 mr-2" />
+                    M-PESA Payment
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Option 1: Paybill</h4>
+                      <div className="text-sm space-y-1">
+                        <div>
+                          <span className="font-medium">Paybill:</span>
+                          <span className="text-muted-foreground font-mono ml-2">522522</span>
+                        </div>
+                        <div>
+                          <span className="font-medium">Account:</span>
+                          <span className="text-muted-foreground font-mono ml-2">1274400929</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Option 2: Business Number</h4>
+                      <div className="text-sm">
+                        <span className="font-medium">Till Number:</span>
+                        <span className="text-muted-foreground font-mono ml-2">0720769993</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Till Number */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <Heart className="w-5 h-5 mr-2" />
+                    Pay After Booking
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Till Number</h4>
+                      <div className="text-sm">
+                        <span className="font-medium">Till:</span>
+                        <span className="text-muted-foreground font-mono ml-2">6203056</span>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">PayPal Integration</h4>
+                      <div className="text-sm text-muted-foreground">
+                        PayPal linked to KCB account above
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center">
+                  <strong>Note:</strong> After making payment through any of the above methods, 
+                  please keep your transaction reference for confirmation. International clients 
+                  can use PayPal or bank transfer options for convenient payments.
+                </p>
+              </div>
+            </Card>
+          </div>
+        </section>
+
         <section className="py-20 px-4 bg-muted/50">
           <div className="max-w-6xl mx-auto">
             <Card className="p-8 rounded-xl shadow-lg border-2 border-primary">
               <h2 className="text-3xl font-bold mb-4 text-primary">
-                Book a Diaspora Consultation – Pay via Paystack (USD)
+                Book a Diaspora Consultation – Pay via Paystack (KES)
               </h2>
               <p className="mb-6 text-lg text-muted-foreground">
-                $<span className="font-bold text-gold">25</span> per hour.
+                KES <span className="font-bold text-gold">3,235</span> per hour.
                 Consultation is activated after payment confirmation.
               </p>
               <form
@@ -274,7 +373,7 @@ export default function Diaspora() {
                     const details =
                       formData.get("details")?.toString().trim() || "";
                     const amount = parseInt(
-                      formData.get("amount")?.toString() || "25"
+                      formData.get("amount")?.toString() || "3235"
                     );
                     const consultTime =
                       formData.get("consultTime")?.toString() || "";
@@ -298,32 +397,7 @@ export default function Diaspora() {
                       consultTime
                     ).toISOString();
 
-                    // Create consultation request first and get the ID
-                    const response = await diasporaService.createRequest({
-                      name: fullName,
-                      email,
-                      phone,
-                      country,
-                      details,
-                      amount,
-                      consult_time: formattedConsultTime,
-                    });
-
-                    if (!response.success) {
-                      alert(
-                        "Failed to create consultation request. Please try again."
-                      );
-                      setIsPaying(false);
-                      return;
-                    }
-
-                    const requestId = response.data.id;
-                    console.log(
-                      "Consultation request created successfully with ID:",
-                      requestId
-                    );
-
-                    // Initialize payment
+                    // Initialize payment directly after validation
                     await loadPaystack();
 
                     const publicKey =
@@ -365,8 +439,58 @@ export default function Diaspora() {
                       amount: Math.round(amount * 100),
                       currency,
                       ref: reference,
-                      callback: (x) => {
-                        console.log(x);
+                      callback: async (response) => {
+                        console.log("Paystack payment response:", response);
+                        
+                        try {
+                          // Create diaspora request first with correct field names
+                          const diasporaRequestData = {
+                            name: fullName,
+                            email: email,
+                            phone: phone,
+                            country: country,
+                            details: details,
+                            consult_time: formattedConsultTime,
+                            amount: amount
+                          };
+                          
+                          console.log("📋 Creating diaspora request:", diasporaRequestData);
+                          const diasporaResult = await diasporaService.createRequest(diasporaRequestData);
+                          console.log("📋 Diaspora request created:", diasporaResult);
+                          
+                          // Create payment record
+                          const paymentRecord = {
+                            amount: amount,
+                            currency: currency,
+                            paymentMethod: "Paystack",
+                            paymentProvider: "Paystack",
+                            transactionId: response.reference,
+                            reference: response.reference,
+                            status: "COMPLETED",
+                            customerEmail: email,
+                            customerPhone: phone,
+                            customerName: fullName,
+                            description: `Paystack diaspora consultation - ${country}`,
+                            diasporaRequestId: diasporaResult.data?.id,
+                            metadata: {
+                              country: country,
+                              consultTime: consultTime,
+                              serviceType: "diaspora-consultation",
+                              paymentReference: response.reference
+                            }
+                          };
+                          
+                          console.log("💳 Creating payment record:", paymentRecord);
+                          const paymentResult = await paymentsService.createPayment(paymentRecord);
+                          console.log("💳 Payment record created:", paymentResult);
+                          
+                          alert("Payment successful! Your diaspora consultation has been booked.");
+                        } catch (error) {
+                          console.error("Error processing payment:", error);
+                          alert("Payment completed but there was an issue saving your booking. Please contact support.");
+                        } finally {
+                          setIsPaying(false);
+                        }
                       },
                       onClose: () => {
                         console.log("Payment window closed");
@@ -440,19 +564,19 @@ export default function Diaspora() {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="amount">Amount (USD) *</Label>
+                    <Label htmlFor="amount">Amount (KES) *</Label>
                     <Input
                       id="amount"
                       name="amount"
                       type="number"
-                      defaultValue={25}
-                      min={25}
-                      step={25}
+                      defaultValue={3235}
+                      min={3235}
+                      step={3235}
                       readOnly
                       className="bg-muted/50"
                     />
                     <small className="text-muted-foreground">
-                      Fixed: $25 for 1 hour. Enter multiples for more hours.
+                      Fixed: KES 3,235 for 1 hour. Enter multiples for more hours.
                     </small>
                   </div>
                   <div>

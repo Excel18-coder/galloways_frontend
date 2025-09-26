@@ -95,24 +95,29 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-      {/* Live Chat Widget */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-white rounded-full shadow-lg flex items-center px-4 py-2 border border-primary">
-          <span className="mr-2 text-primary font-semibold">Live Chat</span>
-          <button
-            className="bg-primary text-white rounded-full px-3 py-1 font-bold hover:bg-primary/90 focus:outline-none"
-            onClick={() => window.open('https://wa.me/254720769993?text=Hello%20Galloways%20Insurance%20Agency%20-%20I%20need%20assistance', '_blank')}
-          >
-            WhatsApp Chat
-          </button>
-        </div>
-      </div>
-          <div className="text-sm opacity-90">
-            © 2025 Galloways Insurance Agencies & Consultancy Services. All rights reserved.
+        <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-2">
+          {/* Live Chat Widget */}
+          <div className="fixed bottom-6 right-6 z-50">
+            <div className="bg-white rounded-full shadow-lg flex items-center px-4 py-2 border border-primary">
+              <span className="mr-2 text-primary font-semibold">Live Chat</span>
+              <button
+                className="bg-primary text-white rounded-full px-3 py-1 font-bold hover:bg-primary/90 focus:outline-none"
+                onClick={() => window.open('https://wa.me/254720769993?text=Hello%20Galloways%20Insurance%20Agency%20-%20I%20need%20assistance', '_blank')}
+              >
+                WhatsApp Chat
+              </button>
+            </div>
           </div>
-          <div className="text-sm opacity-90 mt-4 md:mt-0">
-            Licensed by Insurance Regulatory Authority (IRA) Kenya
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <div className="text-sm opacity-90">
+              © 2025 Galloways Insurance Agencies & Consultancy Services. All rights reserved.
+            </div>
+            <div className="text-sm opacity-90 md:ml-4">
+              Licensed by Insurance Regulatory Authority (IRA) Kenya
+            </div>
+            <div className="text-sm opacity-90 md:ml-4">
+              Powered by <span className="font-bold tracking-wide">CIPHER</span>
+            </div>
           </div>
         </div>
       </div>

@@ -3,8 +3,8 @@ import { paymentStatus } from '../entities/payment.entity';
 
 export class CreatePaymentDto {
   @IsNumber()
-  @IsNotEmpty()
-  user_id: number;
+  @IsOptional()
+  user_id?: number;
 
   @IsNumber()
   @IsNotEmpty()
@@ -15,16 +15,52 @@ export class CreatePaymentDto {
   currency?: string;
 
   @IsString()
-  @IsNotEmpty()
-  method: string;
+  @IsOptional()
+  method?: string;
+
+  @IsString()
+  @IsOptional()
+  paymentMethod?: string;
+
+  @IsString()
+  @IsOptional()
+  paymentProvider?: string;
+
+  @IsString()
+  @IsOptional()
+  transactionId?: string;
 
   @IsString()
   @IsOptional()
   status?: paymentStatus;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // reference: string;
+  @IsString()
+  @IsOptional()
+  reference?: string;
+
+  @IsString()
+  @IsOptional()
+  customerEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  customerPhone?: string;
+
+  @IsString()
+  @IsOptional()
+  customerName?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsNumber()
+  @IsOptional()
+  consultationId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  diasporaRequestId?: number;
 
   @IsObject()
   @IsOptional()

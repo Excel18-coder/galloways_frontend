@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ConsultationBookingForm from "@/components/forms/ConsultationBookingForm";
 import BrochureDownload from "@/components/forms/BrochureDownload";
-import { consultationsService } from "@/lib/api";
+import { consultationsService, paymentsService, type ConsultType } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Consultancy() {
@@ -62,11 +62,14 @@ export default function Consultancy() {
       const consultationData = {
         full_name: paymentData.full_name,
         phone: paymentData.phone,
-        consult_type: paymentData.consult_type as "Online" | "Physical",
-        date: paymentData.date,
-        time: paymentData.time,
+        email: formData.get("email") as string || "", // Add email field, fallback to empty string if not provided
+        organization: formData.get("organization") as string || "", // Add organization field, fallback to empty string if not provided
+        consult_type: "General Consultation" as ConsultType,
+        preferred_date: paymentData.date,
+        preferred_time: paymentData.time,
+        consultationDate: paymentData.date, // Required field for ConsultationData
+        consultationTime: paymentData.time, // Required field for ConsultationData
         message: `M-PESA consultation booking - Amount: KES ${paymentData.amount}`,
-        serviceType: "mpesa-consultation",
         status: "PENDING",
       };
       
@@ -82,19 +85,53 @@ export default function Consultancy() {
         );
       }
 
-      // Simulate M-PESA payment (replace with actual M-PESA integration)
-      console.log("💳 Processing M-PESA payment...", {
-        ...paymentData,
+      // Create payment record for M-PESA
+      const paymentRecord = {
+        amount: paymentData.amount,
+        currency: "KES",
+        paymentMethod: "M-PESA",
+        paymentProvider: "Safaricom",
+        transactionId: `MPESA-${Date.now()}`,
+        reference: `CONS-${consultationResult.data?.id || Date.now()}`,
+        status: "PENDING",
+        customerEmail: formData.get("email") as string || "",
+        customerPhone: paymentData.phone,
+        customerName: paymentData.full_name,
+        description: `M-PESA consultation booking - ${paymentData.consult_type}`,
         consultationId: consultationResult.data?.id,
-        type: "mpesa-consultation",
-      });
+        metadata: {
+          consultationType: paymentData.consult_type,
+          date: paymentData.date,
+          time: paymentData.time,
+          serviceType: "consultation"
+        }
+      };
 
+      console.log("💳 Creating payment record:", paymentRecord);
+      const paymentResult = await paymentsService.createPayment(paymentRecord);
+      console.log("💳 Payment record created:", paymentResult);
+
+      // Simulate M-PESA payment (replace with actual M-PESA integration)
       toast({
         title: "M-PESA Payment Initiated",
         description: `Payment request sent to ${paymentData.phone}. Please check your phone and enter your M-PESA PIN to complete the payment.`,
       });
 
-      setTimeout(() => {
+      setTimeout(async () => {
+        // Update payment status to completed after simulated success
+        if (paymentResult.success && paymentResult.data?.id) {
+          try {
+            await paymentsService.processPayment(paymentResult.data.id.toString(), {
+              status: "COMPLETED",
+              transactionId: `MPESA-SUCCESS-${Date.now()}`,
+              completedAt: new Date().toISOString()
+            });
+            console.log("💳 Payment status updated to COMPLETED");
+          } catch (error) {
+            console.error("Failed to update payment status:", error);
+          }
+        }
+        
         toast({
           title: "Payment Successful!",
           description:
@@ -126,16 +163,21 @@ export default function Consultancy() {
       const projectData = {
         full_name: formData.get("projName") as string,
         phone: formData.get("projPhone") as string,
-        consult_type: "Online" as const, // Default to Online for project consultations
-        date: new Date().toISOString().split("T")[0], // Today's date as default
-        time: new Date().toTimeString().split(" ")[0], // Current time as default
+        email: formData.get("projEmail") as string || "", 
+        organization: formData.get("projOrganization") as string || "", 
+        consult_type: "General Consultation" as ConsultType,
+        preferred_date: new Date().toISOString().split("T")[0],
+        preferred_time: new Date().toTimeString().split(" ")[0],
+        consultationDate: new Date().toISOString().split("T")[0], // Required field
+        consultationTime: new Date().toTimeString().split(" ")[0], // Required field
         message: formData.get("projDesc") as string,
-        serviceType: "project-based-consultation",
         status: "PENDING",
       };
 
       console.log("📋 Submitting project consultation to API...", projectData);
-      const result = await consultationsService.createConsultation(projectData);
+      const result = await consultationsService.createConsultation(
+        projectData
+      );
 
       if (result.success) {
         toast({
@@ -777,6 +819,105 @@ export default function Consultancy() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Payment Information Section */}
+        <section className="py-12 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 rounded-xl shadow-lg border-2 border-primary/20">
+              <h2 className="text-2xl font-bold mb-6 text-center text-primary">
+                Alternative Payment Methods
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Bank Transfer */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <Landmark className="w-5 h-5 mr-2" />
+                    Bank Transfer (KCB)
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="font-medium">Account Name:</span>
+                      <br />
+                      <span className="text-muted-foreground">William Sialuma Analo</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Account Number:</span>
+                      <br />
+                      <span className="text-muted-foreground font-mono">1274400929</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Bank:</span>
+                      <br />
+                      <span className="text-muted-foreground">Kenya Commercial Bank (KCB)</span>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* M-PESA Options */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <Monitor className="w-5 h-5 mr-2" />
+                    M-PESA Payment
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Option 1: Paybill</h4>
+                      <div className="text-sm space-y-1">
+                        <div>
+                          <span className="font-medium">Paybill:</span>
+                          <span className="text-muted-foreground font-mono ml-2">522522</span>
+                        </div>
+                        <div>
+                          <span className="font-medium">Account:</span>
+                          <span className="text-muted-foreground font-mono ml-2">1274400929</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Option 2: Business Number</h4>
+                      <div className="text-sm">
+                        <span className="font-medium">Till Number:</span>
+                        <span className="text-muted-foreground font-mono ml-2">0720769993</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Till Number */}
+                <Card className="p-6 bg-background">
+                  <h3 className="font-bold text-lg mb-4 text-primary flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2" />
+                    Pay After Booking
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Till Number</h4>
+                      <div className="text-sm">
+                        <span className="font-medium">Till:</span>
+                        <span className="text-muted-foreground font-mono ml-2">6203056</span>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">PayPal Integration</h4>
+                      <div className="text-sm text-muted-foreground">
+                        PayPal linked to KCB account above
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+              
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center">
+                  <strong>Note:</strong> After making payment through any of the above methods, 
+                  please keep your transaction reference for confirmation. You can also proceed 
+                  with the automated M-PESA STK Push below for instant payment processing.
+                </p>
+              </div>
+            </Card>
+          </div>
+        </section>
+
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 rounded-xl shadow-lg border-2 border-primary">
@@ -833,6 +974,7 @@ export default function Consultancy() {
                   <select
                     id="consultType"
                     name="consultType"
+                    title="Select consultation type"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     required
                   >
