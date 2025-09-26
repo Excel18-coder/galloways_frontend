@@ -1,4 +1,5 @@
 api/
+pnpm-workspace.yaml
 *.log
 node_modules/
 .env

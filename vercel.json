@@ -1,11 +1,27 @@
 {
-  "buildCommand": "pnpm run vercel-build",
-  "outputDirectory": "frontend/dist",
-  "installCommand": null,
-  "rewrites": [
+  "version": 2,
+  "name": "galloways-finale",
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml"
+    },
+    {
+      "src": "/robots.txt", 
+      "dest": "/robots.txt"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }

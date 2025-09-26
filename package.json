@@ -10,9 +10,5 @@
     "dev:api": "cd api && pnpm run start:dev",
     "install:all": "pnpm install && cd frontend && pnpm install && cd ../api && pnpm install"
   },
-  "workspaces": [
-    "frontend",
-    "api"
-  ],
   "packageManager": "pnpm@10.17.0"
 }
