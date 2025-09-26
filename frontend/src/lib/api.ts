@@ -631,17 +631,91 @@ const resourcesService = {
   getResources: async (): Promise<ApiResponse> =>
     request("/resources", { method: "GET" }),
 
-  downloadResource: async (id: string): Promise<ApiResponse> =>
-    request(`/resources/${id}/download`, { method: "GET" }),
+  getResource: async (id: string): Promise<ApiResponse> =>
+    request(`/resources/${id}`, { method: "GET" }),
+
+  downloadResource: async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/${id}/download`, {
+        method: "GET",
+        headers: {
+          Accept: "application/octet-stream",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      // Get filename from Content-Disposition header or use a default
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `resource-${id}`;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to download resource");
+    }
+  },
 
   uploadResource: async (formData: FormData): Promise<ApiResponse> => {
-    const body = JSON.stringify(
-      Object.fromEntries(
-        formData.entries ? formData.entries() : Object.entries(formData)
-      )
-    );
-    return request("/resources", { method: "POST", body });
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/upload`, {
+        method: "POST",
+        body: formData, // Send FormData directly, don't JSON.stringify it
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      const contentType = response.headers.get("content-type");
+      let data: any;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+
+      if (!response.ok) {
+        const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      return {
+        success: true,
+        data: data?.data || data,
+        message: data?.message || "Resource uploaded successfully",
+      };
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to upload resource");
+    }
   },
+
+  updateResource: async (id: string, data: any): Promise<ApiResponse> =>
+    request(`/resources/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+
+  deleteResource: async (id: string): Promise<ApiResponse> =>
+    request(`/resources/${id}`, { method: "DELETE" }),
+
+  getStats: async (): Promise<ApiResponse> =>
+    request("/resources/stats", { method: "GET" }),
 };
 
 // Dashboard Service

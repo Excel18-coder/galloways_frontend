@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import styles from "./AdminSidebar.module.css";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -194,10 +195,8 @@ export function AdminSidebar({ activeTab, setActiveTab, isOpen, toggleSidebar }:
                       ? 'bg-white/60 text-slate-700 shadow-md shadow-slate-500/10 scale-102 translate-x-0.5'
                       : 'text-slate-600 hover:bg-white/40'
                   }
+                  ${`delay-${index}`}
                 `}
-                style={{
-                  animationDelay: `${index * 50}ms`
-                }}
               >
                 {/* Icon with Gradient Background */}
                 <div className={`

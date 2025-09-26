@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-// API import disabled for build
+import { authService, adminService } from "@/lib/api";
 
 interface Profile {
   id: string;
@@ -103,7 +103,7 @@ const Resources = () => {
       }
 
       // Get user profile
-      const profileData = await console.log();
+      const profileData = await authService.getProfile();
 
       if (!profileData.success || !profileData.data || !["ADMIN", "SUPER_ADMIN"].includes(profileData.data.role)) {
         toast({
@@ -140,8 +140,8 @@ const Resources = () => {
   const loadDashboardData = async () => {
     try {
       const [dashboardStats, activitiesData] = await Promise.all([
-        console.log(),
-        console.log()
+        adminService.getSystemMetrics(),
+        adminService.getRecentActivities()
       ]);
 
       // Handle the response structure from comprehensive stats endpoint
@@ -205,8 +205,12 @@ const Resources = () => {
     }
   };
 
-  const handleSignOut = () => {
-    console.log();
+  const handleSignOut = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
     localStorage.removeItem('auth_token');
     navigate("/");
   };
@@ -218,7 +222,7 @@ const Resources = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await console.log('pdf', { format: 'pdf' });
+      const response = await adminService.exportData('pdf', { format: 'pdf' });
 
       if (!response.success) {
         throw new Error('Failed to generate PDF report');
@@ -384,6 +388,8 @@ Generated on: ${new Date().toLocaleString()}
               value={category}
               onChange={e => setCategory(e.target.value)}
               className="border rounded px-4 py-2 w-full md:w-1/4"
+              aria-label="Filter resources by category"
+              title="Filter resources by category"
             >
               <option value="all">All Categories</option>
               <option value="Contractors">Contractors</option>

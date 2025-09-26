@@ -48,6 +48,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { resourcesService } from "@/lib/api";
 
 interface Resource {
   id: number;
@@ -73,7 +74,7 @@ interface ResourceStats {
   }>;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
 
 const categories = [
   { value: "general", label: "General" },
@@ -137,15 +138,15 @@ export function AdminResources() {
 
   const fetchResources = async () => {
     try {
-      const url = selectedCategory === "all" 
-        ? `${API_BASE_URL}/resources` 
-        : `${API_BASE_URL}/resources?category=${selectedCategory}`;
+      const response = await resourcesService.getResources();
       
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.success) {
-        setResources(data.data);
+      if (response.success && response.data) {
+        // Filter by category if not "all"
+        const filteredResources = selectedCategory === "all" 
+          ? response.data 
+          : response.data.filter((resource: Resource) => resource.category === selectedCategory);
+        
+        setResources(filteredResources);
       } else {
         toast.error("Failed to fetch resources");
       }
@@ -159,11 +160,10 @@ export function AdminResources() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/stats`);
-      const data = await response.json();
+      const response = await resourcesService.getStats();
       
-      if (data.success) {
-        setStats(data.data);
+      if (response.success && response.data) {
+        setStats(response.data);
       }
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -185,6 +185,7 @@ export function AdminResources() {
     formData.append('category', uploadCategory);
 
     try {
+      // Use XMLHttpRequest for progress tracking
       const xhr = new XMLHttpRequest();
       
       xhr.upload.addEventListener('progress', (event) => {
@@ -195,9 +196,9 @@ export function AdminResources() {
       });
 
       xhr.addEventListener('load', () => {
-        if (xhr.status === 201) {
+        try {
           const response = JSON.parse(xhr.responseText);
-          if (response.success) {
+          if (xhr.status === 201 && response.success) {
             toast.success("File uploaded successfully!");
             setSelectedFile(null);
             setUploadDescription("");
@@ -206,17 +207,18 @@ export function AdminResources() {
             fetchResources();
             fetchStats();
           } else {
-            toast.error("Upload failed: " + response.message);
+            toast.error("Upload failed: " + (response.message || "Unknown error"));
           }
-        } else {
-          toast.error("Upload failed");
+        } catch (parseError) {
+          console.error("Failed to parse response:", parseError);
+          toast.error("Upload failed: Invalid response");
         }
         setIsUploading(false);
         setUploadProgress(0);
       });
 
       xhr.addEventListener('error', () => {
-        toast.error("Upload failed");
+        toast.error("Upload failed: Network error");
         setIsUploading(false);
         setUploadProgress(0);
       });
@@ -234,22 +236,8 @@ export function AdminResources() {
 
   const handleDownload = async (resource: Resource) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/${resource.id}/download`);
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = resource.originalName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        toast.success("File downloaded successfully!");
-      } else {
-        toast.error("Download failed");
-      }
+      await resourcesService.downloadResource(resource.id.toString());
+      toast.success("File downloaded successfully!");
     } catch (error) {
       console.error("Download error:", error);
       toast.error("Download failed");
@@ -262,13 +250,9 @@ export function AdminResources() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/${resource.id}`, {
-        method: 'DELETE'
-      });
+      const response = await resourcesService.deleteResource(resource.id.toString());
       
-      const data = await response.json();
-      
-      if (data.success) {
+      if (response.success) {
         toast.success("Resource deleted successfully!");
         fetchResources();
         fetchStats();
@@ -285,20 +269,15 @@ export function AdminResources() {
     if (!editingResource) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/${editingResource.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      const response = await resourcesService.updateResource(
+        editingResource.id.toString(),
+        {
           description: editingResource.description,
           category: editingResource.category
-        })
-      });
+        }
+      );
       
-      const data = await response.json();
-      
-      if (data.success) {
+      if (response.success) {
         toast.success("Resource updated successfully!");
         setIsEditDialogOpen(false);
         setEditingResource(null);
