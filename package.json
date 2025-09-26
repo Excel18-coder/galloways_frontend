@@ -1,13 +1,38 @@
 {
   "name": "galloways-finale",
   "version": "1.0.0",
+  "description": "Galloways Insurance Agencies & Consultancy Services - Complete Platform",
   "private": true,
+  "workspaces": [
+    "frontend",
+    "api"
+  ],
   "scripts": {
-    "dev:frontend": "cd frontend && pnpm run dev",
-    "build:frontend": "cd frontend && pnpm run build",
-    "dev:api": "cd api && pnpm run start:dev",
-    "build:api": "cd api && pnpm run build"
+    "dev": "concurrently \"cd api && pnpm run start:dev\" \"cd frontend && pnpm run dev\"",
+    "build": "cd frontend && pnpm run build",
+    "start": "cd api && pnpm run start:prod",
+    "install:all": "pnpm install && cd frontend && pnpm install && cd ../api && pnpm install",
+    "clean": "rm -rf node_modules frontend/node_modules api/node_modules frontend/dist api/dist"
   },
-  "description": "Insurance platform with React frontend and NestJS API",
-  "packageManager": "pnpm@10.17.0"
+  "keywords": [
+    "insurance",
+    "consultancy",
+    "nestjs",
+    "react",
+    "typescript",
+    "galloways"
+  ],
+  "author": "Galloways Insurance Agencies",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iann-jpeg/Galloways_Finale.git"
+  }
 }
