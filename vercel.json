@@ -1,66 +1,11 @@
 {
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "api/src/main.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/sitemap.xml",
-      "dest": "/frontend/dist/sitemap.xml",
-      "headers": {
-        "Content-Type": "application/xml"
-      }
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/frontend/dist/robots.txt",
-      "headers": {
-        "Content-Type": "text/plain"
-      }
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/src/main.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/dist/$1"
-    }
-  ],
-  "headers": [
+  "buildCommand": "pnpm run vercel-build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": null,
+  "rewrites": [
     {
       "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "origin-when-cross-origin"
-        }
-      ]
+      "destination": "/index.html"
     }
-  ],
-  "outputDirectory": "frontend/dist",
-  "installCommand": "cd frontend && pnpm install && cd ../api && pnpm install",
-  "buildCommand": "cd frontend && pnpm run build",
-  "devCommand": "cd frontend && pnpm run dev"
+  ]
 }
