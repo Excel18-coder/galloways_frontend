@@ -1,4 +1,11 @@
+# Exclude entire API directory
 api/
+# Exclude root-level configs that might confuse Vercel
+package.json
+vite.config.ts
+tsconfig.json
+build.sh
+# Exclude logs and temp files
 *.log
 node_modules/
 .env
@@ -11,3 +18,5 @@ coverage/
 .nyc_output/
 *.tsbuildinfo
 .DS_Store
+# Exclude documentation
+*.md
