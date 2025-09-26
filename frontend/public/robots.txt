@@ -1,72 +1,14 @@
-User-agent: *
-Allow: /
-
-# Disallow admin areas and API endpoints
-Disallow: /admin
-Disallow: /api/
-
-# Allow important pages for SEO
-Allow: /
-Allow: /products
-Allow: /quotes
-Allow: /claims
-Allow: /consultancy
-Allow: /diaspora
-Allow: /outsourcing
-Allow: /pension
-Allow: /resources
-Allow: /auth
-
-# Crawl delay (be respectful)
-Crawl-delay: 1
-
-# Sitemap location
-Sitemap: https://galloways.co.ke/sitemap.xml
-
-# Google-specific directives
 User-agent: Googlebot
 Allow: /
-Allow: /products
-Allow: /quotes
-Allow: /claims
-Allow: /consultancy
-Allow: /diaspora
-Allow: /outsourcing
-Allow: /pension
-Allow: /resources
-Disallow: /admin
-Disallow: /api/
 
-# Bing-specific directives  
 User-agent: Bingbot
-Allow: /
-Allow: /products
-Allow: /quotes
-Allow: /claims
-Allow: /consultancy
-Allow: /diaspora
-Allow: /outsourcing
-Allow: /pension
-Allow: /resources
-Disallow: /admin
-Disallow: /api/
-
-# Social media crawlers
-User-agent: facebookexternalhit
 Allow: /
 
 User-agent: Twitterbot
 Allow: /
 
-User-agent: LinkedInBot
+User-agent: facebookexternalhit
 Allow: /
 
-# Block unwanted bots
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
+User-agent: *
+Allow: /

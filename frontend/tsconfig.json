@@ -14,9 +14,9 @@
     "skipLibCheck": true,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
     "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": true,
     "strict": true
   }
 }
