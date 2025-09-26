@@ -14,12 +14,49 @@
   ],
   "routes": [
     {
+      "src": "/sitemap.xml",
+      "dest": "/frontend/dist/sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml"
+      }
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/frontend/dist/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/src/main.ts"
     },
     {
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        }
+      ]
     }
   ],
   "outputDirectory": "frontend/dist",

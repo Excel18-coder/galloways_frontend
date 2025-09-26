@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { 
   Search,
   Edit,
@@ -196,9 +195,9 @@ export function AdminPayments() {
                   </TableCell>
                   <TableCell>{payment.currency} {payment.amount?.toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadgeColor(payment.status)}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColor(payment.status)}`}>
                       {payment.status}
-                    </Badge>
+                    </span>
                   </TableCell>
                   <TableCell>{payment.paymentMethod || payment.method || 'N/A'}</TableCell>
                   <TableCell>{new Date(payment.createdAt).toLocaleDateString()}</TableCell>
