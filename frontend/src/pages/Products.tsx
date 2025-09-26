@@ -3,6 +3,7 @@ import Footer from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Link } from "react-router-dom";
+import { SEO, seoConfigs } from "../components/SEO";
 import { getPictureUrl, getDownloadUrl } from "../lib/assets";
 import { 
   Heart, 
@@ -252,6 +253,7 @@ const Products = () => {
 
   return (
   <div className="h-screen">
+      <SEO {...seoConfigs.products} />
       <Header />
       <main>
         {/* Hero Section */}
