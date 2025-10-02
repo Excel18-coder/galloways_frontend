@@ -17,13 +17,13 @@ const Footer = () => {
               <a href="https://x.com/gallowaysinsurance" target="_blank" rel="noopener noreferrer" title="X (formerly Twitter)">
                 <Twitter className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
-              <a href="https://facebook.com/gallowaysinsurance" target="_blank" rel="noopener noreferrer" title="Facebook">
+              <a href="https://www.facebook.com/share/1Cc7GDyhxL/" target="_blank" rel="noopener noreferrer" title="Facebook">
                 <Facebook className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
-              <a href="https://instagram.com/gallowaysinsurance" target="_blank" rel="noopener noreferrer" title="Instagram">
+              <a href="https://www.instagram.com/gallo.ways?igsh=MTBta3dxNnFnM2lncw==" target="_blank" rel="noopener noreferrer" title="Instagram">
                 <Instagram className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
-              <a href="https://linkedin.com/company/gallowaysinsurance" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+              <a href="https://www.linkedin.com/in/william-analo-98b90a39?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" title="LinkedIn">
                 <Linkedin className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
               <a href="mailto:Gallowayunderwritting@gmail.com" title="Email">
