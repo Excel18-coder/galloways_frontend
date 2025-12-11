@@ -24,5 +24,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/iann-jpeg/Galloways_Finale.git"
+  },
+  "dependencies": {
+    "lucide-react": "^0.560.0",
+    "react-router-dom": "^7.10.1"
   }
 }
