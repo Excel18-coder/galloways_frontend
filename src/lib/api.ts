@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
+  import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1";
 const DEBUG = import.meta.env.VITE_DEBUG === "true" || true;
 
 // Types
@@ -75,7 +75,7 @@ async function request<T = any>(
   // Don't stringify if it's FormData
   if (!(options.body instanceof FormData)) {
     options.headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     };
     if (options.body) {
@@ -93,7 +93,6 @@ async function request<T = any>(
       credentials: "omit",
       ...options,
     });
-
 
     if (DEBUG) {
       console.log(`API Response: ${res.status} ${res.statusText}`);
@@ -767,14 +766,14 @@ const adminService = {
         success: !response.error,
         data: response.error
           ? {
-            data: [],
-            pagination: {
-              totalPages: 1,
-              currentPage: 1,
-              total: 0,
-              perPage: limit,
-            },
-          }
+              data: [],
+              pagination: {
+                totalPages: 1,
+                currentPage: 1,
+                total: 0,
+                perPage: limit,
+              },
+            }
           : response.data,
         message: response.error || "Claims loaded successfully",
       };
@@ -862,7 +861,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/consultations/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   // Quotes
@@ -886,7 +885,9 @@ const adminService = {
     page = 1,
     limit = 50
   ): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/diaspora-requests?page=${page}&limit=${limit}`, { method: "GET" }),
+    request(`/diaspora-requests?page=${page}&limit=${limit}`, {
+      method: "GET",
+    }),
 
   getDiasporaById: async (id: number): Promise<ApiResponse> =>
     request(`/diaspora-requests/${id}`, { method: "GET" }),
@@ -897,7 +898,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/diaspora-requests/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   // Outsourcing
@@ -918,7 +919,7 @@ const adminService = {
   ): Promise<ApiResponse> =>
     request(`/outsourcing-requests/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: JSON.stringify({ status }),
     }),
 
   deleteOutsourcingRequest: async (id: number): Promise<ApiResponse> =>
@@ -1034,19 +1035,19 @@ const testLaravelConnection = async (): Promise<ApiResponse> => {
 
 // Export all services
 export {
-  authService,
-  claimsService,
-  quotesService,
-  paymentsService,
-  outsourcingRequests,
-  diasporaService,
-  consultationsService,
-  resourcesService,
-  dashboardService,
   adminService,
-  testSupabaseConnection,
-  testLaravelConnection,
+  authService,
   bookingConsultantsService,
+  claimsService,
+  consultationsService,
+  dashboardService,
+  diasporaService,
+  outsourcingRequests,
+  paymentsService,
+  quotesService,
+  resourcesService,
+  testLaravelConnection,
+  testSupabaseConnection,
 };
 
 // Default API object
