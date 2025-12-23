@@ -1,780 +1,365 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Galloways Insurance - Fillable Receipt</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galloways Insurance - Receipt</title>
     <style>
-      @page {
-        margin: 0;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-        line-height: 1.6;
-        background: #f3f4f6;
-        padding: 20px;
-      }
-
-      .receipt-container {
-        width: 210mm;
-        min-height: 297mm;
-        margin: 0 auto;
-        background: white;
-        position: relative;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      }
-
-      .header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 30px 40px;
-        color: white;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .header::after {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -5%;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 50%;
-      }
-
-      .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        position: relative;
-        z-index: 1;
-      }
-
-      .company-section {
-        flex: 1;
-      }
-
-      .logo-placeholder {
-        width: 70px;
-        height: 70px;
-        background: white;
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: #1e3a8a;
-        font-size: 24px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      .company-name {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 5px;
-      }
-
-      .company-tagline {
-        font-size: 12px;
-        font-style: italic;
-        color: #fbbf24;
-        margin-bottom: 10px;
-      }
-
-      .company-details {
-        font-size: 11px;
-        line-height: 1.8;
-        opacity: 0.95;
-      }
-
-      .receipt-title-section {
-        text-align: right;
-      }
-
-      .receipt-title {
-        font-size: 36px;
-        font-weight: 700;
-        margin-bottom: 5px;
-        color: #fbbf24;
-      }
-
-      .receipt-subtitle {
-        font-size: 14px;
-        opacity: 0.95;
-        margin-bottom: 15px;
-      }
-
-      .divider {
-        height: 4px;
-        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
-      }
-
-      .content {
-        padding: 40px;
-        position: relative;
-        z-index: 1;
-      }
-
-      .form-group {
-        margin-bottom: 12px;
-      }
-
-      .form-label {
-        display: block;
-        font-size: 11px;
-        font-weight: 600;
-        color: #666;
-        margin-bottom: 4px;
-      }
-
-      .form-input {
-        width: 100%;
-        padding: 6px 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 4px;
-        font-size: 13px;
-        font-family: inherit;
-      }
-
-      .form-input:focus {
-        outline: none;
-        border-color: #2563eb;
-      }
-
-      .form-input.small {
-        width: 150px;
-      }
-
-      .receipt-badge {
-        text-align: center;
-        padding: 20px;
-        margin: 20px auto 30px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border-radius: 12px;
-        max-width: 500px;
-      }
-
-      .check-icon {
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
-        color: #10b981;
-        margin-bottom: 10px;
-      }
-
-      .amount-box {
-        background: #fffbeb;
-        border: 2px solid #fbbf24;
-        border-radius: 8px;
-        padding: 25px;
-        text-align: center;
-        margin: 30px 0;
-      }
-
-      .amount-box .label {
-        font-size: 13px;
-        color: #666;
-        margin-bottom: 10px;
-      }
-
-      .amount-box .amount {
-        font-size: 42px;
-        font-weight: 700;
-        color: #1e3a8a;
-      }
-
-      .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin: 30px 0;
-      }
-
-      .info-section {
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-      }
-
-      .info-section h3 {
-        font-size: 14px;
-        color: #1e3a8a;
-        margin-bottom: 12px;
-        font-weight: 600;
-      }
-
-      .breakdown-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .breakdown-table thead {
-        background: #1e3a8a;
-        color: white;
-      }
-
-      .breakdown-table th {
-        padding: 12px;
-        text-align: left;
-        font-size: 12px;
-      }
-
-      .breakdown-table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 13px;
-      }
-
-      .breakdown-table .total-row {
-        background: #f9fafb;
-        font-weight: 700;
-        color: #1e3a8a;
-      }
-
-      .action-buttons {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        display: flex;
-        gap: 10px;
-        z-index: 1000;
-      }
-
-      .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s;
-      }
-
-      .btn-primary {
-        background: #2563eb;
-        color: white;
-      }
-
-      .btn-secondary {
-        background: #10b981;
-        color: white;
-      }
-
-      .btn-calculate {
-        background: #f59e0b;
-        color: white;
-      }
-
-      .watermark {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-45deg);
-        font-size: 120px;
-        font-weight: 700;
-        color: rgba(16, 185, 129, 0.05);
-        z-index: 0;
-        pointer-events: none;
-      }
-
-      @media print {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-          background: white;
-          padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            padding: 20px;
+            background: #f5f5f5;
         }
-
-        .receipt-container {
-          box-shadow: none;
+        
+        .page {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
         }
-
-        .action-buttons {
-          display: none;
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            font-weight: bold;
+            color: rgba(34, 197, 94, 0.1);
+            z-index: 0;
+            pointer-events: none;
         }
-
-        .form-input {
-          border: none;
-          padding: 2px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="action-buttons">
-      <button class="btn btn-calculate" onclick="calculateBreakdown()">
-        🔢 Calculate
-      </button>
-      <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print/Save PDF
-      </button>
-      <button class="btn btn-secondary" onclick="downloadHTML()">
-        ⬇️ Download
-      </button>
-    </div>
-
-    <div class="receipt-container">
-      <div class="watermark">PAID</div>
-
-      <!-- Header -->
-      <div class="header">
-        <div class="header-content">
-          <div class="company-section">
-            <div class="logo-placeholder">G</div>
-            <div class="company-name">GALLOWAYS</div>
-            <div class="company-tagline">
-              "Protecting Dreams and Preserving Wealth"
-            </div>
-            <div class="company-details">
-              <div>
-                <strong>Insurance Agencies & Consultancy Services</strong>
-              </div>
-              <div style="margin-top: 10px">
-                Phone: +254 720 769 993 / +254 758 301 346<br />
-                Email: info@galloways.co.ke<br />
-                Location: Nairobi, Kenya
-              </div>
-            </div>
-          </div>
-          <div class="receipt-title-section">
-            <div class="receipt-title">RECEIPT</div>
-            <div class="receipt-subtitle">Official Payment Receipt</div>
-            <div class="form-group">
-              <label class="form-label">Receipt No:</label>
-              <input
-                type="text"
-                class="form-input small"
-                id="receiptNumber"
-                placeholder="RCP-2025-001"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Date:</label>
-              <input type="date" class="form-input small" id="receiptDate" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Time:</label>
-              <input type="time" class="form-input small" id="receiptTime" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- Main Content -->
-      <div class="content">
-        <!-- Payment Confirmation Badge -->
-        <div class="receipt-badge">
-          <div class="check-icon">✓</div>
-          <h2 style="font-size: 20px; margin-bottom: 5px">
-            Payment Received Successfully
-          </h2>
-          <p style="font-size: 14px; opacity: 0.95">
-            Thank you for your payment. Your transaction has been processed.
-          </p>
-        </div>
-
-        <!-- Amount Box -->
-        <div class="amount-box">
-          <div class="label">Amount Paid</div>
-          <div class="form-group">
-            <input
-              type="number"
-              class="form-input amount"
-              id="amountPaid"
-              placeholder="0.00"
-              style="
-                font-size: 32px;
-                text-align: center;
-                font-weight: 700;
-                color: #1e3a8a;
-                border: none;
-                background: transparent;
-              "
-              onchange="calculateBreakdown()"
-            />
-          </div>
-          <div
-            style="
-              font-size: 14px;
-              color: #555;
-              font-style: italic;
-              margin-top: 10px;
-            "
-            id="amountWords"
-          >
-            Enter amount above
-          </div>
-        </div>
-
-        <!-- Information Grid -->
-        <div class="info-grid">
-          <!-- Customer Information -->
-          <div class="info-section">
-            <h3>Received From</h3>
-            <div class="form-group">
-              <label class="form-label">Name:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="customerName"
-                placeholder="Customer name"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Phone:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="customerPhone"
-                placeholder="+254..."
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Email:</label>
-              <input
-                type="email"
-                class="form-input"
-                id="customerEmail"
-                placeholder="email@example.com"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">ID/Passport:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="customerId"
-                placeholder="ID number"
-              />
-            </div>
-          </div>
-
-          <!-- Payment Information -->
-          <div class="info-section">
-            <h3>Payment Details</h3>
-            <div class="form-group">
-              <label class="form-label">Payment Method:</label>
-              <select class="form-input" id="paymentMethod">
-                <option>M-PESA</option>
-                <option>Bank Transfer</option>
-                <option>Cash</option>
-                <option>Card</option>
-                <option>Cheque</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Transaction Ref:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="transactionRef"
-                placeholder="Transaction reference"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Invoice No:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="invoiceNumber"
-                placeholder="Related invoice"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Received By:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="receivedBy"
-                placeholder="Staff name"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Policy Information -->
-        <div class="info-section" style="margin: 20px 0">
-          <h3>Policy Information</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
-            <div class="form-group">
-              <label class="form-label">Policy Number:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="policyNumber"
-                placeholder="Policy number"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Policy Type:</label>
-              <input
-                type="text"
-                class="form-input"
-                id="policyType"
-                placeholder="Policy type"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Coverage Start:</label>
-              <input type="date" class="form-input" id="coverageStart" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Coverage End:</label>
-              <input type="date" class="form-input" id="coverageEnd" />
-            </div>
-          </div>
-          <div class="form-group" style="margin-top: 10px">
-            <label class="form-label">Payment For:</label>
-            <input
-              type="text"
-              class="form-input"
-              id="paymentDescription"
-              placeholder="Description of payment"
-            />
-          </div>
-        </div>
-
-        <!-- Payment Breakdown -->
-        <div style="margin: 30px 0">
-          <h3
-            style="
-              background: #1e3a8a;
-              color: white;
-              padding: 12px;
-              font-size: 14px;
-              border-radius: 8px 8px 0 0;
-            "
-          >
-            Payment Breakdown
-          </h3>
-          <table class="breakdown-table" style="border-top: none">
-            <tbody>
-              <tr>
-                <td>Premium Amount</td>
-                <td style="text-align: right; font-weight: 600">
-                  KES <span id="premiumAmount">0.00</span>
-                </td>
-              </tr>
-              <tr>
-                <td>Levies & Fees</td>
-                <td style="text-align: right; font-weight: 600">
-                  KES <span id="levies">0.00</span>
-                </td>
-              </tr>
-              <tr>
-                <td>Training Levy (0.2%)</td>
-                <td style="text-align: right; font-weight: 600">
-                  KES <span id="trainingLevy">0.00</span>
-                </td>
-              </tr>
-              <tr>
-                <td>Stamp Duty</td>
-                <td style="text-align: right; font-weight: 600">
-                  KES <span id="stampDuty">0.00</span>
-                </td>
-              </tr>
-              <tr>
-                <td>VAT (16%)</td>
-                <td style="text-align: right; font-weight: 600">
-                  KES <span id="vat">0.00</span>
-                </td>
-              </tr>
-              <tr class="total-row">
-                <td style="padding: 12px">TOTAL PAID</td>
-                <td style="text-align: right; padding: 12px">
-                  KES <span id="totalPaid">0.00</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Signature Section -->
-        <div
-          style="
+        
+        .content { position: relative; z-index: 1; }
+        
+        .header {
+            border-bottom: 4px solid #1e3a8a;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        
+        .company-info { flex: 1; }
+        
+        .company-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 5px;
+        }
+        
+        .tagline {
+            font-size: 12px;
+            color: #f59e0b;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .logo-placeholder {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .receipt-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 20px 0;
+            text-transform: uppercase;
+            border: 3px solid #1e3a8a;
+            padding: 15px;
+            background: linear-gradient(to right, #f0f9ff, white);
+        }
+        
+        .receipt-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .info-line label {
+            font-weight: bold;
+            color: #1e3a8a;
+            min-width: 120px;
+        }
+        
+        .info-line .fill {
+            flex: 1;
+            border-bottom: 2px solid #333;
+            height: 25px;
+        }
+        
+        .customer-section {
+            border: 2px solid #1e3a8a;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        
+        .customer-section h3 {
+            color: #1e3a8a;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 5px;
+        }
+        
+        .payment-details {
+            border: 2px solid #1e3a8a;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+        
+        .payment-details h3 {
+            color: #1e3a8a;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .breakdown-table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+        
+        .breakdown-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .breakdown-table .fill-cell {
+            min-height: 35px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .breakdown-table tr:last-child td {
+            background: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: none;
+        }
+        
+        .amount-words {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px dashed #f59e0b;
+            background: #fffbeb;
+            border-radius: 5px;
+        }
+        
+        .amount-words label {
+            font-weight: bold;
+            color: #1e3a8a;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .amount-words .fill {
+            border-bottom: 1px solid #333;
+            height: 25px;
+            margin-bottom: 5px;
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            gap: 30px;
+        }
+        
+        .signature-block {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #333;
+            margin-top: 80px;
+            padding-top: 10px;
+        }
+        
+        .signature-label {
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 13px;
+        }
+        
+        .footer {
             margin-top: 50px;
-            align-items: flex-end;
-          "
-        >
-          <div>
-            <div
-              style="
-                margin-top: 60px;
-                padding-top: 10px;
-                border-top: 2px solid #333;
-                width: 250px;
-              "
-            >
-              <div class="form-group">
-                <input
-                  type="text"
-                  class="form-input"
-                  id="signatory"
-                  placeholder="Authorized Signatory"
-                  style="border: none; font-weight: 600"
-                />
-              </div>
-              <div style="font-size: 11px; color: #666">
-                Galloways Insurance Agencies
-              </div>
+            padding-top: 20px;
+            border-top: 2px solid #f59e0b;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; margin: 0; padding: 20mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="watermark">PAID</div>
+        <div class="content">
+            <div class="header">
+                <div class="company-info">
+                    <div class="company-name">GALLOWAYS INSURANCE</div>
+                    <div class="tagline">Protecting Dreams and Preserving Wealth</div>
+                    <div class="contact-info">
+                        📞 +254 720 769 993 / +254 758 301 346<br>
+                        ✉️ info@galloways.co.ke | underwriting@galloways.co.ke<br>
+                        📍 Nairobi, Kenya | 🔒 IRA Licensed
+                    </div>
+                </div>
+                <div class="logo-placeholder">GALLOWAYS<br>LOGO</div>
             </div>
-          </div>
-          <div
-            style="
-              width: 100px;
-              height: 100px;
-              border: 2px dashed #ccc;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 10px;
-              color: #999;
-              text-align: center;
-            "
-          >
-            OFFICIAL<br />STAMP
-          </div>
+            
+            <div class="receipt-title">OFFICIAL RECEIPT</div>
+            
+            <div class="receipt-info">
+                <div class="info-line">
+                    <label>Receipt No:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Date:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Payment Method:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Ref/Trans No:</label>
+                    <div class="fill"></div>
+                </div>
+            </div>
+            
+            <div class="customer-section">
+                <h3>Received From:</h3>
+                <div class="info-line">
+                    <label>Name:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Company:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Phone:</label>
+                    <div class="fill"></div>
+                </div>
+                <div class="info-line">
+                    <label>Email:</label>
+                    <div class="fill"></div>
+                </div>
+            </div>
+            
+            <div class="payment-details">
+                <h3>Payment Breakdown</h3>
+                
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Description</th>
+                            <th style="width: 25%;">Policy/Reference</th>
+                            <th style="width: 25%; text-align: right;">Amount (KES)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell"></td>
+                            <td class="fill-cell" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">TOTAL AMOUNT:</td>
+                            <td style="text-align: right;" class="fill-cell"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="amount-words">
+                    <label>Amount in Words:</label>
+                    <div class="fill"></div>
+                    <div class="fill"></div>
+                </div>
+            </div>
+            
+            <div class="signature-section">
+                <div class="signature-block">
+                    <div class="signature-line">
+                        <div class="signature-label">Received By</div>
+                    </div>
+                </div>
+                <div class="signature-block">
+                    <div class="signature-line">
+                        <div class="signature-label">Authorized Signature & Stamp</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                Galloways Insurance Agencies & Consultancy Services<br>
+                Regulated by Insurance Regulatory Authority (IRA) of Kenya<br>
+                www.galloways.co.ke | This is an official receipt and serves as proof of payment
+            </div>
         </div>
-      </div>
     </div>
-
-    <script>
-      // Set today's date and time
-      document.getElementById('receiptDate').valueAsDate = new Date();
-      const now = new Date();
-      document.getElementById('receiptTime').value =
-        now.getHours().toString().padStart(2, '0') +
-        ':' +
-        now.getMinutes().toString().padStart(2, '0');
-
-      function calculateBreakdown() {
-        const total =
-          parseFloat(document.getElementById('amountPaid').value) || 0;
-
-        // Reverse calculate from total (approximation)
-        // Total = Premium + Levies + Training Levy + Stamp Duty + VAT
-        // Where VAT = (Premium + Levies + Training Levy) * 0.16
-        // Levies = Premium * 0.0025
-        // Training Levy = Premium * 0.002
-
-        const stampDuty = 40;
-        const premiumAmount =
-          (total - stampDuty) / (1 + 0.0025 + 0.002 + 1.0025 * 1.002 * 0.16);
-        const levies = premiumAmount * 0.0025;
-        const trainingLevy = premiumAmount * 0.002;
-        const vat = (premiumAmount + levies + trainingLevy) * 0.16;
-
-        document.getElementById('premiumAmount').textContent =
-          premiumAmount.toFixed(2);
-        document.getElementById('levies').textContent = levies.toFixed(2);
-        document.getElementById('trainingLevy').textContent =
-          trainingLevy.toFixed(2);
-        document.getElementById('stampDuty').textContent = stampDuty.toFixed(2);
-        document.getElementById('vat').textContent = vat.toFixed(2);
-        document.getElementById('totalPaid').textContent = total.toFixed(2);
-
-        // Convert to words (basic implementation)
-        document.getElementById('amountWords').textContent =
-          numberToWords(total) + ' Shillings Only';
-      }
-
-      function numberToWords(num) {
-        if (num === 0) return 'Zero';
-        const ones = [
-          '',
-          'One',
-          'Two',
-          'Three',
-          'Four',
-          'Five',
-          'Six',
-          'Seven',
-          'Eight',
-          'Nine',
-        ];
-        const teens = [
-          'Ten',
-          'Eleven',
-          'Twelve',
-          'Thirteen',
-          'Fourteen',
-          'Fifteen',
-          'Sixteen',
-          'Seventeen',
-          'Eighteen',
-          'Nineteen',
-        ];
-        const tens = [
-          '',
-          '',
-          'Twenty',
-          'Thirty',
-          'Forty',
-          'Fifty',
-          'Sixty',
-          'Seventy',
-          'Eighty',
-          'Ninety',
-        ];
-
-        if (num < 10) return ones[num];
-        if (num < 20) return teens[num - 10];
-        if (num < 100)
-          return (
-            tens[Math.floor(num / 10)] +
-            (num % 10 !== 0 ? ' ' + ones[num % 10] : '')
-          );
-        if (num < 1000)
-          return (
-            ones[Math.floor(num / 100)] +
-            ' Hundred' +
-            (num % 100 !== 0 ? ' and ' + numberToWords(num % 100) : '')
-          );
-        if (num < 1000000)
-          return (
-            numberToWords(Math.floor(num / 1000)) +
-            ' Thousand' +
-            (num % 1000 !== 0 ? ' ' + numberToWords(num % 1000) : '')
-          );
-        return 'Amount Too Large';
-      }
-
-      function downloadHTML() {
-        const element = document.documentElement.outerHTML;
-        const blob = new Blob([element], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'galloways-receipt-' + new Date().getTime() + '.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-    </script>
-  </body>
+</body>
 </html>
