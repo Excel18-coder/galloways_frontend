@@ -1,0 +1,32 @@
+{
+  "name": "galloways-finale",
+  "version": "1.0.0",
+  "description": "Galloways Insurance Agencies & Consultancy Services - Complete Platform",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && pnpm install && pnpm run build",
+    "dev": "cd frontend && pnpm run dev",
+    "start": "cd frontend && pnpm run preview"
+  },
+  "keywords": [
+    "insurance",
+    "consultancy",
+    "react",
+    "typescript",
+    "galloways"
+  ],
+  "author": "Galloways Insurance Agencies",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iann-jpeg/Galloways_Finale.git"
+  },
+  "dependencies": {
+    "lucide-react": "^0.560.0",
+    "react-router-dom": "^7.10.1"
+  }
+}

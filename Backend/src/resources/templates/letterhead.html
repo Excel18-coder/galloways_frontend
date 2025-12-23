@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galloways Insurance - Official Letterhead</title>
+    <style>
+      @page {
+        margin: 0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        background: #ffffff;
+      }
+
+      .letterhead-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        position: relative;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 30px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .logo-placeholder {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .company-info {
+        flex: 1;
+        margin-left: 20px;
+      }
+
+      .company-name {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
+      }
+
+      .company-tagline {
+        font-size: 14px;
+        font-style: italic;
+        opacity: 0.95;
+        color: #fbbf24;
+        margin-bottom: 8px;
+      }
+
+      .company-subtitle {
+        font-size: 13px;
+        opacity: 0.9;
+      }
+
+      .contact-info-header {
+        text-align: right;
+        font-size: 11px;
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .contact-info-header div {
+        margin-bottom: 3px;
+      }
+
+      .divider {
+        height: 4px;
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+        margin: 0;
+      }
+
+      .content {
+        padding: 40px 40px 60px 40px;
+        min-height: 200mm;
+      }
+
+      .date-ref {
+        margin-bottom: 30px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .date-ref div {
+        margin-bottom: 5px;
+      }
+
+      .recipient {
+        margin-bottom: 30px;
+        line-height: 1.8;
+      }
+
+      .subject {
+        font-weight: 600;
+        margin: 20px 0;
+        text-decoration: underline;
+      }
+
+      .body-content {
+        margin: 20px 0;
+        text-align: justify;
+        font-size: 14px;
+      }
+
+      .signature-section {
+        margin-top: 50px;
+      }
+
+      .signature-line {
+        margin-top: 60px;
+        padding-top: 5px;
+        border-top: 2px solid #333;
+        width: 250px;
+        font-weight: 600;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: #1e3a8a;
+        color: white;
+        padding: 20px 40px;
+        font-size: 11px;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .footer-section {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .footer-section h4 {
+        font-size: 12px;
+        margin-bottom: 8px;
+        color: #fbbf24;
+        font-weight: 600;
+      }
+
+      .footer-section p {
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+
+      .social-links {
+        margin-top: 8px;
+      }
+
+      .social-links a {
+        color: #fbbf24;
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 10px;
+      }
+
+      @media print {
+        .letterhead-container {
+          margin: 0;
+          width: 100%;
+        }
+
+        .footer {
+          position: fixed;
+          bottom: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="letterhead-container">
+      <!-- Header Section -->
+      <div class="header">
+        <div class="header-content">
+          <div class="logo-section">
+            <div class="logo-placeholder">
+              <!-- Replace with actual logo -->
+              <img
+                src="/public/LOGOS/galloways-logo.png"
+                alt="Galloways Logo"
+                style="width: 100%; height: 100%; object-fit: contain"
+                onerror="this.style.display='none'; this.parentElement.innerHTML='G';"
+              />
+            </div>
+            <div class="company-info">
+              <div class="company-name">GALLOWAYS</div>
+              <div class="company-tagline">
+                "Protecting Dreams and Preserving Wealth"
+              </div>
+              <div class="company-subtitle">
+                Insurance Agencies & Consultancy Services
+              </div>
+            </div>
+          </div>
+          <div class="contact-info-header">
+            <div>
+              <strong>Phone:</strong> +254 720 769 993 / +254 758 301 346
+            </div>
+            <div><strong>Email:</strong> info@galloways.co.ke</div>
+            <div><strong>Location:</strong> Nairobi, Kenya</div>
+            <div style="margin-top: 8px; font-size: 10px">
+              Licensed by IRA Kenya
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <div class="date-ref">
+          <div><strong>Date:</strong> {{DATE}}</div>
+          <div><strong>Ref No:</strong> {{REFERENCE_NUMBER}}</div>
+        </div>
+
+        <div class="recipient">
+          <div>{{RECIPIENT_NAME}}</div>
+          <div>{{RECIPIENT_ADDRESS}}</div>
+          <div>{{RECIPIENT_CITY}}</div>
+        </div>
+
+        <div>Dear {{RECIPIENT_TITLE}},</div>
+
+        <div class="subject">
+          <strong>RE: {{SUBJECT}}</strong>
+        </div>
+
+        <div class="body-content">{{LETTER_CONTENT}}</div>
+
+        <div class="signature-section">
+          <p>Yours faithfully,</p>
+          <div class="signature-line">
+            <div>{{SIGNATORY_NAME}}</div>
+            <div style="font-weight: normal; font-size: 12px; margin-top: 5px">
+              {{SIGNATORY_TITLE}}
+            </div>
+            <div style="font-weight: normal; font-size: 12px">
+              Galloways Insurance Agencies & Consultancy
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h4>Contact Us</h4>
+            <p>
+              Underwriting: underwriting@galloways.co.ke<br />
+              Quotations: quotations@galloways.co.ke<br />
+              Claims: Claims@galloways.co.ke<br />
+              Customer Service: customerservice@galloways.co.ke
+            </p>
+          </div>
+          <div class="footer-section">
+            <h4>Business Hours</h4>
+            <p>
+              Monday - Friday: 8:00 AM - 6:00 PM<br />
+              Saturday: 9:00 AM - 2:00 PM<br />
+              Sunday: Closed
+            </p>
+          </div>
+          <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-links">
+              <a href="#">@gallowaysinsurance</a>
+            </div>
+            <p style="margin-top: 10px">www.galloways.co.ke</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

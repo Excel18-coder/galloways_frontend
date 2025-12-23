@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galloways Insurance - Fillable Invoice</title>
+    <style>
+      @page {
+        margin: 0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        background: #f3f4f6;
+        padding: 20px;
+      }
+
+      .invoice-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 30px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+      }
+
+      .company-section {
+        flex: 1;
+      }
+
+      .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        background: white;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 24px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .company-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .company-tagline {
+        font-size: 12px;
+        font-style: italic;
+        color: #fbbf24;
+        margin-bottom: 15px;
+      }
+
+      .company-details {
+        font-size: 11px;
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .invoice-title-section {
+        text-align: right;
+      }
+
+      .invoice-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #fbbf24;
+      }
+
+      .divider {
+        height: 4px;
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 4px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: #2563eb;
+      }
+
+      .form-input.small {
+        width: 150px;
+      }
+
+      .billing-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 40px;
+      }
+
+      .info-block {
+        flex: 1;
+        border: 1px solid #e5e7eb;
+        padding: 15px;
+        border-radius: 6px;
+      }
+
+      .info-block h3 {
+        font-size: 14px;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #fbbf24;
+        font-weight: 600;
+      }
+
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+        font-size: 13px;
+      }
+
+      .items-table thead {
+        background: #1e3a8a;
+        color: white;
+      }
+
+      .items-table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .items-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .items-table .text-right {
+        text-align: right;
+      }
+
+      .totals-section {
+        margin-top: 30px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .totals-table {
+        width: 400px;
+        font-size: 13px;
+      }
+
+      .totals-table td {
+        padding: 10px 15px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .totals-table .total-row {
+        background: #1e3a8a;
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .payment-info {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f9fafb;
+        border-left: 4px solid #fbbf24;
+        border-radius: 4px;
+      }
+
+      .action-buttons {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+      }
+
+      .btn-secondary {
+        background: #10b981;
+        color: white;
+      }
+
+      .btn-calculate {
+        background: #f59e0b;
+        color: white;
+      }
+
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+
+        .invoice-container {
+          box-shadow: none;
+        }
+
+        .action-buttons {
+          display: none;
+        }
+
+        .form-input {
+          border: none;
+          padding: 2px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="action-buttons">
+      <button class="btn btn-calculate" onclick="calculateTotals()">
+        🔢 Calculate
+      </button>
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print/Save PDF
+      </button>
+      <button class="btn btn-secondary" onclick="downloadHTML()">
+        ⬇️ Download
+      </button>
+    </div>
+
+    <div class="invoice-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-content">
+          <div class="company-section">
+            <div class="logo-placeholder">G</div>
+            <div class="company-name">GALLOWAYS</div>
+            <div class="company-tagline">
+              "Protecting Dreams and Preserving Wealth"
+            </div>
+            <div class="company-details">
+              <div>
+                <strong>Insurance Agencies & Consultancy Services</strong>
+              </div>
+              <div style="margin-top: 10px">
+                Phone: +254 720 769 993 / +254 758 301 346<br />
+                Email: info@galloways.co.ke<br />
+                Location: Nairobi, Kenya
+              </div>
+            </div>
+          </div>
+          <div class="invoice-title-section">
+            <div class="invoice-title">INVOICE</div>
+            <div class="form-group">
+              <label class="form-label">Invoice No:</label>
+              <input
+                type="text"
+                class="form-input small"
+                id="invoiceNumber"
+                placeholder="INV-2025-001"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date:</label>
+              <input type="date" class="form-input small" id="invoiceDate" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Due Date:</label>
+              <input type="date" class="form-input small" id="dueDate" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Billing Information -->
+        <div class="billing-info">
+          <div class="info-block">
+            <h3>Bill To</h3>
+            <div class="form-group">
+              <label class="form-label">Client Name:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="clientName"
+                placeholder="Enter client name"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Address:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="clientAddress"
+                placeholder="Enter address"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">City, Postal Code:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="clientCity"
+                placeholder="Enter city"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="clientPhone"
+                placeholder="Enter phone"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email:</label>
+              <input
+                type="email"
+                class="form-input"
+                id="clientEmail"
+                placeholder="Enter email"
+              />
+            </div>
+          </div>
+          <div class="info-block">
+            <h3>Policy Details</h3>
+            <div class="form-group">
+              <label class="form-label">Policy No:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="policyNumber"
+                placeholder="Enter policy number"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Policy Type:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="policyType"
+                placeholder="Enter policy type"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Coverage Start:</label>
+              <input type="date" class="form-input" id="coverageStart" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Coverage End:</label>
+              <input type="date" class="form-input" id="coverageEnd" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Agent:</label>
+              <input
+                type="text"
+                class="form-input"
+                id="agentName"
+                placeholder="Enter agent name"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 40%">Description</th>
+              <th style="width: 15%">Period</th>
+              <th style="width: 20%" class="text-right">Rate/Premium</th>
+              <th style="width: 25%" class="text-right">Amount (KES)</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <tr>
+              <td>
+                <input
+                  type="text"
+                  class="form-input"
+                  placeholder="Item description"
+                  id="item1Desc"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  class="form-input"
+                  placeholder="12 months"
+                  id="item1Period"
+                />
+              </td>
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="form-input text-right"
+                  placeholder="0.00"
+                  id="item1Rate"
+                  onchange="calculateTotals()"
+                />
+              </td>
+              <td class="text-right">
+                <input
+                  type="number"
+                  class="form-input text-right"
+                  placeholder="0.00"
+                  id="item1Amount"
+                  onchange="calculateTotals()"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button
+          onclick="addRow()"
+          style="
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+          "
+        >
+          + Add Item
+        </button>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+          <table class="totals-table">
+            <tr>
+              <td style="text-align: right">Subtotal:</td>
+              <td style="text-align: right; font-weight: 600">
+                KES <span id="subtotal">0.00</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right">Levies & Fees:</td>
+              <td style="text-align: right; font-weight: 600">
+                KES <span id="levies">0.00</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right">Training Levy (0.2%):</td>
+              <td style="text-align: right; font-weight: 600">
+                KES <span id="trainingLevy">0.00</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right">Stamp Duty:</td>
+              <td style="text-align: right; font-weight: 600">
+                KES <span id="stampDuty">0.00</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right">VAT (16%):</td>
+              <td style="text-align: right; font-weight: 600">
+                KES <span id="vat">0.00</span>
+              </td>
+            </tr>
+            <tr class="total-row">
+              <td style="text-align: right; padding: 15px">
+                TOTAL AMOUNT DUE:
+              </td>
+              <td style="text-align: right; padding: 15px">
+                KES <span id="totalAmount">0.00</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+          <h3 style="font-size: 14px; color: #1e3a8a; margin-bottom: 10px">
+            Payment Information
+          </h3>
+          <div class="form-group">
+            <label class="form-label">Bank Name:</label>
+            <input
+              type="text"
+              class="form-input"
+              id="bankName"
+              placeholder="Enter bank name"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Number:</label>
+            <input
+              type="text"
+              class="form-input"
+              id="accountNumber"
+              placeholder="Enter account number"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">M-PESA Paybill:</label>
+            <input
+              type="text"
+              class="form-input"
+              id="mpesaPaybill"
+              placeholder="Enter paybill number"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Set today's date
+      document.getElementById('invoiceDate').valueAsDate = new Date();
+
+      // Set due date to 30 days from now
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 30);
+      document.getElementById('dueDate').valueAsDate = dueDate;
+
+      let rowCount = 1;
+
+      function addRow() {
+        rowCount++;
+        const tbody = document.getElementById('itemsTableBody');
+        const newRow = tbody.insertRow();
+        newRow.innerHTML = `
+                <td>
+                    <input type="text" class="form-input" placeholder="Item description" id="item${rowCount}Desc">
+                </td>
+                <td>
+                    <input type="text" class="form-input" placeholder="12 months" id="item${rowCount}Period">
+                </td>
+                <td class="text-right">
+                    <input type="number" class="form-input text-right" placeholder="0.00" id="item${rowCount}Rate" onchange="calculateTotals()">
+                </td>
+                <td class="text-right">
+                    <input type="number" class="form-input text-right" placeholder="0.00" id="item${rowCount}Amount" onchange="calculateTotals()">
+                </td>
+            `;
+      }
+
+      function calculateTotals() {
+        let subtotal = 0;
+
+        // Sum all item amounts
+        for (let i = 1; i <= rowCount; i++) {
+          const amountInput = document.getElementById(`item${i}Amount`);
+          if (amountInput) {
+            subtotal += parseFloat(amountInput.value) || 0;
+          }
+        }
+
+        // Calculate levies and taxes
+        const trainingLevy = subtotal * 0.002; // 0.2%
+        const stampDuty = 40; // Fixed stamp duty
+        const levies = subtotal * 0.0025; // Example levy
+        const vat = (subtotal + levies + trainingLevy) * 0.16; // 16% VAT
+        const total = subtotal + levies + trainingLevy + stampDuty + vat;
+
+        // Update display
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('levies').textContent = levies.toFixed(2);
+        document.getElementById('trainingLevy').textContent =
+          trainingLevy.toFixed(2);
+        document.getElementById('stampDuty').textContent = stampDuty.toFixed(2);
+        document.getElementById('vat').textContent = vat.toFixed(2);
+        document.getElementById('totalAmount').textContent = total.toFixed(2);
+      }
+
+      function downloadHTML() {
+        const element = document.documentElement.outerHTML;
+        const blob = new Blob([element], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'galloways-invoice-' + new Date().getTime() + '.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>

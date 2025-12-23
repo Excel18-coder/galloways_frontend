@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galloways Insurance - Payment Receipt</title>
+    <style>
+      @page {
+        margin: 0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        background: #ffffff;
+      }
+
+      .receipt-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        position: relative;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 30px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+      }
+
+      .company-section {
+        flex: 1;
+      }
+
+      .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        background: white;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 24px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .company-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .company-tagline {
+        font-size: 12px;
+        font-style: italic;
+        color: #fbbf24;
+        margin-bottom: 10px;
+      }
+
+      .company-details {
+        font-size: 11px;
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .receipt-title-section {
+        text-align: right;
+      }
+
+      .receipt-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #fbbf24;
+      }
+
+      .receipt-subtitle {
+        font-size: 14px;
+        opacity: 0.95;
+        margin-bottom: 15px;
+      }
+
+      .receipt-meta {
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      .divider {
+        height: 4px;
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .receipt-badge {
+        text-align: center;
+        padding: 20px;
+        margin: 20px auto 30px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 12px;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+      }
+
+      .receipt-badge .check-icon {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #10b981;
+        margin-bottom: 10px;
+      }
+
+      .receipt-badge h2 {
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+
+      .receipt-badge p {
+        font-size: 14px;
+        opacity: 0.95;
+      }
+
+      .amount-box {
+        background: #fffbeb;
+        border: 2px solid #fbbf24;
+        border-radius: 8px;
+        padding: 25px;
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .amount-box .label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .amount-box .amount {
+        font-size: 42px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 5px;
+      }
+
+      .amount-box .amount-words {
+        font-size: 14px;
+        color: #555;
+        font-style: italic;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin: 30px 0;
+      }
+
+      .info-section {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #1e3a8a;
+      }
+
+      .info-section h3 {
+        font-size: 14px;
+        color: #1e3a8a;
+        margin-bottom: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 12px;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-row .label {
+        color: #666;
+        font-weight: 500;
+      }
+
+      .info-row .value {
+        color: #333;
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .payment-breakdown {
+        margin: 30px 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .payment-breakdown h3 {
+        background: #1e3a8a;
+        color: white;
+        padding: 15px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .breakdown-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .breakdown-table td {
+        padding: 12px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+      }
+
+      .breakdown-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .breakdown-table .label {
+        color: #666;
+      }
+
+      .breakdown-table .value {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      .breakdown-table .total-row {
+        background: #f9fafb;
+        font-weight: 700;
+        color: #1e3a8a;
+      }
+
+      .signature-section {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .signature-box {
+        text-align: center;
+      }
+
+      .signature-line {
+        width: 250px;
+        border-top: 2px solid #333;
+        padding-top: 10px;
+        margin-top: 60px;
+      }
+
+      .signature-box .name {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+
+      .signature-box .title {
+        font-size: 11px;
+        color: #666;
+      }
+
+      .stamp-placeholder {
+        width: 100px;
+        height: 100px;
+        border: 2px dashed #ccc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #999;
+        text-align: center;
+      }
+
+      .notes-section {
+        margin-top: 40px;
+        padding: 20px;
+        background: #eff6ff;
+        border: 1px solid #3b82f6;
+        border-radius: 8px;
+      }
+
+      .notes-section h4 {
+        font-size: 13px;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .notes-section ul {
+        margin-left: 20px;
+        font-size: 11px;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: #1e3a8a;
+        color: white;
+        padding: 20px 40px;
+        font-size: 11px;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer p {
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .footer-highlight {
+        color: #fbbf24;
+        font-weight: 600;
+      }
+
+      .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 120px;
+        font-weight: 700;
+        color: rgba(16, 185, 129, 0.05);
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      @media print {
+        .receipt-container {
+          margin: 0;
+          width: 100%;
+        }
+
+        .footer {
+          position: fixed;
+          bottom: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt-container">
+      <div class="watermark">PAID</div>
+
+      <!-- Header -->
+      <div class="header">
+        <div class="header-content">
+          <div class="company-section">
+            <div class="logo-placeholder">
+              <img
+                src="/public/LOGOS/galloways-logo.png"
+                alt="Galloways Logo"
+                style="width: 100%; height: 100%; object-fit: contain"
+                onerror="this.style.display='none'; this.parentElement.innerHTML='G';"
+              />
+            </div>
+            <div class="company-name">GALLOWAYS</div>
+            <div class="company-tagline">
+              "Protecting Dreams and Preserving Wealth"
+            </div>
+            <div class="company-details">
+              <div>
+                <strong>Insurance Agencies & Consultancy Services</strong>
+              </div>
+              <div style="margin-top: 10px">
+                Phone: +254 720 769 993 / +254 758 301 346<br />
+                Email: info@galloways.co.ke<br />
+                Location: Nairobi, Kenya
+              </div>
+            </div>
+          </div>
+          <div class="receipt-title-section">
+            <div class="receipt-title">RECEIPT</div>
+            <div class="receipt-subtitle">Official Payment Receipt</div>
+            <div class="receipt-meta">
+              <div><strong>Receipt No:</strong> {{RECEIPT_NUMBER}}</div>
+              <div><strong>Date:</strong> {{RECEIPT_DATE}}</div>
+              <div><strong>Time:</strong> {{RECEIPT_TIME}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Main Content -->
+      <div class="content" style="position: relative; z-index: 1">
+        <!-- Payment Confirmation Badge -->
+        <div class="receipt-badge">
+          <div class="check-icon">✓</div>
+          <h2>Payment Received Successfully</h2>
+          <p>
+            Thank you for your payment. Your transaction has been processed.
+          </p>
+        </div>
+
+        <!-- Amount Box -->
+        <div class="amount-box">
+          <div class="label">Amount Paid</div>
+          <div class="amount">KES {{AMOUNT_PAID}}</div>
+          <div class="amount-words">{{AMOUNT_IN_WORDS}}</div>
+        </div>
+
+        <!-- Information Grid -->
+        <div class="info-grid">
+          <!-- Customer Information -->
+          <div class="info-section">
+            <h3>Received From</h3>
+            <div class="info-row">
+              <span class="label">Name:</span>
+              <span class="value">{{CUSTOMER_NAME}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Phone:</span>
+              <span class="value">{{CUSTOMER_PHONE}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Email:</span>
+              <span class="value">{{CUSTOMER_EMAIL}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">ID/Passport:</span>
+              <span class="value">{{CUSTOMER_ID}}</span>
+            </div>
+          </div>
+
+          <!-- Payment Information -->
+          <div class="info-section">
+            <h3>Payment Details</h3>
+            <div class="info-row">
+              <span class="label">Payment Method:</span>
+              <span class="value">{{PAYMENT_METHOD}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Transaction Ref:</span>
+              <span class="value">{{TRANSACTION_REF}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Invoice No:</span>
+              <span class="value">{{INVOICE_NUMBER}}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Received By:</span>
+              <span class="value">{{RECEIVED_BY}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Policy Information -->
+        <div class="info-section" style="margin: 30px 0">
+          <h3>Policy Information</h3>
+          <div class="info-row">
+            <span class="label">Policy Number:</span>
+            <span class="value">{{POLICY_NUMBER}}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Policy Type:</span>
+            <span class="value">{{POLICY_TYPE}}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Coverage Period:</span>
+            <span class="value">{{COVERAGE_START}} to {{COVERAGE_END}}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Payment For:</span>
+            <span class="value">{{PAYMENT_DESCRIPTION}}</span>
+          </div>
+        </div>
+
+        <!-- Payment Breakdown -->
+        <div class="payment-breakdown">
+          <h3>Payment Breakdown</h3>
+          <table class="breakdown-table">
+            <tr>
+              <td class="label">Premium Amount</td>
+              <td class="value">KES {{PREMIUM_AMOUNT}}</td>
+            </tr>
+            <tr>
+              <td class="label">Levies & Fees</td>
+              <td class="value">KES {{LEVIES}}</td>
+            </tr>
+            <tr>
+              <td class="label">Training Levy (0.2%)</td>
+              <td class="value">KES {{TRAINING_LEVY}}</td>
+            </tr>
+            <tr>
+              <td class="label">Stamp Duty</td>
+              <td class="value">KES {{STAMP_DUTY}}</td>
+            </tr>
+            <tr>
+              <td class="label">VAT (16%)</td>
+              <td class="value">KES {{VAT}}</td>
+            </tr>
+            <tr class="total-row">
+              <td class="label">TOTAL PAID</td>
+              <td class="value">KES {{TOTAL_PAID}}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="signature-section">
+          <div class="signature-box">
+            <div class="signature-line">
+              <div class="name">{{AUTHORIZED_SIGNATORY}}</div>
+              <div class="title">Authorized Signatory</div>
+              <div class="title">Galloways Insurance Agencies</div>
+            </div>
+          </div>
+          <div class="stamp-placeholder">OFFICIAL<br />STAMP</div>
+        </div>
+
+        <!-- Notes -->
+        <div class="notes-section">
+          <h4>Important Notes:</h4>
+          <ul>
+            <li>
+              This is an official receipt and proof of payment for the stated
+              amount.
+            </li>
+            <li>
+              Please retain this receipt for your records and future reference.
+            </li>
+            <li>
+              Your policy documents will be issued upon clearance of this
+              payment.
+            </li>
+            <li>
+              For any queries regarding this receipt, please contact our
+              customer service.
+            </li>
+            <li>
+              This receipt is computer-generated and valid without signature if
+              electronically issued.
+            </li>
+            <li>
+              Payment is non-refundable unless stated otherwise in the policy
+              terms.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-content">
+          <div>
+            <p>
+              <span class="footer-highlight"
+                >Galloways Insurance Agencies & Consultancy Services</span
+              ><br />
+              Licensed by Insurance Regulatory Authority (IRA) Kenya<br />
+              Email: customerservice@galloways.co.ke | Phone: +254 720 769 993 /
+              +254 758 301 346
+            </p>
+          </div>
+          <div style="text-align: right">
+            <p>
+              <strong>Thank you for choosing Galloways</strong><br />
+              www.galloways.co.ke<br />
+              Business Hours: Mon-Fri 8AM-6PM, Sat 9AM-2PM
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galloways Insurance - Invoice</title>
+    <style>
+      @page {
+        margin: 0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        line-height: 1.6;
+        background: #ffffff;
+      }
+
+      .invoice-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        padding: 0;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 30px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+      }
+
+      .company-section {
+        flex: 1;
+      }
+
+      .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        background: white;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 24px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .company-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .company-tagline {
+        font-size: 12px;
+        font-style: italic;
+        color: #fbbf24;
+        margin-bottom: 15px;
+      }
+
+      .company-details {
+        font-size: 11px;
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .invoice-title-section {
+        text-align: right;
+      }
+
+      .invoice-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #fbbf24;
+      }
+
+      .invoice-meta {
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      .divider {
+        height: 4px;
+        background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .billing-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 40px;
+      }
+
+      .info-block {
+        flex: 1;
+      }
+
+      .info-block h3 {
+        font-size: 14px;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #fbbf24;
+        font-weight: 600;
+      }
+
+      .info-block p {
+        font-size: 12px;
+        line-height: 1.8;
+        color: #555;
+      }
+
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+        font-size: 13px;
+      }
+
+      .items-table thead {
+        background: #1e3a8a;
+        color: white;
+      }
+
+      .items-table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .items-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .items-table tbody tr:hover {
+        background: #f9fafb;
+      }
+
+      .items-table .text-right {
+        text-align: right;
+      }
+
+      .items-table .text-center {
+        text-align: center;
+      }
+
+      .totals-section {
+        margin-top: 30px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .totals-table {
+        width: 400px;
+        font-size: 13px;
+      }
+
+      .totals-table tr {
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .totals-table td {
+        padding: 10px 15px;
+      }
+
+      .totals-table .label {
+        text-align: right;
+        font-weight: 500;
+      }
+
+      .totals-table .amount {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      .totals-table .total-row {
+        background: #1e3a8a;
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .totals-table .total-row td {
+        padding: 15px;
+      }
+
+      .payment-info {
+        margin-top: 40px;
+        padding: 20px;
+        background: #f9fafb;
+        border-left: 4px solid #fbbf24;
+        border-radius: 4px;
+      }
+
+      .payment-info h3 {
+        font-size: 14px;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .payment-info p {
+        font-size: 12px;
+        line-height: 1.8;
+        color: #555;
+        margin: 5px 0;
+      }
+
+      .notes {
+        margin-top: 30px;
+        padding: 20px;
+        background: #fffbeb;
+        border: 1px solid #fbbf24;
+        border-radius: 4px;
+      }
+
+      .notes h3 {
+        font-size: 13px;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .notes p {
+        font-size: 11px;
+        line-height: 1.6;
+        color: #555;
+      }
+
+      .footer {
+        margin-top: 40px;
+        padding: 25px 40px;
+        background: #1e3a8a;
+        color: white;
+        font-size: 11px;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer-left {
+        flex: 1;
+      }
+
+      .footer-right {
+        text-align: right;
+      }
+
+      .footer p {
+        line-height: 1.8;
+        opacity: 0.95;
+      }
+
+      .footer-highlight {
+        color: #fbbf24;
+        font-weight: 600;
+      }
+
+      @media print {
+        .invoice-container {
+          margin: 0;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice-container">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-content">
+          <div class="company-section">
+            <div class="logo-placeholder">
+              <img
+                src="/public/LOGOS/galloways-logo.png"
+                alt="Galloways Logo"
+                style="width: 100%; height: 100%; object-fit: contain"
+                onerror="this.style.display='none'; this.parentElement.innerHTML='G';"
+              />
+            </div>
+            <div class="company-name">GALLOWAYS</div>
+            <div class="company-tagline">
+              "Protecting Dreams and Preserving Wealth"
+            </div>
+            <div class="company-details">
+              <div>
+                <strong>Insurance Agencies & Consultancy Services</strong>
+              </div>
+              <div style="margin-top: 10px">
+                Phone: +254 720 769 993 / +254 758 301 346<br />
+                Email: info@galloways.co.ke<br />
+                Location: Nairobi, Kenya<br />
+                Licensed by IRA Kenya
+              </div>
+            </div>
+          </div>
+          <div class="invoice-title-section">
+            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-meta">
+              <div><strong>Invoice No:</strong> {{INVOICE_NUMBER}}</div>
+              <div><strong>Date:</strong> {{INVOICE_DATE}}</div>
+              <div><strong>Due Date:</strong> {{DUE_DATE}}</div>
+              <div style="margin-top: 10px">
+                <strong>Status:</strong>
+                <span
+                  style="
+                    background: #fbbf24;
+                    color: #1e3a8a;
+                    padding: 4px 12px;
+                    border-radius: 12px;
+                    font-weight: 600;
+                  "
+                  >{{STATUS}}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Main Content -->
+      <div class="content">
+        <!-- Billing Information -->
+        <div class="billing-info">
+          <div class="info-block">
+            <h3>Bill To</h3>
+            <p>
+              <strong>{{CLIENT_NAME}}</strong><br />
+              {{CLIENT_ADDRESS}}<br />
+              {{CLIENT_CITY}}, {{CLIENT_POSTAL_CODE}}<br />
+              Phone: {{CLIENT_PHONE}}<br />
+              Email: {{CLIENT_EMAIL}}
+            </p>
+          </div>
+          <div class="info-block">
+            <h3>Policy Details</h3>
+            <p>
+              <strong>Policy No:</strong> {{POLICY_NUMBER}}<br />
+              <strong>Policy Type:</strong> {{POLICY_TYPE}}<br />
+              <strong>Coverage Period:</strong> {{COVERAGE_START}} to
+              {{COVERAGE_END}}<br />
+              <strong>Agent:</strong> {{AGENT_NAME}}
+            </p>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 5%">#</th>
+              <th style="width: 45%">Description</th>
+              <th style="width: 15%" class="text-center">Period</th>
+              <th style="width: 15%" class="text-right">Rate/Premium</th>
+              <th style="width: 20%" class="text-right">Amount (KES)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Sample Row - Replace with dynamic content -->
+            <tr>
+              <td>1</td>
+              <td>
+                <strong>{{ITEM_NAME}}</strong><br />
+                <small style="color: #666">{{ITEM_DESCRIPTION}}</small>
+              </td>
+              <td class="text-center">{{ITEM_PERIOD}}</td>
+              <td class="text-right">{{ITEM_RATE}}</td>
+              <td class="text-right"><strong>{{ITEM_AMOUNT}}</strong></td>
+            </tr>
+            <!-- Add more rows as needed -->
+          </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+          <table class="totals-table">
+            <tr>
+              <td class="label">Subtotal:</td>
+              <td class="amount">KES {{SUBTOTAL}}</td>
+            </tr>
+            <tr>
+              <td class="label">Levies & Fees:</td>
+              <td class="amount">KES {{LEVIES}}</td>
+            </tr>
+            <tr>
+              <td class="label">Training Levy (0.2%):</td>
+              <td class="amount">KES {{TRAINING_LEVY}}</td>
+            </tr>
+            <tr>
+              <td class="label">Stamp Duty:</td>
+              <td class="amount">KES {{STAMP_DUTY}}</td>
+            </tr>
+            <tr>
+              <td class="label">VAT (16%):</td>
+              <td class="amount">KES {{VAT}}</td>
+            </tr>
+            <tr class="total-row">
+              <td class="label">TOTAL AMOUNT DUE:</td>
+              <td class="amount">KES {{TOTAL_AMOUNT}}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+          <h3>Payment Information</h3>
+          <p><strong>Bank Name:</strong> {{BANK_NAME}}</p>
+          <p>
+            <strong>Account Name:</strong> Galloways Insurance Agencies &
+            Consultancy Services
+          </p>
+          <p><strong>Account Number:</strong> {{ACCOUNT_NUMBER}}</p>
+          <p><strong>Bank Code:</strong> {{BANK_CODE}}</p>
+          <p>
+            <strong>M-PESA Paybill:</strong> {{MPESA_PAYBILL}} |
+            <strong>Account:</strong> {{MPESA_ACCOUNT}}
+          </p>
+          <p style="margin-top: 10px">
+            <em>Please include Invoice Number as payment reference</em>
+          </p>
+        </div>
+
+        <!-- Notes -->
+        <div class="notes">
+          <h3>Terms & Conditions</h3>
+          <p>
+            • Payment is due within {{PAYMENT_TERMS}} days from the invoice
+            date.<br />
+            • Late payments may attract a penalty as per the policy terms.<br />
+            • This invoice is subject to our standard terms and conditions.<br />
+            • Policy cover commences upon receipt of full premium payment.<br />
+            • For any queries, please contact our customer service team.<br />
+            • All amounts are in Kenya Shillings (KES) unless otherwise stated.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-content">
+          <div class="footer-left">
+            <p>
+              <span class="footer-highlight"
+                >Galloways Insurance Agencies & Consultancy Services</span
+              ><br />
+              Licensed by Insurance Regulatory Authority (IRA) Kenya |
+              Registration No: {{REGISTRATION_NO}}<br />
+              Underwriting: underwriting@galloways.co.ke | Quotations:
+              quotations@galloways.co.ke<br />
+              Customer Service: customerservice@galloways.co.ke | Claims:
+              Claims@galloways.co.ke
+            </p>
+          </div>
+          <div class="footer-right">
+            <p>
+              <strong>Office Hours</strong><br />
+              Mon-Fri: 8:00 AM - 6:00 PM<br />
+              Sat: 9:00 AM - 2:00 PM<br />
+              www.galloways.co.ke
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
