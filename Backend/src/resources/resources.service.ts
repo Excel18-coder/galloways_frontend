@@ -105,14 +105,16 @@ export class ResourcesService {
     try {
       const files = fs.readdirSync(templatesDir);
       const templates = files
-        .filter((file) => file.endsWith('.html'))
+        .filter((file) => file.endsWith('.html') || file.endsWith('.pdf'))
         .map((file) => {
           const stats = fs.statSync(path.join(templatesDir, file));
+          const extension = file.endsWith('.pdf') ? 'PDF' : 'HTML';
           return {
             name: file,
-            displayName: file.replace(/-/g, ' ').replace('.html', ''),
+            displayName: file.replace(/-/g, ' ').replace('.html', '').replace('.pdf', ''),
             size: stats.size,
             type: file.includes('fillable') ? 'fillable' : 'template',
+            format: extension,
             category: file.includes('letterhead')
               ? 'letterhead'
               : file.includes('invoice')
@@ -131,7 +133,7 @@ export class ResourcesService {
     }
   }
 
-  async getTemplate(templateName: string): Promise<string> {
+  async getTemplate(templateName: string): Promise<string | Buffer> {
     const templatesDir = path.join(__dirname, 'templates');
     const templatePath = path.join(templatesDir, templateName);
 
@@ -145,6 +147,11 @@ export class ResourcesService {
     }
 
     try {
+      // Read PDF files as binary buffer
+      if (templateName.endsWith('.pdf')) {
+        return fs.readFileSync(templatePath);
+      }
+      // Read HTML/text files as UTF-8 string
       return fs.readFileSync(templatePath, 'utf8');
     } catch (error) {
       throw new NotFoundException(

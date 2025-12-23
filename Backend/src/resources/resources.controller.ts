@@ -218,11 +218,18 @@ export class ResourcesController {
       const templateContent =
         await this.resourcesService.getTemplate(templateName);
 
-      res.setHeader('Content-Type', 'text/html');
+      // Determine content type based on file extension
+      const contentType = templateName.endsWith('.pdf') 
+        ? 'application/pdf' 
+        : 'text/html';
+      
+      res.setHeader('Content-Type', contentType);
       res.setHeader(
         'Content-Disposition',
         `attachment; filename="${templateName}"`,
       );
+      
+      // Send buffer directly for PDFs, string for HTML
       res.send(templateContent);
     } catch (error) {
       res.status(HttpStatus.NOT_FOUND).json({
