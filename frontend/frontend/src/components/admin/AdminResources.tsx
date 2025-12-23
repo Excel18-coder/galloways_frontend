@@ -138,7 +138,7 @@ export function AdminResources() {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  
+
   // Templates state
   const [templates, setTemplates] = useState<any[]>([]);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
@@ -524,82 +524,6 @@ export function AdminResources() {
           </Card>
         </div>
       )}
-
-      {/* Document Templates Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            Document Templates
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoadingTemplates ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          ) : templates.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No templates available</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {templates.map((template) => (
-                <Card key={template.name} className="hover:shadow-md transition-shadow">
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col items-center text-center space-y-3">
-                      <div className="p-3 bg-blue-100 rounded-lg">
-                        {template.category === 'letterhead' && <FileText className="w-8 h-8 text-blue-600" />}
-                        {template.category === 'invoice' && <File className="w-8 h-8 text-green-600" />}
-                        {template.category === 'receipt' && <FileText className="w-8 h-8 text-purple-600" />}
-                        {!['letterhead', 'invoice', 'receipt'].includes(template.category) && (
-                          <File className="w-8 h-8 text-gray-600" />
-                        )}
-                      </div>
-                      
-                      <div className="w-full">
-                        <h3 className="font-semibold text-gray-900 mb-1">
-                          {template.name.replace(/-/g, ' ').replace(/\.html$/, '').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                        </h3>
-                        <p className="text-xs text-gray-500 mb-2">
-                          {template.type || 'HTML'} • {formatFileSize(template.size || 0)}
-                        </p>
-                        <Badge variant="secondary" className="text-xs">
-                          {template.category || 'template'}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex gap-2 w-full">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleTemplateDownload(template.name)}>
-                          <Download className="w-4 h-4 mr-1" />
-                          Download
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(`${API_BASE_URL}/resources/templates/${template.name}`, '_blank')}>
-                          <FileText className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      
-                      {template.lastModified && (
-                        <p className="text-xs text-gray-400 w-full text-left">
-                          Updated: {formatDate(template.lastModified)}
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Filters */}
       <Card>

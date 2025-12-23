@@ -1,261 +1,282 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Galloways Insurance - Letterhead</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        color: #333;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+
+      .page {
+        max-width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        border-bottom: 4px solid #1e3a8a;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .company-info {
+        flex: 1;
+      }
+
+      .company-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1e3a8a;
+        margin-bottom: 5px;
+      }
+
+      .tagline {
+        font-size: 12px;
+        color: #f59e0b;
+        font-style: italic;
+        margin-bottom: 10px;
+      }
+
+      .contact-info {
+        font-size: 11px;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .logo-placeholder {
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .document-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .info-field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .info-field label {
+        font-weight: bold;
+        color: #1e3a8a;
+        min-width: 70px;
+      }
+
+      .fill-line {
+        flex: 1;
+        border-bottom: 1px solid #333;
+        height: 20px;
+      }
+
+      .recipient-section {
+        margin-bottom: 30px;
+      }
+
+      .recipient-section h3 {
+        color: #1e3a8a;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .recipient-lines {
+        border: 1px solid #ccc;
+        padding: 15px;
+        min-height: 100px;
+        background: #fafafa;
+      }
+
+      .recipient-lines .line {
+        border-bottom: 1px solid #ddd;
+        height: 25px;
+        margin-bottom: 5px;
+      }
+
+      .subject-line {
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .subject-line label {
+        font-weight: bold;
+        color: #1e3a8a;
+        text-decoration: underline;
+      }
+
+      .subject-line .fill-line {
+        border-bottom: 2px solid #333;
+      }
+
+      .letter-body {
+        margin-bottom: 40px;
+        min-height: 400px;
+      }
+
+      .body-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .body-lines .line {
+        border-bottom: 1px solid #ddd;
+        height: 20px;
+      }
+
+      .signature-section {
+        margin-top: 80px;
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .signature-block {
+        width: 300px;
+      }
+
+      .signature-line {
+        border-top: 2px solid #333;
+        margin-top: 60px;
+        padding-top: 10px;
+        text-align: center;
+      }
+
+      .signature-label {
+        font-weight: bold;
+        color: #1e3a8a;
+        font-size: 12px;
+      }
+
+      .footer {
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 2px solid #f59e0b;
+        text-align: center;
+        font-size: 10px;
+        color: #666;
+      }
+
+      @media print {
         body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            padding: 20px;
-            background: #f5f5f5;
+          background: white;
+          padding: 0;
         }
-        
         .page {
-            max-width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          box-shadow: none;
+          margin: 0;
+          padding: 20mm;
         }
-        
-        .header {
-            border-bottom: 4px solid #1e3a8a;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .company-info { flex: 1; }
-        
-        .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e3a8a;
-            margin-bottom: 5px;
-        }
-        
-        .tagline {
-            font-size: 12px;
-            color: #f59e0b;
-            font-style: italic;
-            margin-bottom: 10px;
-        }
-        
-        .contact-info {
-            font-size: 11px;
-            color: #666;
-            line-height: 1.4;
-        }
-        
-        .logo-placeholder {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            border-radius: 10px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .document-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .info-field {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .info-field label {
-            font-weight: bold;
-            color: #1e3a8a;
-            min-width: 70px;
-        }
-        
-        .fill-line {
-            flex: 1;
-            border-bottom: 1px solid #333;
-            height: 20px;
-        }
-        
-        .recipient-section { margin-bottom: 30px; }
-        
-        .recipient-section h3 {
-            color: #1e3a8a;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .recipient-lines {
-            border: 1px solid #ccc;
-            padding: 15px;
-            min-height: 100px;
-            background: #fafafa;
-        }
-        
-        .recipient-lines .line {
-            border-bottom: 1px solid #ddd;
-            height: 25px;
-            margin-bottom: 5px;
-        }
-        
-        .subject-line {
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .subject-line label {
-            font-weight: bold;
-            color: #1e3a8a;
-            text-decoration: underline;
-        }
-        
-        .subject-line .fill-line { border-bottom: 2px solid #333; }
-        
-        .letter-body {
-            margin-bottom: 40px;
-            min-height: 400px;
-        }
-        
-        .body-lines {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .body-lines .line {
-            border-bottom: 1px solid #ddd;
-            height: 20px;
-        }
-        
-        .signature-section {
-            margin-top: 80px;
-            display: flex;
-            justify-content: flex-start;
-        }
-        
-        .signature-block { width: 300px; }
-        
-        .signature-line {
-            border-top: 2px solid #333;
-            margin-top: 60px;
-            padding-top: 10px;
-            text-align: center;
-        }
-        
-        .signature-label {
-            font-weight: bold;
-            color: #1e3a8a;
-            font-size: 12px;
-        }
-        
-        .footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 2px solid #f59e0b;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-        }
-        
-        @media print {
-            body { background: white; padding: 0; }
-            .page { box-shadow: none; margin: 0; padding: 20mm; }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="page">
-        <div class="header">
-            <div class="company-info">
-                <div class="company-name">GALLOWAYS INSURANCE</div>
-                <div class="tagline">Protecting Dreams and Preserving Wealth</div>
-                <div class="contact-info">
-                    📞 +254 720 769 993 / +254 758 301 346<br>
-                    ✉️ info@galloways.co.ke | underwriting@galloways.co.ke<br>
-                    📍 Nairobi, Kenya | 🔒 IRA Licensed
-                </div>
-            </div>
-            <div class="logo-placeholder">GALLOWAYS<br>LOGO</div>
+      <div class="header">
+        <div class="company-info">
+          <div class="company-name">GALLOWAYS INSURANCE</div>
+          <div class="tagline">Protecting Dreams and Preserving Wealth</div>
+          <div class="contact-info">
+            📞 +254 720 769 993 / +254 758 301 346<br />
+            ✉️ info@galloways.co.ke | underwriting@galloways.co.ke<br />
+            📍 Nairobi, Kenya | 🔒 IRA Licensed
+          </div>
         </div>
-        
-        <div class="document-info">
-            <div class="info-field">
-                <label>Date:</label>
-                <div class="fill-line"></div>
-            </div>
-            <div class="info-field">
-                <label>Ref No:</label>
-                <div class="fill-line"></div>
-            </div>
+        <div class="logo-placeholder">
+          <img src="galloways-logo.png" alt="Galloways Logo" />
         </div>
-        
-        <div class="recipient-section">
-            <h3>To:</h3>
-            <div class="recipient-lines">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
+      </div>
+
+      <div class="document-info">
+        <div class="info-field">
+          <label>Date:</label>
+          <div class="fill-line"></div>
         </div>
-        
-        <div class="subject-line">
-            <label>RE:</label>
-            <div class="fill-line"></div>
+        <div class="info-field">
+          <label>Ref No:</label>
+          <div class="fill-line"></div>
         </div>
-        
-        <div class="letter-body">
-            <div class="body-lines">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
+      </div>
+
+      <div class="recipient-section">
+        <h3>To:</h3>
+        <div class="recipient-lines">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
-        
-        <div class="signature-section">
-            <div class="signature-block">
-                <div class="signature-line">
-                    <div class="signature-label">Authorized Signature & Stamp</div>
-                </div>
-            </div>
+      </div>
+
+      <div class="subject-line">
+        <label>RE:</label>
+        <div class="fill-line"></div>
+      </div>
+
+      <div class="letter-body">
+        <div class="body-lines">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
         </div>
-        
-        <div class="footer">
-            Galloways Insurance Agencies & Consultancy Services<br>
-            Regulated by Insurance Regulatory Authority (IRA) of Kenya<br>
-            www.galloways.co.ke
+      </div>
+
+      <div class="signature-section">
+        <div class="signature-block">
+          <div class="signature-line">
+            <div class="signature-label">Authorized Signature & Stamp</div>
+          </div>
         </div>
+      </div>
+
+      <div class="footer">
+        Galloways Insurance Agencies & Consultancy Services<br />
+        Regulated by Insurance Regulatory Authority (IRA) of Kenya<br />
+        www.galloways.co.ke
+      </div>
     </div>
-</body>
+  </body>
 </html>
