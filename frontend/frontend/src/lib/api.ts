@@ -716,6 +716,82 @@ const resourcesService = {
 
   getStats: async (): Promise<ApiResponse> =>
     request("/resources/stats", { method: "GET" }),
+
+  // Template Management Endpoints
+  getTemplates: async (): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request("/resources/templates/list", { 
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+  },
+
+  getTemplate: async (templateName: string): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request(`/resources/templates/${templateName}`, { 
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+  },
+
+  downloadTemplate: async (templateName: string): Promise<void> => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/resources/templates/${templateName}/download`, {
+        method: "GET",
+        headers: {
+          'Accept': 'application/octet-stream',
+          'Authorization': `Bearer ${token}`,
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      // Get filename from Content-Disposition header or use template name
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = templateName;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to download template");
+    }
+  },
+
+  updateTemplate: async (templateName: string, content: string): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request(`/resources/templates/${templateName}`, { 
+      method: "PUT",
+      body: JSON.stringify({ content }),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+  },
 };
 
 // Dashboard Service
