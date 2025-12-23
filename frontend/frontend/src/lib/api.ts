@@ -75,7 +75,7 @@ async function request<T = any>(
   // Don't stringify if it's FormData
   if (!(options.body instanceof FormData)) {
     options.headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     };
     if (options.body) {
@@ -93,7 +93,6 @@ async function request<T = any>(
       credentials: "omit",
       ...options,
     });
-
 
     if (DEBUG) {
       console.log(`API Response: ${res.status} ${res.statusText}`);
@@ -302,7 +301,9 @@ const paymentsService = {
   querySTKPushStatus: async (checkoutRequestId: string): Promise<ApiResponse> =>
     request(`/payments/mpesa/status/${checkoutRequestId}`, { method: "GET" }),
 
-  getPaymentByCheckoutRequestId: async (checkoutRequestId: string): Promise<ApiResponse> =>
+  getPaymentByCheckoutRequestId: async (
+    checkoutRequestId: string
+  ): Promise<ApiResponse> =>
     request(`/payments/mpesa/payment/${checkoutRequestId}`, { method: "GET" }),
 };
 
@@ -650,9 +651,9 @@ const resourcesService = {
       }
 
       // Get filename from Content-Disposition header or use a default
-      const contentDisposition = response.headers.get('Content-Disposition');
+      const contentDisposition = response.headers.get("Content-Disposition");
       let filename = `resource-${id}`;
-      
+
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="(.+)"/);
         if (filenameMatch) {
@@ -663,7 +664,7 @@ const resourcesService = {
       // Create blob and trigger download
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -694,7 +695,10 @@ const resourcesService = {
       }
 
       if (!response.ok) {
-        const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
+        const errorMessage =
+          data?.message ||
+          data?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
@@ -709,7 +713,10 @@ const resourcesService = {
   },
 
   updateResource: async (id: string, data: any): Promise<ApiResponse> =>
-    request(`/resources/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+    request(`/resources/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 
   deleteResource: async (id: string): Promise<ApiResponse> =>
     request(`/resources/${id}`, { method: "DELETE" }),
@@ -720,45 +727,48 @@ const resourcesService = {
   // Template Management Endpoints
   getTemplates: async (): Promise<ApiResponse> => {
     const token = localStorage.getItem("token");
-    return request("/resources/templates/list", { 
+    return request("/resources/templates/list", {
       method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
 
   getTemplate: async (templateName: string): Promise<ApiResponse> => {
     const token = localStorage.getItem("token");
-    return request(`/resources/templates/${templateName}`, { 
+    return request(`/resources/templates/${templateName}`, {
       method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
 
   downloadTemplate: async (templateName: string): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/resources/templates/${templateName}/download`, {
-        method: "GET",
-        headers: {
-          'Accept': 'application/octet-stream',
-          'Authorization': `Bearer ${token}`,
-        },
-        mode: "cors",
-        credentials: "omit",
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/resources/templates/${templateName}/download`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/octet-stream",
+            Authorization: `Bearer ${token}`,
+          },
+          mode: "cors",
+          credentials: "omit",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Download failed: ${response.statusText}`);
       }
 
       // Get filename from Content-Disposition header or use template name
-      const contentDisposition = response.headers.get('Content-Disposition');
+      const contentDisposition = response.headers.get("Content-Disposition");
       let filename = templateName;
-      
+
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="(.+)"/);
         if (filenameMatch) {
@@ -769,7 +779,7 @@ const resourcesService = {
       // Create blob and trigger download
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -781,15 +791,18 @@ const resourcesService = {
     }
   },
 
-  updateTemplate: async (templateName: string, content: string): Promise<ApiResponse> => {
+  updateTemplate: async (
+    templateName: string,
+    content: string
+  ): Promise<ApiResponse> => {
     const token = localStorage.getItem("token");
-    return request(`/resources/templates/${templateName}`, { 
+    return request(`/resources/templates/${templateName}`, {
       method: "PUT",
       body: JSON.stringify({ content }),
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      }
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     });
   },
 };
@@ -937,14 +950,14 @@ const adminService = {
         success: !response.error,
         data: response.error
           ? {
-            data: [],
-            pagination: {
-              totalPages: 1,
-              currentPage: 1,
-              total: 0,
-              perPage: limit,
-            },
-          }
+              data: [],
+              pagination: {
+                totalPages: 1,
+                currentPage: 1,
+                total: 0,
+                perPage: limit,
+              },
+            }
           : response.data,
         message: response.error || "Claims loaded successfully",
       };
@@ -1056,7 +1069,9 @@ const adminService = {
     page = 1,
     limit = 50
   ): Promise<ApiResponse<PaginatedResponse<any>>> =>
-    request(`/diaspora-requests?page=${page}&limit=${limit}`, { method: "GET" }),
+    request(`/diaspora-requests?page=${page}&limit=${limit}`, {
+      method: "GET",
+    }),
 
   getDiasporaById: async (id: number): Promise<ApiResponse> =>
     request(`/diaspora-requests/${id}`, { method: "GET" }),
@@ -1204,19 +1219,19 @@ const testLaravelConnection = async (): Promise<ApiResponse> => {
 
 // Export all services
 export {
-  authService,
-  claimsService,
-  quotesService,
-  paymentsService,
-  outsourcingRequests,
-  diasporaService,
-  consultationsService,
-  resourcesService,
-  dashboardService,
   adminService,
-  testSupabaseConnection,
-  testLaravelConnection,
+  authService,
   bookingConsultantsService,
+  claimsService,
+  consultationsService,
+  dashboardService,
+  diasporaService,
+  outsourcingRequests,
+  paymentsService,
+  quotesService,
+  resourcesService,
+  testLaravelConnection,
+  testSupabaseConnection,
 };
 
 // Default API object
