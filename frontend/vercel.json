@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm install --no-frozen-lockfile && pnpm run build",
-  "installCommand": "npm install -g pnpm@8.15.0 && pnpm install --no-frozen-lockfile",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
   "framework": "vite",
   "outputDirectory": "dist",
   "rewrites": [
