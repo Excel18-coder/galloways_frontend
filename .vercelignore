@@ -1,21 +1,21 @@
 # Keep deployments deterministic
 
-# Never upload dependencies
-
 \*\*/node_modules
 
-# Ignore backend for Vercel builds (frontend-only project)
+# Vercel deploys frontend only
 
 Backend/\*\*
 
-# Ignore local artifacts
+# Ignore pnpm artifacts
 
 **/.pnpm\*
-**/pnpm*
-**/.cache
-**/.DS_Store
-\*\*/*.log
+**/pnpm\*
 
-# Ignore frontend build output (Vercel rebuilds it)
+# Ignore caches/logs
+
+**/.cache
+**/.DS_Store \*_/_.log
+
+# Ignore build output (Vercel rebuilds)
 
 frontend/dist
