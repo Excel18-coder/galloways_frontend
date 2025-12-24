@@ -1,26 +1,24 @@
 # ------------------ BUILD ------------------
-    FROM node:22-alpine AS builder
-
-    RUN npm install -g pnpm@8.15.0
+    FROM node:20-alpine AS builder
 
     WORKDIR /app
 
-    COPY package.json pnpm-lock.yaml ./
-    RUN pnpm install --no-frozen-lockfile
+    COPY package.json package-lock.json ./
+    RUN npm ci --legacy-peer-deps
 
     COPY . .
-    RUN pnpm run build
+    RUN npm run build
 
     # ------------------ PRODUCTION ------------------
-    FROM node:22-alpine AS production
-
-    RUN npm install -g pnpm@8.15.0
+    FROM node:20-alpine AS production
 
     WORKDIR /app
 
-    COPY package.json pnpm-lock.yaml ./
-    RUN pnpm install --no-frozen-lockfile --prod
+    COPY package.json package-lock.json ./
+    RUN npm ci --legacy-peer-deps --omit=dev
 
     COPY --from=builder /app/dist ./dist
+
+    ENV NODE_ENV=production
 
     CMD ["node", "dist/main.js"]
