@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1";
+  import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
 const DEBUG = import.meta.env.VITE_DEBUG === "true" || true;
 
 // Types
@@ -283,6 +283,28 @@ const paymentsService = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  // M-Pesa STK Push
+  initiateSTKPush: async (data: {
+    phoneNumber: string;
+    amount: number;
+    accountReference: string;
+    transactionDesc: string;
+    userId?: number;
+    consultationId?: number;
+  }): Promise<ApiResponse> =>
+    request("/payments/mpesa/stkpush", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  querySTKPushStatus: async (checkoutRequestId: string): Promise<ApiResponse> =>
+    request(`/payments/mpesa/status/${checkoutRequestId}`, { method: "GET" }),
+
+  getPaymentByCheckoutRequestId: async (
+    checkoutRequestId: string
+  ): Promise<ApiResponse> =>
+    request(`/payments/mpesa/payment/${checkoutRequestId}`, { method: "GET" }),
 };
 
 // Outsourcing Service
@@ -610,16 +632,178 @@ const resourcesService = {
   getResources: async (): Promise<ApiResponse> =>
     request("/resources", { method: "GET" }),
 
-  downloadResource: async (id: string): Promise<ApiResponse> =>
-    request(`/resources/${id}/download`, { method: "GET" }),
+  getResource: async (id: string): Promise<ApiResponse> =>
+    request(`/resources/${id}`, { method: "GET" }),
+
+  downloadResource: async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/${id}/download`, {
+        method: "GET",
+        headers: {
+          Accept: "application/octet-stream",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      // Get filename from Content-Disposition header or use a default
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = `resource-${id}`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to download resource");
+    }
+  },
 
   uploadResource: async (formData: FormData): Promise<ApiResponse> => {
-    const body = JSON.stringify(
-      Object.fromEntries(
-        formData.entries ? formData.entries() : Object.entries(formData)
-      )
-    );
-    return request("/resources", { method: "POST", body });
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/upload`, {
+        method: "POST",
+        body: formData, // Send FormData directly, don't JSON.stringify it
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      const contentType = response.headers.get("content-type");
+      let data: any;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+
+      if (!response.ok) {
+        const errorMessage =
+          data?.message ||
+          data?.error ||
+          `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      return {
+        success: true,
+        data: data?.data || data,
+        message: data?.message || "Resource uploaded successfully",
+      };
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to upload resource");
+    }
+  },
+
+  updateResource: async (id: string, data: any): Promise<ApiResponse> =>
+    request(`/resources/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  deleteResource: async (id: string): Promise<ApiResponse> =>
+    request(`/resources/${id}`, { method: "DELETE" }),
+
+  getStats: async (): Promise<ApiResponse> =>
+    request("/resources/stats", { method: "GET" }),
+
+  // Template Management Endpoints
+  getTemplates: async (): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request("/resources/templates/list", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getTemplate: async (templateName: string): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request(`/resources/templates/${templateName}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  downloadTemplate: async (templateName: string): Promise<void> => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/resources/templates/${templateName}/download`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/octet-stream",
+            Authorization: `Bearer ${token}`,
+          },
+          mode: "cors",
+          credentials: "omit",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`);
+      }
+
+      // Get filename from Content-Disposition header or use template name
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = templateName;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to download template");
+    }
+  },
+
+  updateTemplate: async (
+    templateName: string,
+    content: string
+  ): Promise<ApiResponse> => {
+    const token = localStorage.getItem("token");
+    return request(`/resources/templates/${templateName}`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
   },
 };
 

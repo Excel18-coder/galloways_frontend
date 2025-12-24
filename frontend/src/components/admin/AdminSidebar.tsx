@@ -14,10 +14,12 @@ import {
   Crown,
   MessageSquare,
   Globe,
-  Briefcase
+  Briefcase,
+  FolderOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import styles from "./AdminSidebar.module.css";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -105,6 +107,13 @@ const menuItems = [
     color: "from-indigo-500 to-indigo-600",
   },
   {
+    id: "resources",
+    label: "Resources",
+    icon: FolderOpen,
+    description: "File Management",
+    color: "from-teal-500 to-teal-600",
+  },
+  {
     id: "settings",
     label: "Settings",
     icon: Settings,
@@ -186,10 +195,8 @@ export function AdminSidebar({ activeTab, setActiveTab, isOpen, toggleSidebar }:
                       ? 'bg-white/60 text-slate-700 shadow-md shadow-slate-500/10 scale-102 translate-x-0.5'
                       : 'text-slate-600 hover:bg-white/40'
                   }
+                  ${`delay-${index}`}
                 `}
-                style={{
-                  animationDelay: `${index * 50}ms`
-                }}
               >
                 {/* Icon with Gradient Background */}
                 <div className={`

@@ -14,7 +14,7 @@ import { UsersModule } from './users/users.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
-    cors: false,
+    cors: true,
   });
 
   // Configure body parser for large file uploads

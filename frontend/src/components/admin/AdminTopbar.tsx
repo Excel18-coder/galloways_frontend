@@ -70,18 +70,16 @@ export function AdminTopbar({ toggleSidebar }: AdminTopbarProps) {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await console.log();
-        const notificationsData = response.data?.notifications || [];
+        // Mock notifications data for now
+        const mockNotifications = [
+          { id: 1, title: "New claim submitted", time: "2 minutes ago", unread: true },
+          { id: 2, title: "Payment processed", time: "1 hour ago", unread: true },
+          { id: 3, title: "Consultation scheduled", time: "3 hours ago", unread: false },
+          { id: 4, title: "New user registration", time: "1 day ago", unread: false },
+          { id: 5, title: "System backup completed", time: "2 days ago", unread: false }
+        ];
         
-        // Transform backend data to match frontend format
-        const transformedNotifications = notificationsData.slice(0, 5).map((notification: any, index: number) => ({
-          id: notification.id || index,
-          title: notification.title || notification.message || "New notification",
-          time: notification.createdAt ? new Date(notification.createdAt).toLocaleDateString() : "Recent",
-          unread: notification.unread !== false
-        }));
-        
-        setNotifications(transformedNotifications);
+        setNotifications(mockNotifications);
       } catch (error) {
         console.error('Failed to fetch notifications:', error);
         // Keep empty array if API fails
@@ -91,12 +89,16 @@ export function AdminTopbar({ toggleSidebar }: AdminTopbarProps) {
 
     const fetchSystemStats = async () => {
       try {
-        const userStatsResponse = await console.log();
-        const userStats = userStatsResponse.data || {};
+        // Mock system stats for now
+        const mockStats = {
+          totalUsers: Math.floor(Math.random() * 100) + 50, // Random number between 50-150
+          status: 'operational'
+        };
         
         setSystemStatus(prev => ({
           ...prev,
-          activeUsers: userStats.totalUsers || 0
+          activeUsers: mockStats.totalUsers,
+          status: mockStats.status
         }));
       } catch (error) {
         console.error('Failed to fetch system stats:', error);
@@ -163,6 +165,14 @@ export function AdminTopbar({ toggleSidebar }: AdminTopbarProps) {
         break;
       case 'logout':
         toast.success("Logging out...");
+        // Clear admin session
+        localStorage.removeItem("admin_authenticated");
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_login_time");
+        // Reload page to trigger login screen
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
         break;
       default:
         toast.success(`${action} executed`);

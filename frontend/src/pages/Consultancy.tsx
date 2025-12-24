@@ -1,29 +1,33 @@
-import Header from "@/components/layout/Header";
+import BrochureDownload from "@/components/forms/BrochureDownload";
+import ConsultationBookingForm from "@/components/forms/ConsultationBookingForm";
 import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import {
+  consultationsService,
+  paymentsService,
+  type ConsultType,
+} from "@/lib/api";
+import {
+  BookOpen,
+  Building,
+  FileCheck,
+  Heart,
+  Landmark,
+  Monitor,
   Shield,
   TrendingUp,
-  FileCheck,
-  Users,
-  BookOpen,
-  Monitor,
-  Building,
-  Heart,
   Truck,
-  Landmark,
+  Users,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Fragment, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import ConsultationBookingForm from "@/components/forms/ConsultationBookingForm";
-import BrochureDownload from "@/components/forms/BrochureDownload";
-import { consultationsService } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function Consultancy() {
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
@@ -62,14 +66,17 @@ export default function Consultancy() {
       const consultationData = {
         full_name: paymentData.full_name,
         phone: paymentData.phone,
-        consult_type: paymentData.consult_type as "Online" | "Physical",
-        date: paymentData.date,
-        time: paymentData.time,
+        email: (formData.get("email") as string) || "", // Add email field, fallback to empty string if not provided
+        organization: (formData.get("organization") as string) || "", // Add organization field, fallback to empty string if not provided
+        consult_type: "General Consultation" as ConsultType,
+        preferred_date: paymentData.date,
+        preferred_time: paymentData.time,
+        consultationDate: paymentData.date, // Required field for ConsultationData
+        consultationTime: paymentData.time, // Required field for ConsultationData
         message: `M-PESA consultation booking - Amount: KES ${paymentData.amount}`,
-        serviceType: "mpesa-consultation",
         status: "PENDING",
       };
-      
+
       console.log("📋 Sending consultation data to API:", consultationData);
       const consultationResult = await consultationsService.createConsultation(
         consultationData
@@ -82,19 +89,56 @@ export default function Consultancy() {
         );
       }
 
-      // Simulate M-PESA payment (replace with actual M-PESA integration)
-      console.log("💳 Processing M-PESA payment...", {
-        ...paymentData,
+      // Create payment record for M-PESA
+      const paymentRecord = {
+        amount: paymentData.amount,
+        currency: "KES",
+        paymentMethod: "M-PESA",
+        paymentProvider: "Safaricom",
+        transactionId: `MPESA-${Date.now()}`,
+        reference: `CONS-${consultationResult.data?.id || Date.now()}`,
+        status: "PENDING",
+        customerEmail: (formData.get("email") as string) || "",
+        customerPhone: paymentData.phone,
+        customerName: paymentData.full_name,
+        description: `M-PESA consultation booking - ${paymentData.consult_type}`,
         consultationId: consultationResult.data?.id,
-        type: "mpesa-consultation",
-      });
+        metadata: {
+          consultationType: paymentData.consult_type,
+          date: paymentData.date,
+          time: paymentData.time,
+          serviceType: "consultation",
+        },
+      };
 
+      console.log("💳 Creating payment record:", paymentRecord);
+      const paymentResult = await paymentsService.createPayment(paymentRecord);
+      console.log("💳 Payment record created:", paymentResult);
+
+      // Simulate M-PESA payment (replace with actual M-PESA integration)
       toast({
         title: "M-PESA Payment Initiated",
         description: `Payment request sent to ${paymentData.phone}. Please check your phone and enter your M-PESA PIN to complete the payment.`,
       });
 
-      setTimeout(() => {
+      setTimeout(async () => {
+        // Update payment status to completed after simulated success
+        if (paymentResult.success && paymentResult.data?.id) {
+          try {
+            await paymentsService.processPayment(
+              paymentResult.data.id.toString(),
+              {
+                status: "COMPLETED",
+                transactionId: `MPESA-SUCCESS-${Date.now()}`,
+                completedAt: new Date().toISOString(),
+              }
+            );
+            console.log("💳 Payment status updated to COMPLETED");
+          } catch (error) {
+            console.error("Failed to update payment status:", error);
+          }
+        }
+
         toast({
           title: "Payment Successful!",
           description:
@@ -126,11 +170,14 @@ export default function Consultancy() {
       const projectData = {
         full_name: formData.get("projName") as string,
         phone: formData.get("projPhone") as string,
-        consult_type: "Online" as const, // Default to Online for project consultations
-        date: new Date().toISOString().split("T")[0], // Today's date as default
-        time: new Date().toTimeString().split(" ")[0], // Current time as default
+        email: (formData.get("projEmail") as string) || "",
+        organization: (formData.get("projOrganization") as string) || "",
+        consult_type: "General Consultation" as ConsultType,
+        preferred_date: new Date().toISOString().split("T")[0],
+        preferred_time: new Date().toTimeString().split(" ")[0],
+        consultationDate: new Date().toISOString().split("T")[0], // Required field
+        consultationTime: new Date().toTimeString().split(" ")[0], // Required field
         message: formData.get("projDesc") as string,
-        serviceType: "project-based-consultation",
         status: "PENDING",
       };
 
@@ -418,8 +465,7 @@ export default function Consultancy() {
               ].map((service, index) => (
                 <Card
                   key={index}
-                  className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                >
+                  className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                   <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                     <div className="text-primary">{service.icon}</div>
                   </div>
@@ -441,14 +487,12 @@ export default function Consultancy() {
                     open={openServiceIdx === index}
                     onOpenChange={(open) =>
                       setOpenServiceIdx(open ? index : null)
-                    }
-                  >
+                    }>
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
                         className="w-full"
-                        aria-label={`Learn more about ${service.title}`}
-                      >
+                        aria-label={`Learn more about ${service.title}`}>
                         Learn More
                       </Button>
                     </DialogTrigger>
@@ -499,8 +543,7 @@ export default function Consultancy() {
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="text-xs mr-1 mb-1"
-                  >
+                    className="text-xs mr-1 mb-1">
                     {product}
                   </Badge>
                 ))}
@@ -666,8 +709,7 @@ export default function Consultancy() {
               ].map((industry, index) => (
                 <Card
                   key={index}
-                  className="p-6 hover:shadow-lg transition-all duration-300"
-                >
+                  className="p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="bg-primary/10 rounded-lg w-12 h-12 flex items-center justify-center mr-4">
                       <div className="text-primary">{industry.icon}</div>
@@ -681,8 +723,7 @@ export default function Consultancy() {
                       <Badge
                         key={idx}
                         variant="secondary"
-                        className="text-xs mr-1 mb-1"
-                      >
+                        className="text-xs mr-1 mb-1">
                         {specialty}
                       </Badge>
                     ))}
@@ -700,8 +741,7 @@ export default function Consultancy() {
               <Button
                 variant="outline"
                 size="lg"
-                className="px-8 py-3 mt-4 border-gold text-gold font-bold"
-              >
+                className="px-8 py-3 mt-4 border-gold text-gold font-bold">
                 Request Project-Based Consultation
               </Button>
             </DialogTrigger>
@@ -711,8 +751,7 @@ export default function Consultancy() {
               </h3>
               <form
                 className="space-y-4"
-                onSubmit={handleProjectConsultationSubmit}
-              >
+                onSubmit={handleProjectConsultationSubmit}>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="projName">Full Name</Label>
@@ -769,14 +808,111 @@ export default function Consultancy() {
                 <Button
                   size="lg"
                   className="w-full bg-gold text-primary font-bold"
-                  type="submit"
-                >
+                  type="submit">
                   Submit Request
                 </Button>
               </form>
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Payment Information Section */}
+        <section className="py-12 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 rounded-xl shadow-lg border-2 border-primary/20">
+              <h2 className="text-2xl font-bold mb-6 text-center text-primary">
+                Alternative Payment Methods
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* M-PESA Paybill */}
+                <Card className="p-6 bg-gradient-to-br from-accent/5 to-primary/5 border-accent/30 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="bg-accent/20 p-2 rounded-lg mr-3">
+                        <Monitor className="w-6 h-6 text-accent" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-primary">
+                          M-PESA Paybill
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Recommended
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3 bg-card p-4 rounded-lg">
+                    <div className="flex justify-between items-center pb-2 border-b">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Paybill Number
+                      </span>
+                      <span className="text-lg font-bold font-mono text-primary">
+                        880100
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Account Number
+                      </span>
+                      <span className="text-lg font-bold font-mono text-primary">
+                        203282
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-accent/10 rounded-lg">
+                    <p className="text-xs text-center font-medium">
+                      GALLOWAY INSURANCE AGENCIES
+                    </p>
+                  </div>
+                </Card>
+
+                {/* M-PESA Buy Goods (Till) */}
+                <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/30 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="bg-primary/20 p-2 rounded-lg mr-3">
+                        <Landmark className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-primary">
+                          M-PESA Buy Goods
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          Till Number
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3 bg-card p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Till Number
+                      </span>
+                      <span className="text-lg font-bold font-mono text-primary">
+                        6203056
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-primary/10 rounded-lg">
+                    <p className="text-xs text-center font-medium">
+                      GALLOWAY INSURANCE AGENCIES
+                    </p>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                <p className="text-sm text-muted-foreground text-center">
+                  <strong>Note:</strong> After making payment through any of the
+                  above methods, please keep your transaction reference for
+                  confirmation. You can also proceed with the automated M-PESA
+                  STK Push below for instant payment processing.
+                </p>
+              </div>
+            </Card>
+          </div>
+        </section>
+
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 rounded-xl shadow-lg border-2 border-primary">
@@ -833,9 +969,9 @@ export default function Consultancy() {
                   <select
                     id="consultType"
                     name="consultType"
+                    title="Select consultation type"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    required
-                  >
+                    required>
                     <option value="">Select type</option>
                     <option value="Online">Online</option>
                     <option value="Physical">Physical</option>
@@ -855,8 +991,7 @@ export default function Consultancy() {
                   size="lg"
                   className="w-full bg-gold text-primary font-bold"
                   type="submit"
-                  disabled={isPaymentLoading}
-                >
+                  disabled={isPaymentLoading}>
                   {isPaymentLoading
                     ? "Processing M-PESA Payment..."
                     : "Pay & Book via M-PESA"}

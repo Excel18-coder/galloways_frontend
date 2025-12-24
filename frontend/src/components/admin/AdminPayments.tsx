@@ -19,7 +19,7 @@ import {
   DollarSign,
   TrendingUp
 } from "lucide-react";
-// API import disabled for build
+import { adminService } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
 export function AdminPayments() {
@@ -39,14 +39,14 @@ export function AdminPayments() {
   const fetchPayments = async () => {
     try {
       setLoading(true);
-      const result = await console.log(currentPage, 20);
+      const result = await adminService.getAllPayments(currentPage, 20);
       
-      if (result.success) {
-        let filteredPayments = result.data;
+      if (result.success && result.data) {
+        let filteredPayments = result.data.data || [];
         
         // Apply search filter if search term exists
         if (search.trim()) {
-          filteredPayments = result.data.filter((payment: any) =>
+          filteredPayments = filteredPayments.filter((payment: any) =>
             payment.reference?.toLowerCase().includes(search.toLowerCase()) ||
             payment.amount?.toString().includes(search) ||
             payment.status?.toLowerCase().includes(search.toLowerCase())
@@ -54,8 +54,8 @@ export function AdminPayments() {
         }
         
         setPayments(filteredPayments);
-        // Calculate total pages based on count
-        setTotalPages(Math.ceil((result.count || 0) / 20));
+        // Calculate total pages based on pagination
+        setTotalPages(result.data.pagination?.totalPages || 1);
       }
     } catch (error) {
       console.error('Failed to fetch payments:', error);
@@ -66,7 +66,7 @@ export function AdminPayments() {
 
   const fetchPaymentStats = async () => {
     try {
-      const result = await console.log();
+      const result = await adminService.getPaymentStats();
       
       if (result.success) {
         setPaymentStats(result.data);
@@ -180,7 +180,7 @@ export function AdminPayments() {
             <TableBody>
               {payments.map((payment) => (
                 <TableRow key={payment.id}>
-                  <TableCell className="font-mono text-sm">{payment.transactionId}</TableCell>
+                  <TableCell className="font-mono text-sm">{payment.transactionId || payment.reference}</TableCell>
                   <TableCell>
                     {payment.user ? (
                       <div>
@@ -188,16 +188,19 @@ export function AdminPayments() {
                         <div className="text-sm text-gray-500">{payment.user.email}</div>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-500">{payment.email}</div>
+                      <div>
+                        <div className="font-medium">{payment.customerName}</div>
+                        <div className="text-sm text-gray-500">{payment.customerEmail}</div>
+                      </div>
                     )}
                   </TableCell>
-                  <TableCell>KES {payment.amount.toLocaleString()}</TableCell>
+                  <TableCell>{payment.currency} {payment.amount?.toLocaleString()}</TableCell>
                   <TableCell>
                     <Badge className={getStatusBadgeColor(payment.status)}>
                       {payment.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{payment.method || 'N/A'}</TableCell>
+                  <TableCell>{payment.paymentMethod || payment.method || 'N/A'}</TableCell>
                   <TableCell>{new Date(payment.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Button variant="outline" size="sm">

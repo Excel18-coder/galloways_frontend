@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { ArrowRight, Shield, TrendingUp, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -11,34 +11,35 @@ const HeroSection = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                Manage risk, arrange 
-                <span className="text-accent"> insurance solutions</span> tailored to customers' needs
+                Manage risk, arrange
+                <span className="text-accent"> insurance solutions</span>{" "}
+                tailored to customers' needs
               </h1>
               <p className="text-xl md:text-2xl opacity-90 leading-relaxed">
-                Professional insurance agency and consultancy services with our trusted business partners
+                Professional insurance agency and consultancy services with our
+                trusted business partners
+              </p>
+              <p className="text-lg md:text-xl font-semibold text-accent italic">
+                "Protecting Dreams and Preserving Wealth"
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold px-8 py-4 text-lg"
-                asChild
-              >
+                asChild>
                 <Link to="/quotes">
                   Get a Quote
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
+                size="lg"
+                variant="outline"
                 className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary font-semibold px-8 py-4 text-lg"
-                asChild
-              >
-                <Link to="/consultancy">
-                  Book Consultation
-                </Link>
+                asChild>
+                <Link to="/consultancy">Book Consultation</Link>
               </Button>
             </div>
 
@@ -60,7 +61,9 @@ const HeroSection = () => {
                 <div className="flex justify-center mb-2">
                   <TrendingUp className="h-8 w-8 text-accent" />
                 </div>
-                <div className="text-sm opacity-90">99% Client Satisfaction</div>
+                <div className="text-sm opacity-90">
+                  99% Client Satisfaction
+                </div>
               </div>
             </div>
           </div>

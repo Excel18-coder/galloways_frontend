@@ -14,23 +14,51 @@ import {
   AdminSettings,
   AdminClaims,
   AdminConsultations,
+  AdminResources,
+  AdminLogin,
 } from "../components/admin";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Auto-access, no login required
+  // Check authentication status
   useEffect(() => {
-    console.log("Admin dashboard loaded");
+    const checkAuth = () => {
+      const authStatus = localStorage.getItem("admin_authenticated");
+      const loginTime = localStorage.getItem("admin_login_time");
+      
+      // Check if admin is authenticated and session is still valid (24 hours)
+      if (authStatus === "true" && loginTime) {
+        const loginDate = new Date(loginTime);
+        const now = new Date();
+        const hoursDiff = (now.getTime() - loginDate.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 24) {
+          setIsAuthenticated(true);
+          localStorage.setItem("admin_token", "admin-access-token");
+          console.log("Admin access restored from session");
+        } else {
+          // Session expired
+          localStorage.removeItem("admin_authenticated");
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_login_time");
+          setIsAuthenticated(false);
+        }
+      }
+      setIsLoading(false);
+    };
 
-    // Set admin token for API calls
-    localStorage.setItem("admin_token", "admin-access-token");
-
-    // Note: Using Supabase for authentication, no token needed for API
-    console.log("Admin access configured");
+    checkAuth();
   }, []);
+
+  // Handle successful login
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   // Enhanced tab switching with smooth transitions
   const handleTabSwitch = (newTab: string) => {
@@ -60,6 +88,8 @@ export default function Admin() {
         return <AdminNotifications />;
       case "analytics":
         return <AdminAnalytics />;
+      case "resources":
+        return <AdminResources />;
       case "settings":
         return <AdminSettings />;
       case "quotes":
@@ -72,6 +102,23 @@ export default function Admin() {
         return <AdminDashboard />;
     }
   };
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p>Loading admin portal...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 overflow-hidden">

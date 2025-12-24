@@ -17,8 +17,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { Roles } from '../auth/decorators';
-import { RolesGuard } from '../auth/guards';
+import * as http from 'http';
+import * as https from 'https';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guards';
 import { AtGuard } from '../auth/token/token.guard';
 import { Role } from '../users/entities/user.entity';
 import { ResourcesService } from './resources.service';
@@ -28,6 +30,61 @@ import { ResourcesService } from './resources.service';
 @ApiBearerAuth()
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
+
+  private proxyFileToResponse(
+    url: string,
+    res: Response,
+    redirectsLeft = 5,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        const client = url.startsWith('https://') ? https : http;
+        const req = client.get(url, (fileRes) => {
+          const statusCode = fileRes.statusCode || 0;
+
+          if (
+            [301, 302, 303, 307, 308].includes(statusCode) &&
+            fileRes.headers.location &&
+            redirectsLeft > 0
+          ) {
+            const nextUrl = new URL(fileRes.headers.location, url).toString();
+            fileRes.resume();
+            this.proxyFileToResponse(nextUrl, res, redirectsLeft - 1)
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
+
+          if (statusCode >= 400) {
+            fileRes.resume();
+            reject(new Error(`Upstream file request failed (${statusCode})`));
+            return;
+          }
+
+          const upstreamContentLength = fileRes.headers['content-length'];
+          if (upstreamContentLength && !res.getHeader('Content-Length')) {
+            res.setHeader('Content-Length', upstreamContentLength);
+          }
+
+          fileRes.on('error', reject);
+          res.on('close', () => {
+            try {
+              fileRes.destroy();
+            } catch {
+              // ignore
+            }
+          });
+
+          fileRes.pipe(res);
+          fileRes.on('end', () => resolve());
+        });
+
+        req.on('error', reject);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -122,22 +179,35 @@ export class ResourcesController {
   }
 
   @Get(':id/download')
-  async downloadResource(@Param('id') id: string) {
+  async downloadResource(@Param('id') id: string, @Res() res: Response) {
     try {
       const resource = await this.resourcesService.getResourceById(id);
       await this.resourcesService.incrementDownloads(id);
 
-      return {
-        success: true,
-        data: resource,
-        statusCode: HttpStatus.OK,
-      };
+      const isPdf = (resource.fileType || '').toLowerCase().includes('pdf');
+      const safeName =
+        resource.originalName || resource.filename || `resource-${id}`;
+      const filename =
+        isPdf && !safeName.toLowerCase().endsWith('.pdf')
+          ? `${safeName}.pdf`
+          : safeName;
+
+      res.setHeader(
+        'Content-Type',
+        resource.fileType || 'application/octet-stream',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${filename}"`,
+      );
+
+      await this.proxyFileToResponse(resource.url, res);
     } catch (error) {
-      return {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: error.message || 'Failed to download resource',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      };
+      });
     }
   }
 
@@ -166,7 +236,7 @@ export class ResourcesController {
   @Roles(Role.ADMIN)
   async listTemplates() {
     try {
-      const templates = await this.resourcesService.getAvailableTemplates();
+      const templates = await this.resourcesService.listTemplates();
       return {
         success: true,
         data: templates,
@@ -192,11 +262,11 @@ export class ResourcesController {
       const templateContent =
         await this.resourcesService.getTemplate(templateName);
 
-      res.setHeader('Content-Type', 'text/html');
-      res.setHeader(
-        'Content-Disposition',
-        `inline; filename="${templateName}"`,
-      );
+      const contentType = templateName.endsWith('.pdf')
+        ? 'application/pdf'
+        : 'text/html';
+
+      res.setHeader('Content-Type', contentType);
       res.send(templateContent);
     } catch (error) {
       res.status(HttpStatus.NOT_FOUND).json({
@@ -215,22 +285,21 @@ export class ResourcesController {
     @Res() res: Response,
   ) {
     try {
-      const templateContent =
-        await this.resourcesService.getTemplate(templateName);
+      // Convert HTML template to PDF
+      const pdfBuffer =
+        await this.resourcesService.convertTemplateToPdf(templateName);
 
-      // Determine content type based on file extension
-      const contentType = templateName.endsWith('.pdf') 
-        ? 'application/pdf' 
-        : 'text/html';
-      
-      res.setHeader('Content-Type', contentType);
+      // Generate PDF filename
+      const pdfFilename = templateName.replace('.html', '.pdf');
+
+      res.setHeader('Content-Type', 'application/pdf');
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename="${templateName}"`,
+        `attachment; filename="${pdfFilename}"`,
       );
-      
-      // Send buffer directly for PDFs, string for HTML
-      res.send(templateContent);
+      res.setHeader('Content-Length', pdfBuffer.length.toString());
+
+      res.send(pdfBuffer);
     } catch (error) {
       res.status(HttpStatus.NOT_FOUND).json({
         success: false,
