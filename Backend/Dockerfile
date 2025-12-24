@@ -5,7 +5,7 @@
 
     WORKDIR /app
 
-    COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+    COPY package.json pnpm-lock.yaml ./
     RUN pnpm install --no-frozen-lockfile
 
     COPY . .
@@ -18,7 +18,7 @@
 
     WORKDIR /app
 
-    COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+    COPY package.json pnpm-lock.yaml ./
     RUN pnpm install --no-frozen-lockfile --prod
 
     COPY --from=builder /app/dist ./dist
