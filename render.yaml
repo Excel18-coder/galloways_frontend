@@ -1,13 +1,13 @@
 services:
   - type: web
     name: galloways-backend
-    env: docker
-    rootDir: Backend
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    runtime: node
     region: oregon
     plan: free
     branch: main
+    rootDir: Backend
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    startCommand: npm run start:prod
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
