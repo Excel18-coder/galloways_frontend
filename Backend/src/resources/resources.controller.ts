@@ -31,6 +31,11 @@ import { ResourcesService } from './resources.service';
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
+  private isUpstreamAuthFailure(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.includes('(401)') || message.includes('(403)');
+  }
+
   private proxyFileToResponse(
     url: string,
     res: Response,
@@ -201,11 +206,24 @@ export class ResourcesController {
         `attachment; filename="${filename}"`,
       );
 
-      await this.proxyFileToResponse(resource.url, res);
+      try {
+        await this.proxyFileToResponse(resource.url, res);
+      } catch (error) {
+        if (this.isUpstreamAuthFailure(error) && resource.publicId) {
+          const signedUrl =
+            this.resourcesService.getCloudinaryDownloadUrl(resource);
+          if (signedUrl) {
+            await this.proxyFileToResponse(signedUrl, res);
+            return;
+          }
+        }
+        throw error;
+      }
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: error.message || 'Failed to download resource',
+        message: message || 'Failed to download resource',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       });
     }

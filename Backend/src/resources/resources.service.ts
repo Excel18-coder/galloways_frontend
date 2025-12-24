@@ -15,6 +15,17 @@ export class ResourcesService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  getCloudinaryDownloadUrl(resource: Resource): string | null {
+    if (!resource.publicId) return null;
+
+    return this.cloudinaryService.getPrivateDownloadUrl({
+      publicId: resource.publicId,
+      originalName: resource.originalName || resource.filename,
+      url: resource.url,
+      mimeType: resource.fileType,
+    });
+  }
+
   async uploadResource(
     file: Express.Multer.File,
     category: string,

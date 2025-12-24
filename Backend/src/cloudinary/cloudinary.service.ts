@@ -26,6 +26,63 @@ export class CloudinaryService {
     });
   }
 
+  private inferFormat(fileNameOrUrl?: string, mimeType?: string): string {
+    const fromName = (fileNameOrUrl ?? '').split('?')[0].split('#')[0];
+    const lastDot = fromName.lastIndexOf('.');
+    if (lastDot >= 0 && lastDot < fromName.length - 1) {
+      const ext = fromName.slice(lastDot + 1).toLowerCase();
+      if (/^[a-z0-9]{1,10}$/.test(ext)) return ext;
+    }
+
+    const lowerMime = (mimeType ?? '').toLowerCase();
+    if (lowerMime.includes('pdf')) return 'pdf';
+    if (lowerMime.startsWith('image/')) return lowerMime.split('/')[1] || 'jpg';
+    if (lowerMime.startsWith('video/')) return lowerMime.split('/')[1] || 'mp4';
+    return 'bin';
+  }
+
+  private inferResourceType(mimeType?: string): 'image' | 'video' | 'raw' {
+    const lowerMime = (mimeType ?? '').toLowerCase();
+    if (lowerMime.includes('pdf')) return 'image';
+    if (lowerMime.startsWith('image/')) return 'image';
+    if (lowerMime.startsWith('video/')) return 'video';
+    return 'raw';
+  }
+
+  private inferDeliveryTypeFromUrl(
+    url?: string,
+  ): 'upload' | 'private' | 'authenticated' {
+    const lowerUrl = (url ?? '').toLowerCase();
+    if (lowerUrl.includes('/authenticated/')) return 'authenticated';
+    if (lowerUrl.includes('/private/')) return 'private';
+    return 'upload';
+  }
+
+  getPrivateDownloadUrl(options: {
+    publicId: string;
+    originalName?: string;
+    url?: string;
+    mimeType?: string;
+    expiresInSeconds?: number;
+  }): string {
+    const format = this.inferFormat(
+      options.originalName || options.url,
+      options.mimeType,
+    );
+    const resourceType = this.inferResourceType(options.mimeType);
+    const type = this.inferDeliveryTypeFromUrl(options.url);
+
+    const expiresAt =
+      Math.floor(Date.now() / 1000) + (options.expiresInSeconds ?? 60 * 60);
+
+    return cloudinary.utils.private_download_url(options.publicId, format, {
+      resource_type: resourceType,
+      type,
+      expires_at: expiresAt,
+      attachment: true,
+    });
+  }
+
   async uploadFile(file: Express.Multer.File): Promise<UploadedDocument> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
