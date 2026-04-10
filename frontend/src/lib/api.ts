@@ -809,8 +809,6 @@ const resourcesService = {
       throw new Error(error.message || "Failed to download template");
     }
   },
-    }
-  },
 
   updateTemplate: async (
     templateName: string,
