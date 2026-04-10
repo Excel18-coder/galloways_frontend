@@ -107,6 +107,34 @@ export class ResourcesController {
       };
     }
 
+    // Validate category
+    if (!category || category.trim().length === 0) {
+      return {
+        success: false,
+        message: 'Category is required',
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+
+    // Validate file size (max 50MB)
+    const maxFileSize = 50 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      return {
+        success: false,
+        message: `File size exceeds maximum limit of 50MB. Received: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+
+    // Validate file name
+    if (!file.originalname || file.originalname.trim().length === 0) {
+      return {
+        success: false,
+        message: 'Invalid file name',
+        statusCode: HttpStatus.BAD_REQUEST,
+      };
+    }
+
     try {
       const resource = await this.resourcesService.uploadResource(
         file,
@@ -121,9 +149,10 @@ export class ResourcesController {
         statusCode: HttpStatus.CREATED,
       };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload resource';
       return {
         success: false,
-        message: error.message || 'Failed to upload resource',
+        message: errorMessage,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       };
     }
@@ -257,13 +286,16 @@ export class ResourcesController {
       const templates = await this.resourcesService.listTemplates();
       return {
         success: true,
-        data: templates,
+        data: templates || [],
+        message: `Found ${templates?.length || 0} templates`,
         statusCode: HttpStatus.OK,
       };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch templates';
       return {
         success: false,
-        message: error.message || 'Failed to fetch templates',
+        message: errorMessage,
+        data: [],
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       };
     }
@@ -303,6 +335,15 @@ export class ResourcesController {
     @Res() res: Response,
   ) {
     try {
+      // Validate template name to prevent path traversal
+      if (templateName.includes('..') || templateName.includes('/')) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          success: false,
+          message: 'Invalid template name',
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+      }
+
       // Convert HTML template to PDF
       const pdfBuffer =
         await this.resourcesService.convertTemplateToPdf(templateName);
@@ -316,13 +357,19 @@ export class ResourcesController {
         `attachment; filename="${pdfFilename}"`,
       );
       res.setHeader('Content-Length', pdfBuffer.length.toString());
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
       res.send(pdfBuffer);
     } catch (error) {
-      res.status(HttpStatus.NOT_FOUND).json({
+      const errorMessage = error instanceof Error ? error.message : 'Template not found';
+      const statusCode = errorMessage.includes('not found') 
+        ? HttpStatus.NOT_FOUND 
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+      
+      res.status(statusCode).json({
         success: false,
-        message: error.message || 'Template not found',
-        statusCode: HttpStatus.NOT_FOUND,
+        message: errorMessage,
+        statusCode,
       });
     }
   }

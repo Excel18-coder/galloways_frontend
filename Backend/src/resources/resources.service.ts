@@ -182,76 +182,94 @@ export class ResourcesService {
   }
 
   async convertTemplateToPdf(templateName: string): Promise<Buffer> {
-    const htmlContent = await this.getTemplate(templateName);
-    const htmlString =
-      typeof htmlContent === 'string'
-        ? htmlContent
-        : htmlContent.toString('utf-8');
+    try {
+      const htmlContent = await this.getTemplate(templateName);
+      const htmlString =
+        typeof htmlContent === 'string'
+          ? htmlContent
+          : htmlContent.toString('utf-8');
 
-    return new Promise((resolve, reject) => {
-      try {
-        const doc = new PDFDocument({
-          size: 'A4',
-          margin: 50,
-          bufferPages: true,
-        });
-
-        const chunks: Buffer[] = [];
-
-        doc.on('data', (chunk) => chunks.push(chunk));
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-        doc.on('error', reject);
-
-        // Extract text content from HTML (simple parsing)
-        const textContent = htmlString
-          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-          .replace(/<br\s*\/?>/gi, '\n')
-          .replace(/<\/p>/gi, '\n\n')
-          .replace(/<\/div>/gi, '\n')
-          .replace(/<\/h[1-6]>/gi, '\n\n')
-          .replace(/<[^>]+>/g, '')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '"')
-          .trim();
-
-        // Extract title if present
-        const titleMatch = htmlString.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-        const title = titleMatch
-          ? titleMatch[1].trim()
-          : templateName.replace('.html', '');
-
-        // Add title
-        doc
-          .fontSize(20)
-          .font('Helvetica-Bold')
-          .text(title, { align: 'center' });
-        doc.moveDown(2);
-
-        // Add content
-        doc.fontSize(12).font('Helvetica').text(textContent, {
-          align: 'left',
-          lineGap: 5,
-        });
-
-        // Add footer with page numbers
-        const pages = doc.bufferedPageRange();
-        for (let i = 0; i < pages.count; i++) {
-          doc.switchToPage(i);
-          doc
-            .fontSize(10)
-            .text(`Page ${i + 1} of ${pages.count}`, 50, doc.page.height - 50, {
-              align: 'center',
-            });
-        }
-
-        doc.end();
-      } catch (error) {
-        reject(error);
+      if (!htmlString || htmlString.trim().length === 0) {
+        throw new Error('Template content is empty');
       }
-    });
+
+      return new Promise((resolve, reject) => {
+        try {
+          const doc = new PDFDocument({
+            size: 'A4',
+            margin: 50,
+            bufferPages: true,
+          });
+
+          const chunks: Buffer[] = [];
+          let hasError = false;
+
+          doc.on('data', (chunk) => chunks.push(chunk));
+          doc.on('end', () => {
+            if (!hasError) {
+              resolve(Buffer.concat(chunks));
+            }
+          });
+          doc.on('error', (err) => {
+            hasError = true;
+            reject(new Error(`PDF generation error: ${err.message}`));
+          });
+
+          // Extract text content from HTML (simple parsing)
+          const textContent = htmlString
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<\/p>/gi, '\n\n')
+            .replace(/<\/div>/gi, '\n')
+            .replace(/<\/h[1-6]>/gi, '\n\n')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .trim();
+
+          // Extract title if present
+          const titleMatch = htmlString.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+          const title = titleMatch
+            ? titleMatch[1].trim()
+            : templateName.replace('.html', '');
+
+          // Add title
+          doc
+            .fontSize(20)
+            .font('Helvetica-Bold')
+            .text(title || 'Document', { align: 'center' });
+          doc.moveDown(2);
+
+          // Add content
+          if (textContent) {
+            doc.fontSize(12).font('Helvetica').text(textContent, {
+              align: 'left',
+              lineGap: 5,
+            });
+          }
+
+          // Add footer with page numbers
+          const pages = doc.bufferedPageRange();
+          for (let i = 0; i < pages.count; i++) {
+            doc.switchToPage(i);
+            doc
+              .fontSize(10)
+              .text(`Page ${i + 1} of ${pages.count}`, 50, doc.page.height - 50, {
+                align: 'center',
+              });
+          }
+
+          doc.end();
+        } catch (error) {
+          reject(new Error(`PDF creation error: ${error instanceof Error ? error.message : String(error)}`));
+        }
+      });
+    } catch (error) {
+      throw new Error(`Failed to convert template to PDF: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 }

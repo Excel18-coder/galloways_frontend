@@ -142,6 +142,7 @@ export function AdminResources() {
   // Templates state
   const [templates, setTemplates] = useState<any[]>([]);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchResources();
@@ -231,18 +232,27 @@ export function AdminResources() {
   };
 
   const handleTemplateDownload = async (templateName: string) => {
+    setDownloading(templateName);
     try {
       await resourcesService.downloadTemplate(templateName);
       toast.success("Template downloaded successfully!");
     } catch (error) {
       console.error("Template download error:", error);
-      toast.error("Failed to download template");
+      const errorMessage = error instanceof Error ? error.message : "Failed to download template";
+      toast.error(errorMessage);
+    } finally {
+      setDownloading(null);
     }
   };
 
   const handleFileUpload = async () => {
     if (!selectedFile) {
       toast.error("Please select a file to upload");
+      return;
+    }
+
+    if (!uploadCategory) {
+      toast.error("Please select a category");
       return;
     }
 
@@ -277,20 +287,25 @@ export function AdminResources() {
             fetchResources();
             fetchStats();
           } else {
-            toast.error(
-              "Upload failed: " + (response.message || "Unknown error")
-            );
+            const errorMessage = response.message || "Upload failed";
+            toast.error(errorMessage);
           }
         } catch (parseError) {
           console.error("Failed to parse response:", parseError);
-          toast.error("Upload failed: Invalid response");
+          toast.error("Upload failed: Invalid response from server");
         }
         setIsUploading(false);
         setUploadProgress(0);
       });
 
       xhr.addEventListener("error", () => {
-        toast.error("Upload failed: Network error");
+        toast.error("Upload failed: Network error. Please check your connection.");
+        setIsUploading(false);
+        setUploadProgress(0);
+      });
+
+      xhr.addEventListener("abort", () => {
+        toast.error("Upload was cancelled");
         setIsUploading(false);
         setUploadProgress(0);
       });
@@ -308,6 +323,8 @@ export function AdminResources() {
       xhr.send(formData);
     } catch (error) {
       console.error("Upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Upload failed";
+      toast.error(errorMessage);
       toast.error("Upload failed");
       setIsUploading(false);
       setUploadProgress(0);
@@ -702,9 +719,19 @@ export function AdminResources() {
                         onClick={() => handleTemplateDownload(template.name)}
                         className="w-full"
                         size="sm"
-                        variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download PDF
+                        variant="outline"
+                        disabled={downloading === template.name}>
+                        {downloading === template.name ? (
+                          <>
+                            <div className="w-4 h-4 mr-2 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                            Downloading...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4 mr-2" />
+                            Download PDF
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>

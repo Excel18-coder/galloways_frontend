@@ -762,7 +762,16 @@ const resourcesService = {
       );
 
       if (!response.ok) {
-        throw new Error(`Download failed: ${response.statusText}`);
+        let errorMessage = `Download failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch {
+          // If response is not JSON, use status text
+        }
+        throw new Error(errorMessage);
       }
 
       // Get filename from Content-Disposition header or use template name
@@ -778,6 +787,12 @@ const resourcesService = {
 
       // Create blob and trigger download
       const blob = await response.blob();
+      
+      // Validate blob size
+      if (blob.size === 0) {
+        throw new Error("Downloaded file is empty. Template may be invalid.");
+      }
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -785,9 +800,15 @@ const resourcesService = {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      
+      // Clean up after a delay to allow download to start
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 100);
     } catch (error: any) {
       throw new Error(error.message || "Failed to download template");
+    }
+  },
     }
   },
 
