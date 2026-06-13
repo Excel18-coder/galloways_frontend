@@ -12,6 +12,8 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { ClaimsService } from './claims.service';
 import { CreateClaimDto } from './dto/create-claim.dto';
@@ -34,10 +36,12 @@ interface ApiResponse<T = any> {
 @Controller('claims')
 @ApiBearerAuth()
 export class ClaimsController {
+  private readonly logger = new Logger(ClaimsController.name);
+
   constructor(
     private readonly claimsService: ClaimsService,
     private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   @Post()
   @ApiConsumes('multipart/form-data')
@@ -108,8 +112,8 @@ export class ClaimsController {
           public_id: result.public_id,
         }));
       } catch (error) {
-        console.error('File upload error:', error);
-        throw new Error('Failed to upload files');
+        this.logger.error('File upload error:', error);
+        throw new InternalServerErrorException('Failed to upload supporting documents to Cloudinary');
       }
     }
 

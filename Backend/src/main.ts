@@ -1,8 +1,8 @@
-import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import helmet from 'helmet';
 import { join } from 'path';
@@ -12,41 +12,65 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { UsersModule } from './users/users.module';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-  // Enable CORS early with proper configuration
+  const configService = app.get(ConfigService);
+
+  // Enable CORS with detailed logging and robust matching
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow all origins in development or if origin is not provided (like curl)
-      if (!origin || process.env.NODE_ENV !== 'production') {
+      const isDevelopment = process.env.NODE_ENV !== 'production';
+
+      // Allow if no origin (like mobile apps or curl)
+      if (!origin) {
         callback(null, true);
         return;
       }
 
-      // List of allowed domains in production
-      const allowedOrigins = [
+      const rawAllowedOrigins = configService.get<string>('ALLOWED_ORIGINS') || '';
+      const envAllowedOrigins = rawAllowedOrigins.split(',').map(o => o.trim()).filter(o => o);
+
+      const defaultAllowedOrigins = [
         'https://galloways.onrender.com',
         'http://localhost:5173',
         'http://localhost:3000',
         /\.onrender\.com$/,
+        /\.vercel\.app$/,
       ];
 
-      const isAllowed = allowedOrigins.some((allowed) => {
+      const allAllowedOrigins = [...defaultAllowedOrigins, ...envAllowedOrigins];
+
+      const isAllowed = allAllowedOrigins.some((allowed) => {
         if (allowed instanceof RegExp) return allowed.test(origin);
+        if (typeof allowed === 'string' && allowed.includes('*')) {
+          const regex = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
+          return regex.test(origin);
+        }
         return allowed === origin;
       });
 
-      if (isAllowed) {
+      if (isAllowed || isDevelopment) {
+        if (isDevelopment && !isAllowed) {
+          logger.debug(`CORS: Allowing origin ${origin} in development mode`);
+        } else {
+          logger.log(`CORS: Allowed origin ${origin}`);
+        }
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        logger.warn(`CORS: Denied origin ${origin}`);
+        // Return null instead of error to avoid 500 but still deny CORS
+        callback(null, false);
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Configure body parser for large file uploads
@@ -119,7 +143,6 @@ async function bootstrap() {
 
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 
-  const configService = app.get(ConfigService);
   const PORT = configService.get('PORT') || 8000;
   await app.listen(PORT);
   console.log(`Server is running on port ${PORT}`);

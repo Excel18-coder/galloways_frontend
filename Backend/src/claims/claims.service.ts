@@ -24,14 +24,22 @@ export class ClaimsService {
     createClaimDto: CreateClaimDto,
   ): Promise<ApiResponse<Claim>> {
     try {
+      // Validate date before attempting to create
+      const incidentDate = new Date(createClaimDto.incident_date);
+      if (isNaN(incidentDate.getTime())) {
+        return {
+          success: false,
+          message: 'Invalid incident date provided',
+          error: `Could not parse date: ${createClaimDto.incident_date}`,
+        };
+      }
+
       const preparedClaim: Partial<Claim> = {
         ...createClaimDto,
-        supporting_documents: JSON.stringify(
-          createClaimDto.supporting_documents,
-        ),
-        incident_date: new Date(
-          createClaimDto.incident_date as unknown as string,
-        ),
+        supporting_documents: createClaimDto.supporting_documents
+          ? JSON.stringify(createClaimDto.supporting_documents)
+          : null,
+        incident_date: incidentDate,
         phone: String(createClaimDto.phone),
       } as Partial<Claim>;
 
@@ -43,6 +51,7 @@ export class ClaimsService {
         data: savedClaim,
       };
     } catch (error) {
+      console.error('Create Claim Service Error:', error);
       return {
         success: false,
         message: 'Failed to create claim',
