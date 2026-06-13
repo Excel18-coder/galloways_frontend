@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1").replace(/\/$/, "");
 const DEBUG = import.meta.env.VITE_DEBUG === "true" || import.meta.env.DEV;
 
 // Types
@@ -70,7 +69,17 @@ async function request<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const API_PREFIX = "/api/v1";
+
+  // Ensure we don't have double prefixes if API_BASE_URL already has it
+  const baseUrl = API_BASE_URL.endsWith(API_PREFIX)
+    ? API_BASE_URL.slice(0, -API_PREFIX.length)
+    : API_BASE_URL;
+
+  // Ensure endpoint starts with a slash
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  const url = `${baseUrl}${API_PREFIX}${cleanEndpoint}`;
 
   // Don't stringify if it's FormData
   if (!(options.body instanceof FormData)) {

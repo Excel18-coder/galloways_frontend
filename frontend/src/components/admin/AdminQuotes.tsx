@@ -238,9 +238,8 @@ export function AdminQuotes() {
 
   const updateQuoteStatus = async (quoteId: number, status: string) => {
     try {
-      const url = `${
-        import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1"
-      }/quotes/${quoteId}/status`;
+      const baseUrl = (import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1").replace(/\/$/, "");
+      const url = baseUrl.endsWith("/quotes") ? `${baseUrl}/${quoteId}/status` : `${baseUrl}/quotes/${quoteId}/status`;
 
       const response = await fetch(url, {
         method: "PUT",
@@ -291,10 +290,8 @@ export function AdminQuotes() {
       )
     ) {
       try {
-        const url = `${
-          import.meta.env.VITE_API_URL ||
-          "https://galloways.onrender.com/api/v1"
-        }/quotes/${quoteId}`;
+        const baseUrl = (import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1").replace(/\/$/, "");
+        const url = baseUrl.endsWith("/quotes") ? `${baseUrl}/${quoteId}` : `${baseUrl}/quotes/${quoteId}`;
 
         await fetch(url, {
           method: "DELETE",
@@ -756,7 +753,7 @@ export function AdminQuotes() {
                         Attached Documents
                       </Label>
                       {selectedQuote.documents &&
-                      selectedQuote.documents.length > 0 ? (
+                        selectedQuote.documents.length > 0 ? (
                         <ul className="mt-2 space-y-2">
                           {selectedQuote.documents.map((doc: any) => {
                             return (

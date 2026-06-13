@@ -37,7 +37,9 @@ function App() {
       try {
 
         // Test Laravel API connection
-        const response = await fetch(`${import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1"}/health`);
+        const apiBaseUrl = (import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1").replace(/\/$/, "");
+        const healthUrl = apiBaseUrl.endsWith("/health") ? apiBaseUrl : `${apiBaseUrl}/health`;
+        const response = await fetch(healthUrl);
         if (response.ok) {
           const data = await response.json();
         } else {
