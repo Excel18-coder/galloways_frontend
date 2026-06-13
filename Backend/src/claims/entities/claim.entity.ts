@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 export enum claimStatus {
-  PENDING = 'pending',
+  PENDING = 'pending  ',
   APPROVED = 'approved',
   REJECTED = 'rejected',
   IN_REVIEW = 'in-review',
