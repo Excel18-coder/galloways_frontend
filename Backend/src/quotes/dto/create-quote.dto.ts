@@ -51,8 +51,8 @@ export class CreateQuoteDto {
 
   // Quote Details
   @IsString()
-  @IsNotEmpty()
-  budget: string;
+  @IsOptional()
+  budget?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -67,14 +67,15 @@ export class CreateQuoteDto {
   contactMethod: string;
 
   @IsString()
-  @IsNotEmpty()
-  bestTime: string;
+  @IsOptional()
+  bestTime?: string;
 
   @IsOptional()
   documents?: any;
 
   @IsBoolean()
   @IsNotEmpty()
+  @Transform(({ value }) => value === 'true' || value === true)
   terms: boolean;
 
   @IsString()

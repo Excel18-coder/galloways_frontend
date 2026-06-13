@@ -444,8 +444,13 @@ export default function Quotes() {
       const formElement = document.querySelector("#quote-form");
       const formData = collectFormData(formElement);
 
+      const email = formData.get("email") as string;
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error("Please enter a valid email address.");
+      }
+
       // Add metadata
-      formData.append("selectedProduct", selectedProduct);
+      if (selectedProduct) formData.append("selectedProduct", selectedProduct);
       formData.append("status", isDraft ? "DRAFT" : "SUBMITTED");
       formData.append("timestamp", new Date().toISOString());
 
@@ -479,21 +484,19 @@ export default function Quotes() {
         <div className="max-w-5xl mx-auto mt-8">
           <div className="flex border-b mb-8">
             <button
-              className={`px-6 py-3 font-semibold focus:outline-none ${
-                tab === "quote"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground"
-              }`}
+              className={`px-6 py-3 font-semibold focus:outline-none ${tab === "quote"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground"
+                }`}
               onClick={() => setTab("quote")}
             >
               Request Quote
             </button>
             <button
-              className={`px-6 py-3 font-semibold focus:outline-none ${
-                tab === "downloads"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-muted-foreground"
-              }`}
+              className={`px-6 py-3 font-semibold focus:outline-none ${tab === "downloads"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground"
+                }`}
               onClick={() => setTab("downloads")}
             >
               Downloads
@@ -973,7 +976,7 @@ export default function Quotes() {
               <h4 className="text-xl font-bold mb-2">
                 {
                   insuranceIcons[
-                    "PI Proposal Form – Doctors / Medical Practitioners"
+                  "PI Proposal Form – Doctors / Medical Practitioners"
                   ]
                 }
                 PI Proposal Form – Doctors / Medical Practitioners
@@ -994,7 +997,7 @@ export default function Quotes() {
               <h4 className="text-xl font-bold mb-2">
                 {
                   insuranceIcons[
-                    "PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors"
+                  "PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS & Land Surveyors"
                   ]
                 }
                 PI Proposal Form – Insurance Agents / Solicitors / Engineers, QS
@@ -1152,7 +1155,7 @@ export default function Quotes() {
               <h4 className="text-xl font-bold mb-2">
                 {
                   insuranceIcons[
-                    "Contractors’ Plant & Machinery (CPM Write-Up)"
+                  "Contractors’ Plant & Machinery (CPM Write-Up)"
                   ]
                 }
                 Contractors’ Plant & Machinery (CPM Write-Up)
