@@ -66,17 +66,14 @@ export function AdminClaims() {
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
 
-  console.log("Claims", claims);
 
   const fetchClaims = async () => {
     try {
       setLoading(true);
-      console.log("📋 Fetching real claims data from API...");
 
       // Fetch real data from Laravel backend API
-      const url = `${
-        import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
-      }/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
+      const url = `${import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+        }/claims?page=${currentPage}&status=${statusFilter}&search=${searchTerm}`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -91,7 +88,6 @@ export function AdminClaims() {
       }
 
       const result = await response.json();
-      console.log("📋 Real claims data received:", result);
 
       if (result && result.success) {
         const claimsData = result.data?.claims || result.data || [];
@@ -127,9 +123,8 @@ export function AdminClaims() {
   const viewClaimDetails = async (claimId: number) => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL ||
-          "https://gallo-api.onrender.com/api/v1"
+        `${import.meta.env.VITE_API_URL ||
+        "https://galloways.onrender.com/api/v1"
         }/claims/${claimId}`
       );
 
@@ -162,9 +157,8 @@ export function AdminClaims() {
   const updateClaimStatus = async (claimId: number, newStatus: string) => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL ||
-          "https://gallo-api.onrender.com/api/v1"
+        `${import.meta.env.VITE_API_URL ||
+        "https://galloways.onrender.com/api/v1"
         }/claims/${claimId}/status`,
         {
           method: "PUT",

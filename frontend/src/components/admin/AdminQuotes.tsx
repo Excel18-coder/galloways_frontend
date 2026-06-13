@@ -107,7 +107,6 @@ export function AdminQuotes() {
   const fetchQuotes = async () => {
     try {
       setLoading(true);
-      console.log("📋 Fetching real quotes data from API...");
 
       // Build API URL with parameters
       const params = new URLSearchParams();
@@ -117,7 +116,6 @@ export function AdminQuotes() {
       if (searchTerm) params.append("search", searchTerm);
 
       const result = await adminService.getAllQuotes(params);
-      console.log("📋 Real quotes data received:", result);
 
       if (result.success) {
         const quotesData = result.data?.quotes || result.data || [];
@@ -241,7 +239,7 @@ export function AdminQuotes() {
   const updateQuoteStatus = async (quoteId: number, status: string) => {
     try {
       const url = `${
-        import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+        import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1"
       }/quotes/${quoteId}/status`;
 
       const response = await fetch(url, {
@@ -295,7 +293,7 @@ export function AdminQuotes() {
       try {
         const url = `${
           import.meta.env.VITE_API_URL ||
-          "https://gallo-api.onrender.com/api/v1"
+          "https://galloways.onrender.com/api/v1"
         }/quotes/${quoteId}`;
 
         await fetch(url, {
@@ -325,7 +323,6 @@ export function AdminQuotes() {
 
   const exportQuotes = async (format: "csv" | "json") => {
     try {
-      const response = await console.log("quotes", format);
       const blob = new Blob([response.data], {
         type: format === "csv" ? "text/csv" : "application/json",
       });

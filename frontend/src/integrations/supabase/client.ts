@@ -4,8 +4,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env || '';
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env. || '';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   const errorMessage = `Supabase configuration error:
@@ -13,14 +13,14 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     - VITE_SUPABASE_ANON_KEY: ${SUPABASE_PUBLISHABLE_KEY ? '✅ Set' : '❌ Missing'}
     
     Please ensure these environment variables are set in your .env file`;
-    
+
   console.error(errorMessage);
-  
+
   // In development, show detailed error
   if (import.meta.env.DEV) {
     throw new Error('Supabase configuration missing. Check your .env file.');
   }
-  
+
   // In production, continue but warn
   console.warn('Supabase credentials missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your environment.');
 }

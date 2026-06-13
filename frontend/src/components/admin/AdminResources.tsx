@@ -75,7 +75,7 @@ interface ResourceStats {
 }
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
+  import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1";
 
 const categories = [
   { value: "general", label: "General" },

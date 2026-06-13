@@ -1,6 +1,6 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1";
-const DEBUG = import.meta.env.VITE_DEBUG === "true" || true;
+  import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1";
+const DEBUG = import.meta.env.VITE_DEBUG === "true" || import.meta.env.DEV;
 
 // Types
 interface ApiResponse<T = any> {
@@ -787,7 +787,7 @@ const resourcesService = {
 
       // Create blob and trigger download
       const blob = await response.blob();
-      
+
       // Validate blob size
       if (blob.size === 0) {
         throw new Error("Downloaded file is empty. Template may be invalid.");
@@ -800,7 +800,7 @@ const resourcesService = {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       // Clean up after a delay to allow download to start
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
@@ -969,14 +969,14 @@ const adminService = {
         success: !response.error,
         data: response.error
           ? {
-              data: [],
-              pagination: {
-                totalPages: 1,
-                currentPage: 1,
-                total: 0,
-                perPage: limit,
-              },
-            }
+            data: [],
+            pagination: {
+              totalPages: 1,
+              currentPage: 1,
+              total: 0,
+              perPage: limit,
+            },
+          }
           : response.data,
         message: response.error || "Claims loaded successfully",
       };

@@ -87,13 +87,12 @@ export function AdminDashboard() {
     setConnectionStatus('connecting');
 
     try {
-      console.log('📊 Fetching real dashboard data from API...');
 
       // Fetch real data from Laravel backend API
       const [metricsRes, activitiesRes] = await Promise.all([
         fetch(
           `${
-            import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+            import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1"
           }/dashboard/comprehensive`
         )
           .then((res) => res.json())
@@ -122,7 +121,7 @@ export function AdminDashboard() {
           }),
         fetch(
           `${
-            import.meta.env.VITE_API_URL || "https://gallo-api.onrender.com/api/v1"
+            import.meta.env.VITE_API_URL || "https://galloways.onrender.com/api/v1"
           }/claims`
         )
           .then((res) => res.json())
@@ -222,7 +221,6 @@ export function AdminDashboard() {
   }, [toastHook]);
 
   const handleRealTimeUpdate = useCallback((payload: any) => {
-    console.log('Real-time update received:', payload);
 
     const updateType = payload.eventType || 'UPDATE';
     const table = payload.table || 'Unknown';
@@ -252,14 +250,12 @@ export function AdminDashboard() {
       Promise.resolve(channels).then((channelArray) => {
         if (channelArray && channelArray.length >= 0) {
           realtimeChannels.current = channelArray;
-          console.log('Real-time subscriptions established');
 
           toastHook({
             title: "Real-time Connected",
             description: "Dashboard will update automatically",
           });
         } else {
-          console.log('Real-time not available, falling back to polling');
           setRealtimeEnabled(false);
           setAutoRefresh(true);
         }
@@ -301,7 +297,6 @@ export function AdminDashboard() {
     return () => {
       if (realtimeChannels.current.length > 0) {
         try {
-          console.log(realtimeChannels.current);
         } catch (error) {
           console.warn('Error unsubscribing from real-time updates:', error);
         }

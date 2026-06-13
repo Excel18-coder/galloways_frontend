@@ -21,28 +21,7 @@ async function bootstrap() {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-  app.use(
-    (
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction,
-    ) => {
-      if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header(
-          'Access-Control-Allow-Methods',
-          'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        );
-        res.header(
-          'Access-Control-Allow-Headers',
-          'Content-Type, Accept, Authorization',
-        );
-        res.header('Access-Control-Max-Age', '86400');
-        return res.status(200).end();
-      }
-      next();
-    },
-  );
+  // NestJS built-in CORS is enabled in NestFactory.create
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -69,29 +48,12 @@ async function bootstrap() {
     }),
   );
 
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-      'Access-Control-Allow-Methods',
-      'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    );
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Accept, Authorization',
-    );
-    next();
+  // Enable CORS with proper configuration
+  app.enableCors({
+    origin: true, // Reflects the request origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   });
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
