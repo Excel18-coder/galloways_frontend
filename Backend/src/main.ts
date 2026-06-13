@@ -14,7 +14,39 @@ import { UsersModule } from './users/users.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
-    cors: true,
+  });
+
+  // Enable CORS early with proper configuration
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow all origins in development or if origin is not provided (like curl)
+      if (!origin || process.env.NODE_ENV !== 'production') {
+        callback(null, true);
+        return;
+      }
+
+      // List of allowed domains in production
+      const allowedOrigins = [
+        'https://galloways.onrender.com',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        /\.onrender\.com$/,
+      ];
+
+      const isAllowed = allowedOrigins.some((allowed) => {
+        if (allowed instanceof RegExp) return allowed.test(origin);
+        return allowed === origin;
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
 
   // Configure body parser for large file uploads
@@ -36,24 +68,21 @@ async function bootstrap() {
 
   app.use(
     helmet({
+      crossOriginResourcePolicy: false,
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.tailwindcss.com'],
-          styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-          fontSrc: ["'self'", 'cdnjs.cloudflare.com'],
-          imgSrc: ["'self'", 'data:', '*.postgresql.org', 'nestjs.com'],
+          scriptSrc: ["'self'", "'unsafe-inline'", 'cdn.tailwindcss.com', 'js.paystack.co'],
+          styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'fonts.googleapis.com'],
+          fontSrc: ["'self'", 'cdnjs.cloudflare.com', 'fonts.gstatic.com'],
+          imgSrc: ["'self'", 'data:', '*', 'res.cloudinary.com'],
+          connectSrc: ["'self'", '*', 'https://api.paystack.co'],
         },
       },
     }),
   );
 
-  // Enable CORS with proper configuration
-  app.enableCors({
-    origin: true, // Reflects the request origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+
 
   app.useGlobalFilters(new AllExceptionsFilter());
 

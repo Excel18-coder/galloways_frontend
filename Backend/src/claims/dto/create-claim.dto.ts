@@ -7,10 +7,11 @@ import {
   IsEnum,
   IsOptional,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ClaimType, Document } from '../entities/claim.entity';
 export class CreateClaimDto {
-  @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value, 10))
   policy_number: number;
 
   @IsEnum(ClaimType)
@@ -21,8 +22,8 @@ export class CreateClaimDto {
   @IsNotEmpty()
   incident_date: string;
 
-  @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => parseFloat(value))
   estimated_loss: number;
 
   @IsString()

@@ -26,6 +26,7 @@ import {
   Mail,
   MessageSquare,
   FileDown,
+  Ship,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -108,6 +109,7 @@ const insuranceIcons = {
   "Electronic Equipment Insurance": (
     <MonitorSmartphone className="inline-block mr-2 text-accent" />
   ),
+  "Marine Insurance": <Ship className="inline-block mr-2 text-accent" />,
 };
 
 // ============= CONSTANTS =============
@@ -162,11 +164,11 @@ const CONTACT_METHODS = [
 // ============= UTILITY FUNCTIONS =============
 const generateReferenceNumber = () => `GIQ-${Date.now().toString().slice(-8)}`;
 
-const collectFormData = (formElement) => {
+const collectFormData = (formElement: HTMLFormElement) => {
   const formData = new FormData();
   const inputs = formElement.querySelectorAll("input, select, textarea");
 
-  inputs.forEach((input) => {
+  inputs.forEach((input: any) => {
     if (input.name) {
       if (input.type === "checkbox") {
         formData.append(input.name, input.checked);
@@ -188,7 +190,7 @@ const collectFormData = (formElement) => {
   return formData;
 };
 
-const showToast = (title, description, variant = "default") => {
+const showToast = (title: string, description: string, variant: "default" | "destructive" = "default") => {
   console.log(`Toast: ${title} - ${description} (${variant})`);
 };
 
@@ -249,7 +251,13 @@ const PersonalInfoSection = () => (
   </div>
 );
 
-const InsuranceDetailsSection = ({ selectedProduct, onProductChange }) => (
+const InsuranceDetailsSection = ({
+  selectedProduct,
+  onProductChange
+}: {
+  selectedProduct: string;
+  onProductChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
+}) => (
   <div className="space-y-4">
     <h3 className="text-lg font-semibold border-b pb-2">
       Insurance Requirements
@@ -391,7 +399,13 @@ const FileUploadSection = () => (
   </div>
 );
 
-const SuccessMessage = ({ refNum, onReset }) => (
+const SuccessMessage = ({
+  refNum,
+  onReset
+}: {
+  refNum: string;
+  onReset: () => void
+}) => (
   <div className="max-w-2xl mx-auto text-center py-16">
     <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
     <h2 className="text-3xl font-bold text-green-800 mb-4">
@@ -427,7 +441,7 @@ export default function Quotes() {
   const [refNum, setRefNum] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleProductChange = (e) => {
+  const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProduct(e.target.value);
   };
 
@@ -442,6 +456,9 @@ export default function Quotes() {
 
     try {
       const formElement = document.querySelector("#quote-form");
+      if (!formElement || !(formElement instanceof HTMLFormElement)) {
+        throw new Error("Quote form was not found in the document.");
+      }
       const formData = collectFormData(formElement);
 
       const email = formData.get("email") as string;
@@ -469,7 +486,7 @@ export default function Quotes() {
       console.error("Form submission error:", error);
       showToast(
         "Submission Error",
-        error.message || "Failed to submit. Please try again.",
+        (error instanceof Error ? error.message : String(error)) || "Failed to submit. Please try again.",
         "destructive"
       );
     } finally {

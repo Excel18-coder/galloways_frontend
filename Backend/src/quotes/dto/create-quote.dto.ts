@@ -29,8 +29,8 @@ export class CreateQuoteDto {
   phone: string;
 
   @IsString()
-  @IsNotEmpty()
-  location: string;
+  @IsOptional()
+  location?: string;
 
   // Product Information
   @IsString()
@@ -55,8 +55,8 @@ export class CreateQuoteDto {
   budget?: string;
 
   @IsString()
-  @IsNotEmpty()
-  coverage: string;
+  @IsOptional()
+  coverage?: string;
 
   @IsString()
   @IsOptional()

@@ -66,13 +66,11 @@ export default function Consultancy() {
       const consultationData = {
         full_name: paymentData.full_name,
         phone: paymentData.phone,
-        email: (formData.get("email") as string) || "", // Add email field, fallback to empty string if not provided
-        organization: (formData.get("organization") as string) || "", // Add organization field, fallback to empty string if not provided
+        email: (formData.get("email") as string) || "",
+        organization: (formData.get("organization") as string) || "",
         consult_type: "General Consultation" as ConsultType,
-        preferred_date: paymentData.date,
-        preferred_time: paymentData.time,
-        consultationDate: paymentData.date, // Required field for ConsultationData
-        consultationTime: paymentData.time, // Required field for ConsultationData
+        date: paymentData.date,
+        time: paymentData.time,
         message: `M-PESA consultation booking - Amount: KES ${paymentData.amount}`,
         status: "PENDING",
       };
@@ -173,10 +171,8 @@ export default function Consultancy() {
         email: (formData.get("projEmail") as string) || "",
         organization: (formData.get("projOrganization") as string) || "",
         consult_type: "General Consultation" as ConsultType,
-        preferred_date: new Date().toISOString().split("T")[0],
-        preferred_time: new Date().toTimeString().split(" ")[0],
-        consultationDate: new Date().toISOString().split("T")[0], // Required field
-        consultationTime: new Date().toTimeString().split(" ")[0], // Required field
+        date: new Date().toISOString().split("T")[0],
+        time: new Date().toTimeString().split(" ")[0],
         message: formData.get("projDesc") as string,
         status: "PENDING",
       };

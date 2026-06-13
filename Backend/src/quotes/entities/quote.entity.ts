@@ -24,7 +24,7 @@ export class Quote {
   @Column({ length: 50 })
   phone: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   location: string;
 
   // Product Information
@@ -41,10 +41,10 @@ export class Quote {
   occupancy?: string;
 
   // Quote Details
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   budget: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   coverage: string;
 
   @Column({ type: 'text', nullable: true })
@@ -54,7 +54,7 @@ export class Quote {
   @Column({ length: 100 })
   contactMethod: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   bestTime: string;
 
   @Column({ type: 'text', nullable: true, default: null })

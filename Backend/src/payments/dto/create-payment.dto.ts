@@ -1,10 +1,11 @@
 import { IsNumber, IsNotEmpty, IsString, IsOptional, IsObject } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { paymentStatus } from '../entities/payment.entity';
 
 export class CreatePaymentDto {
   @IsNumber()
-  @IsNotEmpty()
-  user_id: number;
+  @IsOptional()
+  user_id?: number;
 
   @IsNumber()
   @IsNotEmpty()
@@ -15,18 +16,50 @@ export class CreatePaymentDto {
   currency?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
+  @Transform(({ value, obj }) => value || obj.paymentMethod)
   method: string;
+
+  @IsString()
+  @IsOptional()
+  paymentMethod?: string;
 
   @IsString()
   @IsOptional()
   status?: paymentStatus;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // reference: string;
-
   @IsObject()
   @IsOptional()
   metadata?: Record<string, unknown>;
+
+  @IsString()
+  @IsOptional()
+  transactionId?: string;
+
+  @IsString()
+  @IsOptional()
+  reference?: string;
+
+  @IsString()
+  @IsOptional()
+  paymentProvider?: string;
+
+  @IsString()
+  @IsOptional()
+  customerEmail?: string;
+
+  @IsString()
+  @IsOptional()
+  customerPhone?: string;
+
+  @IsString()
+  @IsOptional()
+  customerName?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  diasporaRequestId?: number;
 }

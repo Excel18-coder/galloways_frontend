@@ -15,8 +15,8 @@ export class CreateBookingConsultantDto {
     phone: string;
 
     @IsString()
-    @IsNotEmpty()
-    organization: string;
+    @IsOptional()
+    organization?: string;
 
     @IsEnum(ConsultationType)
     @IsNotEmpty()

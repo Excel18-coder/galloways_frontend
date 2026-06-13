@@ -39,19 +39,21 @@ export type ConsultType =
 interface ConsultationData {
   id?: number;
   full_name: string;
-  email: string;
+  email?: string;
   phone: string;
-  organization: string;
+  organization?: string;
   consult_type: ConsultType;
-  preferred_date: string;
-  preferred_time: string;
-  // description: string;
+  date: string;
+  time: string;
+  message?: string;
   status?: string;
-  consultationTime: string;
-  message: string;
-  consultationDate: string;
   createdAt?: string;
   updatedAt?: string;
+  // Legacy fields
+  preferred_date?: string;
+  preferred_time?: string;
+  consultationDate?: string;
+  consultationTime?: string;
 }
 
 interface OutsourcingData {
