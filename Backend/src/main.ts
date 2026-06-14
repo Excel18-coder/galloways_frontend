@@ -39,7 +39,9 @@ async function bootstrap() {
         'http://localhost:5173',
         'http://localhost:3000',
         /\.onrender\.com$/,
-        /\.vercel\.app$/,
+        'www.galloways.co.ke',
+        'https://galloways.co.ke',
+        'https://galloways-frontend.vercel.app/',
       ];
 
       const allAllowedOrigins = [...defaultAllowedOrigins, ...envAllowedOrigins];
